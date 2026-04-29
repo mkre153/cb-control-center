@@ -40,20 +40,20 @@ export const MOCK_BUSINESS_TRUTH_SCHEMA: TruthSection[] = [
     name: 'Core Offer',
     fields: [
       { id: 'co-offer', label: 'Offer', value: 'A dental membership plan that gives members access to reduced dental pricing at participating practices', status: 'confirmed' },
-      { id: 'co-decision', label: 'Decision Question', value: 'Should I join this plan now so my next visit costs less instead of paying full price out of pocket?', status: 'confirmed' },
+      { id: 'co-decision', label: 'Decision Question', value: 'Is Dental Advantage Plan available for my dental care need — and if not, should I request it near me or at my preferred dentist?', status: 'confirmed' },
       { id: 'co-activation', label: 'Activation Path', value: null, status: 'needs_confirmation' },
-      { id: 'co-exclusions', label: 'Plan Exclusions', value: null, status: 'missing' },
+      { id: 'co-exclusions', label: 'Plan Exclusions / Limitations', value: null, status: 'needs_confirmation' },
     ],
   },
   {
     id: 'pricing-savings',
     name: 'Pricing & Savings Logic',
     fields: [
-      { id: 'ps-individual', label: 'Individual Plan Price', value: null, status: 'needs_confirmation' },
-      { id: 'ps-family', label: 'Family Plan Price', value: null, status: 'needs_confirmation' },
-      { id: 'ps-savings-example', label: 'Savings Example (Patient-Facing)', value: null, status: 'needs_confirmation' },
-      { id: 'ps-discount-rate', label: 'Discount Rate or Range', value: null, status: 'missing' },
-      { id: 'ps-billing-model', label: 'Billing Model (Monthly / Annual)', value: null, status: 'missing' },
+      { id: 'ps-individual', label: 'Adult Annual Premium', value: '$450/year — confirmed, Irene Olaes DDS (source: plan PDF; brochure confirmation pending)', status: 'confirmed' },
+      { id: 'ps-family', label: 'Child Annual Premium', value: '$350/year per child age 17 and under — confirmed, Irene Olaes DDS (per member, not a family bundle)', status: 'confirmed' },
+      { id: 'ps-savings-example', label: 'Patient-Facing Savings Example', value: null, status: 'needs_confirmation' },
+      { id: 'ps-discount-rate', label: 'Discount Rate / Special Pricing', value: '25% off non-covered procedures; ClearCorrect $1,000 off; Bleaching $100 off — from plan PDF, full brochure confirmation pending', status: 'needs_confirmation' },
+      { id: 'ps-billing-model', label: 'Billing Model / Renewal Terms', value: 'Annual per member — renewal and cancellation terms not yet confirmed', status: 'needs_confirmation' },
     ],
   },
   {
@@ -72,7 +72,7 @@ export const MOCK_BUSINESS_TRUTH_SCHEMA: TruthSection[] = [
       { id: 'tp-no-claims', label: 'No Insurance Claims Required', value: 'Confirmed — no claims process', status: 'confirmed' },
       { id: 'tp-no-waiting', label: 'No Waiting Period', value: 'Confirmed — use plan immediately', status: 'confirmed' },
       { id: 'tp-testimonials', label: 'Patient Testimonials', value: null, status: 'missing' },
-      { id: 'tp-savings-proof', label: 'Verified Savings Examples', value: null, status: 'blocked' },
+      { id: 'tp-savings-proof', label: 'Verified Savings Examples', value: null, status: 'needs_confirmation' },
     ],
   },
   {
@@ -82,12 +82,12 @@ export const MOCK_BUSINESS_TRUTH_SCHEMA: TruthSection[] = [
       { id: 'dl-trigger', label: 'Primary Purchase Trigger', value: 'Upcoming dental visit without insurance coverage', status: 'confirmed' },
       { id: 'dl-objection', label: 'Primary Objection', value: null, status: 'needs_confirmation' },
       { id: 'dl-urgency', label: 'Urgency Signal', value: null, status: 'needs_confirmation' },
-      { id: 'dl-comparison', label: 'Key Comparison (Plan vs. Insurance)', value: null, status: 'blocked' },
+      { id: 'dl-comparison', label: 'Key Comparison (Plan vs. Insurance)', value: null, status: 'needs_confirmation' },
     ],
   },
 ]
 
-// 27 fields: 10 confirmed, 11 needs_confirmation, 4 missing, 2 blocked
+// 27 fields: 12 confirmed, 14 needs_confirmation, 1 missing, 0 blocked → 44% readiness
 function schemaReadiness(schema: TruthSection[]): number {
   const total = schema.reduce((n, s) => n + s.fields.length, 0)
   const confirmed = schema.reduce((n, s) => n + s.fields.filter(f => f.status === 'confirmed').length, 0)
@@ -103,18 +103,18 @@ export const MOCK_BUSINESS: BusinessRecord = {
   currentStage: 'Business Truth JSON',
   overallReadiness: schemaReadiness(MOCK_BUSINESS_TRUTH_SCHEMA),
   primaryDecision:
-    'Should I join this plan now so my next dental visit costs less instead of paying full price out of pocket?',
+    'Is Dental Advantage Plan available for my dental care need — and if not, should I request it near me or at my preferred dentist?',
 }
 
 export const MOCK_CURRENT_COMMAND: CurrentCommand = {
   stage: 'Business Truth JSON',
   status: 'blocked',
-  primaryBlocker: 'Pricing model is not yet normalized into patient-facing plan logic.',
+  primaryBlocker: 'Plan terms and network availability must be confirmed before decision pages or patient-facing copy can be finalized.',
   whyItMatters:
-    'Core 30 pages cannot be generated safely until pricing, savings logic, included benefits, and activation path are represented as structured truth.',
-  wrongNextMove: 'Do not generate Core 30 or AI-search pages from crawl copy alone.',
+    'Pricing is partially confirmed from the Irene Olaes plan PDF, but the full brochure, exclusions, activation timing, and renewal terms are unconfirmed. Network availability is confirmed for only one practice — the system must not imply broader coverage.',
+  wrongNextMove: 'Do not generate Core 30 pages, claim DAP is broadly available, or imply coverage beyond confirmed participating practices.',
   correctNextAction:
-    'Normalize DAP pricing, benefits, savings logic, practice availability, and activation path into Business Truth JSON.',
+    'Confirm the current plan brochure with Irene Olaes DDS. Establish the full participating practice list. Define the unavailable-area user path (request/waitlist flow).',
   stageLocked: false,
 }
 
@@ -234,7 +234,7 @@ export const MOCK_BUSINESS_TRUTH: BusinessTruthRecord = {
   primary_problem: 'Patients delay care or pay full price out of pocket because they do not have insurance',
   offer: 'A dental membership plan that gives members access to reduced dental pricing at participating practices',
   decision_question:
-    'Should I join this plan now so my next visit costs less instead of paying full price out of pocket?',
+    'Is Dental Advantage Plan available for my dental care need — and if not, should I request it near me or at my preferred dentist?',
   pricing_status: 'Needs confirmation',
   trust_signals: [
     'No insurance claims',
@@ -280,7 +280,7 @@ export const MOCK_STRATEGY: StrategyRecord = {
   storybrandStatus: 'Not Started',
   decisionStatus: 'Draft',
   currentDecisionQuestion:
-    'Should I join this plan now so my next visit costs less instead of paying full price out of pocket?',
+    'Is Dental Advantage Plan available for my dental care need — and if not, should I request it near me or at my preferred dentist?',
   positioningAngle: 'No insurance? Start here.',
   homepageGoal:
     'Help patients decide whether joining the plan now is better than paying full price at their next visit.',
@@ -315,77 +315,85 @@ export const MOCK_ACTIVITY: ActivityEvent[] = [
 export const MOCK_ENRICHED_BLOCKERS: EnrichedBlocker[] = [
   {
     id: 'eb-001',
-    title: 'Plan pricing is not confirmed',
+    title: 'Plan terms need final confirmation',
     severity: 'high',
     relatedSection: 'Pricing & Savings Logic',
-    affectedFields: ['Individual Plan Price', 'Family Plan Price', 'Savings Example', 'Discount Rate', 'Billing Model'],
-    description: 'Exact membership plan prices have not been confirmed. The crawl contains pricing language but the source values are unverified.',
-    whyItMatters: 'Savings claims, decision pages, and Core 30 page copy all depend on accurate pricing. Generating pages before this is confirmed risks publishing false claims.',
+    affectedFields: ['Patient-Facing Savings Example', 'Discount Rate / Special Pricing', 'Billing Model / Renewal Terms', 'Plan Exclusions / Limitations'],
+    description: 'The plan PDF provides pricing for Irene Olaes DDS ($450 adult / $350 child, 25% discount). However, the full brochure, exclusion language, activation timing, and renewal/cancellation terms have not been confirmed. The system must not make final savings claims until the current practice-approved brochure is confirmed.',
+    whyItMatters: 'Generating savings copy or decision pages from partial plan terms risks publishing inaccurate claims. The PDF may not reflect the current effective version. Exclusion language and activation rules materially affect the patient decision.',
     requiredEvidence: [
-      'Confirmed individual plan price (e.g., $X/month or $X/year)',
-      'Confirmed family plan price if applicable',
-      'At least one verified patient-facing savings example',
+      'Current approved plan brochure (with effective date)',
+      'Confirmation from Irene Olaes DDS that the PDF terms are still current',
+      'Full exclusion and limitation language',
+      'Activation timing — can patient use the plan immediately at enrollment?',
+      'Renewal and cancellation terms',
     ],
     resolutionOptions: [
-      { type: 'confirm', label: 'Confirm pricing and enter values' },
-      { type: 'defer', label: 'Defer — mark as pending and continue with placeholder copy' },
+      { type: 'confirm', label: 'Confirm current brochure and enter confirmed terms' },
+      { type: 'defer', label: 'Defer — publish with PDF-sourced terms and disclaimer pending confirmation' },
     ],
-    gateCondition: 'All Pricing & Savings Logic fields must reach "confirmed" status before Business Truth JSON can be finalized.',
+    gateCondition: 'Pricing & Savings Logic fields with confirmed or explicitly deferred status before savings copy, patient-facing examples, and decision pages can be finalized.',
     downstreamUnlockImpact: [
-      'Business Truth JSON → Finalized',
-      'StoryBrand Diagnosis → Unlocked',
-      'Core 30 Pages → Unlocked',
-      'Decision Pages → Savings claim copy unblocked',
+      'Patient-Facing Savings Example → Unlocked',
+      'Plan vs. Insurance comparison copy → Unlocked',
+      'Core 30 page briefs → Pricing inputs confirmed',
+      'Decision pages → Final copy unblocked',
     ],
     resolutionStatus: 'open',
   },
   {
     id: 'eb-002',
-    title: 'Participating practice data needs validation',
-    severity: 'medium',
+    title: 'Network availability not confirmed',
+    severity: 'high',
     relatedSection: 'Practice Availability',
-    affectedFields: ['Number of Participating Practices', 'Practice Locations', 'Practice Data Source of Truth'],
-    description: 'The number and locations of participating dental practices have not been validated against a confirmed source of truth.',
-    whyItMatters: 'Location-based AI search pages (e.g., "dental savings plan near me") require accurate practice coverage data. Incorrect availability claims undermine trust.',
+    affectedFields: ['Number of Participating Practices', 'Practice Locations / Geographic Coverage', 'Practice Data Source of Truth'],
+    description: 'DAP is currently confirmed for exactly one participating practice — Irene Olaes DDS. The system must not imply that other San Diego dentists accept or offer the plan. The decision engine cannot route users to a confirmed provider without a validated practice list.',
+    whyItMatters: 'The primary user journey depends on whether DAP is available at or near the patient\'s preferred provider. Without a confirmed practice list, routing users to unavailable coverage destroys trust and produces a dead end. Language implying broad availability ("San Diego dentists," "dentists near you") is false until the network is confirmed.',
     requiredEvidence: [
-      'Confirmed count of participating practices',
-      'Geographic coverage area or list of locations',
-      'Identified source of truth for practice data (database, spreadsheet, or API)',
+      'Full list of participating practices with acceptance status',
+      'Geographic coverage — ZIP codes or cities where DAP is active',
+      'Source of truth for practice data (CRM, portal, or database)',
+      'Clarity on whether non-participating dentists can be solicited to join',
+      'Whether all participating practices use the same plan terms ($450/$350)',
     ],
     resolutionOptions: [
-      { type: 'confirm', label: 'Confirm practice count and coverage area' },
-      { type: 'defer', label: 'Defer — generate pages without location-specific claims' },
+      { type: 'confirm', label: 'Confirm full practice list and coverage area' },
+      { type: 'defer', label: 'Defer — scope messaging to "currently available at select practices" and launch with Olaes only' },
     ],
-    gateCondition: 'Practice Availability section must be confirmed or explicitly deferred before location-based page variants can be generated.',
+    gateCondition: 'Practice Availability must be confirmed or explicitly scoped before location-based pages, ZIP routing logic, and any network availability claims can be generated.',
     downstreamUnlockImpact: [
-      'Location pages → Unlocked',
-      '"Near me" query variants → Unlocked',
-      'Practice finder feature → Data source established',
+      'Location pages ("near me" variants) → Unlocked',
+      'ZIP search routing → Implementable',
+      'Unavailable-area user path → Can be designed',
+      'Network size claims → Safe to include in copy',
     ],
     resolutionStatus: 'open',
   },
   {
     id: 'eb-003',
-    title: 'Primary decision question not locked',
+    title: 'Unavailable-area user path not finalized',
     severity: 'medium',
     relatedSection: 'Decision Logic',
-    affectedFields: ['Primary Objection', 'Urgency Signal', 'Key Comparison'],
-    description: 'The decision question has a draft but the full decision logic section — objection, urgency signal, and plan vs. insurance comparison — is incomplete.',
-    whyItMatters: 'The homepage hero, StoryBrand diagnosis, and all decision-layer pages derive from the locked decision question and supporting logic. A draft decision question produces inconsistent messaging.',
+    affectedFields: ['Primary Objection', 'Urgency Signal', 'Key Comparison (Plan vs. Insurance)'],
+    description: 'When a user searches a ZIP, city, or preferred dentist where DAP is not available, the system has no confirmed honest next step. The current decision model assumes availability. Without a request/waitlist path, users in uncovered areas hit a dead end — or worse, are silently routed past a coverage gap.',
+    whyItMatters: 'Sending a patient down a "join now" path when DAP is not available in their area destroys trust and produces a zero-conversion dead end. The request/waitlist path, consent language for contacting preferred dentists, and user messaging for "not yet available near you" must be finalized before launch.',
     requiredEvidence: [
-      'Confirmed primary patient objection (e.g., "Is this worth it if I only go once a year?")',
-      'Identified urgency signal (e.g., "Upcoming appointment without coverage")',
-      'Confirmed key comparison angle (plan vs. insurance)',
+      'Approved request or waitlist flow design',
+      'Consent language for contacting the patient\'s preferred dentist',
+      'User-facing message for "DAP not yet available near you"',
+      'Practice recruitment workflow and expected timeline',
+      'Follow-up expectation for patients who submit a request',
     ],
     resolutionOptions: [
-      { type: 'confirm', label: 'Confirm decision logic fields' },
-      { type: 'defer', label: 'Defer — lock decision question only, mark logic fields as pending' },
+      { type: 'confirm', label: 'Define and confirm unavailable-area path' },
+      { type: 'defer', label: 'Defer — suppress search results in uncovered areas with a "coming soon" message until path is finalized' },
     ],
-    gateCondition: 'Decision question must be locked and at least one supporting logic field confirmed before StoryBrand Diagnosis can begin.',
+    gateCondition: 'Decision Logic must include a confirmed or explicitly deferred unavailable-area path before the system is safe to use with real users outside confirmed coverage areas.',
     downstreamUnlockImpact: [
-      'StoryBrand Diagnosis → Decision question locked as input',
-      'Homepage hero copy → Unlocked',
-      'Decision pages → Primary message confirmed',
+      'ZIP search results → Safe for launch in all areas',
+      'Request/waitlist flow → Designed and copywritten',
+      'Decision pages → Both available and unavailable branches complete',
+      'StoryBrand Diagnosis → Full conditional decision logic confirmed',
     ],
     resolutionStatus: 'open',
   },

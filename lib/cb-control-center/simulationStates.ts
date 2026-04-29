@@ -81,14 +81,13 @@ const s1Stages = buildStages({}) // same as MOCK_PIPELINE_STAGES
 // Pricing & Savings Logic fields confirmed. BT JSON in progress, not yet locked.
 // Blocked fields move to needs_confirmation. Decision Logic still incomplete.
 
+// ps-individual and ps-family are already confirmed in the base schema (from plan PDF).
+// State 2 confirms the remaining Pricing & Savings Logic fields and plan brochure.
 const s2Schema = patchSchema(MOCK_BUSINESS_TRUTH_SCHEMA, {
-  'ps-individual':      { status: 'confirmed', value: '$49/year individual' },
-  'ps-family':          { status: 'confirmed', value: '$89/year family (up to 4 members)' },
-  'ps-savings-example': { status: 'confirmed', value: 'Save ~$200 on a standard crown vs. paying full price' },
-  'ps-discount-rate':   { status: 'confirmed', value: '20–40% off standard rates at participating practices' },
-  'ps-billing-model':   { status: 'confirmed', value: 'Annual membership, paid upfront' },
-  'tp-savings-proof':   { status: 'needs_confirmation' },
-  'dl-comparison':      { status: 'needs_confirmation' },
+  'ps-savings-example': { status: 'confirmed', value: 'Preventive care alone (2 cleanings, exams, X-rays) valued ~$400–$500 — covered 100% at $450/year. Any crown or filling at 25% off.' },
+  'ps-discount-rate':   { status: 'confirmed', value: '25% off all non-covered procedures; ClearCorrect $1,000 off; Bleaching $100 off — confirmed via current plan brochure' },
+  'ps-billing-model':   { status: 'confirmed', value: 'Annual per member — $450 adult / $350 child. Immediate activation. No auto-renewal; cancellation allowed at renewal date.' },
+  'co-exclusions':      { status: 'confirmed', value: 'Orthodontic treatment not included. Implants not included. See plan brochure for full exclusion list.' },
 })
 const s2Blockers = resolveBlockers(s1Blockers, 'eb-001')
 const s2Stages = buildStages({
@@ -104,8 +103,8 @@ const s3Schema = patchSchema(s2Schema, {
   'pa-count':       { status: 'confirmed', value: '14 participating practices' },
   'pa-locations':   { status: 'confirmed', value: 'Central Texas — Austin, Round Rock, Cedar Park' },
   'pa-source':      { status: 'confirmed', value: 'Practice partner database maintained by DAP operations team' },
-  'tp-savings-proof':{ status: 'confirmed', value: 'Avg patient saves $180 on a crown (confirmed across 3 partner practice examples)' },
-  'dl-comparison':  { status: 'confirmed', value: 'Membership pays off after 1–2 visits; insurance premiums require 6–12 months to break even' },
+  'tp-savings-proof':{ status: 'confirmed', value: '2 cleanings + exams + X-rays retail ~$400–$550 — covered fully at $450/year. Patient recoups plan cost on first preventive visit.' },
+  'dl-comparison':  { status: 'confirmed', value: '$450/year vs $600–$1,200/year dental insurance premiums, with waiting periods, deductibles, and claim limits. Plan activates immediately; no annual maximum.' },
   'dl-objection':   { status: 'confirmed', value: "Is this worth it if I only go to the dentist once a year?" },
   'dl-urgency':     { status: 'confirmed', value: 'Upcoming appointment scheduled without coverage' },
   'co-exclusions':  { status: 'needs_confirmation' },
@@ -202,12 +201,12 @@ export const SIMULATION_STATES: Record<SimulationStateId, SimulationSnapshot> = 
     command: {
       stage: 'Business Truth JSON',
       status: 'blocked',
-      primaryBlocker: 'Pricing & Savings Logic is not confirmed.',
+      primaryBlocker: 'Plan terms and network availability must be confirmed before decision pages or patient-facing copy can be finalized.',
       whyItMatters:
-        'Business Truth JSON cannot be finalized until pricing, savings logic, and decision fields are confirmed. Downstream stages remain locked.',
-      wrongNextMove: 'Do not generate Core 30 or AI-search pages from crawl copy alone.',
+        'Pricing is partially confirmed from the Irene Olaes plan PDF, but the full brochure, exclusions, and renewal terms are unconfirmed. Network availability is confirmed for one practice only — the system must not imply broader coverage.',
+      wrongNextMove: 'Do not generate Core 30 pages, claim DAP is broadly available, or imply coverage beyond confirmed participating practices.',
       correctNextAction:
-        'Resolve the Pricing blocker. Confirm all Pricing & Savings Logic fields in the Business Truth JSON tab.',
+        'Confirm current plan brochure with Irene Olaes DDS. Establish the full participating practice list. Define the unavailable-area user path.',
       stageLocked: false,
     },
     schema: s1Schema,
@@ -217,17 +216,17 @@ export const SIMULATION_STATES: Record<SimulationStateId, SimulationSnapshot> = 
 
   pricing_resolved: {
     id: 'pricing_resolved',
-    label: 'Pricing Resolved',
+    label: 'Plan Terms Confirmed',
     stages: s2Stages,
     command: {
       stage: 'Business Truth JSON',
       status: 'in_progress',
-      primaryBlocker: 'Decision Logic needs final confirmation before Business Truth JSON can be locked.',
+      primaryBlocker: 'Network availability and unavailable-area user path still need confirmation before Business Truth JSON can be locked.',
       whyItMatters:
-        'Pricing is resolved but Business Truth JSON is not yet locked. Strategy and pages remain blocked until the record is finalized.',
-      wrongNextMove: 'Do not advance to StoryBrand Diagnosis with an unfinalized Business Truth JSON.',
+        'Plan terms are confirmed. Network availability (practice list and coverage) and the unavailable-area path must be confirmed before the decision model is complete and pages can be generated safely.',
+      wrongNextMove: 'Do not advance to StoryBrand Diagnosis or generate pages until network availability is confirmed or explicitly scoped.',
       correctNextAction:
-        'Confirm Decision Logic fields (objection, urgency, comparison) and lock Business Truth JSON.',
+        'Confirm participating practice list and coverage area. Define the unavailable-area user path. Lock Business Truth JSON.',
       stageLocked: false,
     },
     schema: s2Schema,
