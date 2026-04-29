@@ -9,6 +9,8 @@ import type {
   PagePlanItem,
   ActivityEvent,
   InitialInput,
+  TruthSection,
+  EnrichedBlocker,
 } from './types'
 
 export const MOCK_BUSINESS: BusinessRecord = {
@@ -222,4 +224,155 @@ export const MOCK_ACTIVITY: ActivityEvent[] = [
   { timestamp: 'Today 9:15 AM', description: 'Business Truth JSON draft created' },
   { timestamp: 'Today 9:18 AM', description: 'Pricing blocker detected — pipeline paused at Business Truth JSON' },
   { timestamp: 'Today 9:22 AM', description: 'Pipeline status set to Blocked' },
+]
+
+export const MOCK_BUSINESS_TRUTH_SCHEMA: TruthSection[] = [
+  {
+    id: 'business-identity',
+    name: 'Business Identity',
+    fields: [
+      { id: 'bi-name', label: 'Business Name', value: 'Dental Advantage Plan', status: 'confirmed' },
+      { id: 'bi-category', label: 'Category', value: 'Dental membership plan', status: 'confirmed' },
+      { id: 'bi-website', label: 'Source Website', value: 'https://dentaladvantageplan.vercel.app', status: 'confirmed' },
+    ],
+  },
+  {
+    id: 'audience',
+    name: 'Audience',
+    fields: [
+      { id: 'au-primary', label: 'Primary Customer', value: 'Patients without dental insurance who need affordable dental care', status: 'confirmed' },
+      { id: 'au-problem', label: 'Primary Problem', value: 'Patients delay care or pay full price out of pocket because they do not have insurance', status: 'confirmed' },
+      { id: 'au-segment', label: 'Secondary Segment', value: null, status: 'needs_confirmation' },
+      { id: 'au-geography', label: 'Geographic Scope', value: null, status: 'needs_confirmation' },
+    ],
+  },
+  {
+    id: 'core-offer',
+    name: 'Core Offer',
+    fields: [
+      { id: 'co-offer', label: 'Offer', value: 'A dental membership plan that gives members access to reduced dental pricing at participating practices', status: 'confirmed' },
+      { id: 'co-decision', label: 'Decision Question', value: 'Should I join this plan now so my next visit costs less instead of paying full price out of pocket?', status: 'confirmed' },
+      { id: 'co-activation', label: 'Activation Path', value: null, status: 'needs_confirmation' },
+      { id: 'co-exclusions', label: 'Plan Exclusions', value: null, status: 'missing' },
+    ],
+  },
+  {
+    id: 'pricing-savings',
+    name: 'Pricing & Savings Logic',
+    fields: [
+      { id: 'ps-individual', label: 'Individual Plan Price', value: null, status: 'needs_confirmation' },
+      { id: 'ps-family', label: 'Family Plan Price', value: null, status: 'needs_confirmation' },
+      { id: 'ps-savings-example', label: 'Savings Example (Patient-Facing)', value: null, status: 'needs_confirmation' },
+      { id: 'ps-discount-rate', label: 'Discount Rate or Range', value: null, status: 'missing' },
+      { id: 'ps-billing-model', label: 'Billing Model (Monthly / Annual)', value: null, status: 'missing' },
+    ],
+  },
+  {
+    id: 'practice-availability',
+    name: 'Practice Availability',
+    fields: [
+      { id: 'pa-count', label: 'Number of Participating Practices', value: null, status: 'needs_confirmation' },
+      { id: 'pa-locations', label: 'Practice Locations / Geographic Coverage', value: null, status: 'needs_confirmation' },
+      { id: 'pa-source', label: 'Practice Data Source of Truth', value: null, status: 'needs_confirmation' },
+    ],
+  },
+  {
+    id: 'trust-proof',
+    name: 'Trust & Proof',
+    fields: [
+      { id: 'tp-no-claims', label: 'No Insurance Claims Required', value: 'Confirmed — no claims process', status: 'confirmed' },
+      { id: 'tp-no-waiting', label: 'No Waiting Period', value: 'Confirmed — use plan immediately', status: 'confirmed' },
+      { id: 'tp-testimonials', label: 'Patient Testimonials', value: null, status: 'missing' },
+      { id: 'tp-savings-proof', label: 'Verified Savings Examples', value: null, status: 'blocked' },
+    ],
+  },
+  {
+    id: 'decision-logic',
+    name: 'Decision Logic',
+    fields: [
+      { id: 'dl-trigger', label: 'Primary Purchase Trigger', value: 'Upcoming dental visit without insurance coverage', status: 'confirmed' },
+      { id: 'dl-objection', label: 'Primary Objection', value: null, status: 'needs_confirmation' },
+      { id: 'dl-urgency', label: 'Urgency Signal', value: null, status: 'needs_confirmation' },
+      { id: 'dl-comparison', label: 'Key Comparison (Plan vs. Insurance)', value: null, status: 'blocked' },
+    ],
+  },
+]
+
+export const MOCK_ENRICHED_BLOCKERS: EnrichedBlocker[] = [
+  {
+    id: 'eb-001',
+    title: 'Plan pricing is not confirmed',
+    severity: 'high',
+    relatedSection: 'Pricing & Savings Logic',
+    affectedFields: ['Individual Plan Price', 'Family Plan Price', 'Savings Example', 'Discount Rate', 'Billing Model'],
+    description: 'Exact membership plan prices have not been confirmed. The crawl contains pricing language but the source values are unverified.',
+    whyItMatters: 'Savings claims, decision pages, and Core 30 page copy all depend on accurate pricing. Generating pages before this is confirmed risks publishing false claims.',
+    requiredEvidence: [
+      'Confirmed individual plan price (e.g., $X/month or $X/year)',
+      'Confirmed family plan price if applicable',
+      'At least one verified patient-facing savings example',
+    ],
+    resolutionOptions: [
+      { type: 'confirm', label: 'Confirm pricing and enter values' },
+      { type: 'defer', label: 'Defer — mark as pending and continue with placeholder copy' },
+    ],
+    gateCondition: 'All Pricing & Savings Logic fields must reach "confirmed" status before Business Truth JSON can be finalized.',
+    downstreamUnlockImpact: [
+      'Business Truth JSON → Finalized',
+      'StoryBrand Diagnosis → Unlocked',
+      'Core 30 Pages → Unlocked',
+      'Decision Pages → Savings claim copy unblocked',
+    ],
+    resolutionStatus: 'open',
+  },
+  {
+    id: 'eb-002',
+    title: 'Participating practice data needs validation',
+    severity: 'medium',
+    relatedSection: 'Practice Availability',
+    affectedFields: ['Number of Participating Practices', 'Practice Locations', 'Practice Data Source of Truth'],
+    description: 'The number and locations of participating dental practices have not been validated against a confirmed source of truth.',
+    whyItMatters: 'Location-based AI search pages (e.g., "dental savings plan near me") require accurate practice coverage data. Incorrect availability claims undermine trust.',
+    requiredEvidence: [
+      'Confirmed count of participating practices',
+      'Geographic coverage area or list of locations',
+      'Identified source of truth for practice data (database, spreadsheet, or API)',
+    ],
+    resolutionOptions: [
+      { type: 'confirm', label: 'Confirm practice count and coverage area' },
+      { type: 'defer', label: 'Defer — generate pages without location-specific claims' },
+    ],
+    gateCondition: 'Practice Availability section must be confirmed or explicitly deferred before location-based page variants can be generated.',
+    downstreamUnlockImpact: [
+      'Location pages → Unlocked',
+      '"Near me" query variants → Unlocked',
+      'Practice finder feature → Data source established',
+    ],
+    resolutionStatus: 'open',
+  },
+  {
+    id: 'eb-003',
+    title: 'Primary decision question not locked',
+    severity: 'medium',
+    relatedSection: 'Decision Logic',
+    affectedFields: ['Primary Objection', 'Urgency Signal', 'Key Comparison'],
+    description: 'The decision question has a draft but the full decision logic section — objection, urgency signal, and plan vs. insurance comparison — is incomplete.',
+    whyItMatters: 'The homepage hero, StoryBrand diagnosis, and all decision-layer pages derive from the locked decision question and supporting logic. A draft decision question produces inconsistent messaging.',
+    requiredEvidence: [
+      'Confirmed primary patient objection (e.g., "Is this worth it if I only go once a year?")',
+      'Identified urgency signal (e.g., "Upcoming appointment without coverage")',
+      'Confirmed key comparison angle (plan vs. insurance)',
+    ],
+    resolutionOptions: [
+      { type: 'confirm', label: 'Confirm decision logic fields' },
+      { type: 'defer', label: 'Defer — lock decision question only, mark logic fields as pending' },
+    ],
+    gateCondition: 'Decision question must be locked and at least one supporting logic field confirmed before StoryBrand Diagnosis can begin.',
+    downstreamUnlockImpact: [
+      'StoryBrand Diagnosis → Decision question locked as input',
+      'Homepage hero copy → Unlocked',
+      'Decision pages → Primary message confirmed',
+    ],
+    resolutionStatus: 'open',
+  },
 ]

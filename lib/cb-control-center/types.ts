@@ -104,3 +104,42 @@ export interface InitialInput {
   seedCustomerDecision: string
   inputStatus: InputStatus
 }
+
+// v0.2 — Business Truth schema model
+
+export type FieldStatus = "confirmed" | "needs_confirmation" | "missing" | "blocked"
+export type ResolutionType = "confirm" | "reject" | "defer"
+export type BlockerResolutionStatus = "open" | "resolved"
+
+export interface TruthField {
+  id: string
+  label: string
+  value: string | null
+  status: FieldStatus
+}
+
+export interface TruthSection {
+  id: string
+  name: string
+  fields: TruthField[]
+}
+
+export interface ResolutionOption {
+  type: ResolutionType
+  label: string
+}
+
+export interface EnrichedBlocker {
+  id: string
+  title: string
+  severity: BlockerSeverity
+  relatedSection: string
+  affectedFields: string[]
+  description: string
+  whyItMatters: string
+  requiredEvidence: string[]
+  resolutionOptions: ResolutionOption[]
+  gateCondition: string
+  downstreamUnlockImpact: string[]
+  resolutionStatus: BlockerResolutionStatus
+}

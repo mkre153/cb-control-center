@@ -9,8 +9,8 @@ import { PagesTab } from './tabs/PagesTab'
 import { ActivityTab } from './tabs/ActivityTab'
 import type {
   CrawlOutput,
-  PipelineBlocker,
-  BusinessTruthRecord,
+  EnrichedBlocker,
+  TruthSection,
   StrategyRecord,
   PagePlanItem,
   ActivityEvent,
@@ -20,8 +20,8 @@ type TabId = 'crawl-output' | 'business-truth-json' | 'blockers' | 'strategy' | 
 
 interface ControlCenterTabsProps {
   crawlOutput: CrawlOutput
-  businessTruth: BusinessTruthRecord
-  blockers: PipelineBlocker[]
+  businessTruthSchema: TruthSection[]
+  blockers: EnrichedBlocker[]
   strategy: StrategyRecord
   pages: PagePlanItem[]
   activity: ActivityEvent[]
@@ -29,7 +29,7 @@ interface ControlCenterTabsProps {
 
 export function ControlCenterTabs({
   crawlOutput,
-  businessTruth,
+  businessTruthSchema,
   blockers,
   strategy,
   pages,
@@ -37,10 +37,12 @@ export function ControlCenterTabs({
 }: ControlCenterTabsProps) {
   const [activeTab, setActiveTab] = useState<TabId>('crawl-output')
 
+  const openBlockerCount = blockers.filter(b => b.resolutionStatus === 'open').length
+
   const tabs: { id: TabId; label: string }[] = [
     { id: 'crawl-output', label: 'Crawl Output' },
     { id: 'business-truth-json', label: 'Business Truth JSON' },
-    { id: 'blockers', label: `Blockers (${blockers.length})` },
+    { id: 'blockers', label: `Blockers (${openBlockerCount})` },
     { id: 'strategy', label: 'Strategy' },
     { id: 'pages', label: 'Pages' },
     { id: 'activity', label: 'Activity' },
@@ -66,7 +68,7 @@ export function ControlCenterTabs({
 
       <div>
         {activeTab === 'crawl-output' && <CrawlOutputTab crawlOutput={crawlOutput} />}
-        {activeTab === 'business-truth-json' && <BusinessTruthTab businessTruth={businessTruth} />}
+        {activeTab === 'business-truth-json' && <BusinessTruthTab schema={businessTruthSchema} />}
         {activeTab === 'blockers' && <BlockersTab blockers={blockers} />}
         {activeTab === 'strategy' && <StrategyTab strategy={strategy} />}
         {activeTab === 'pages' && <PagesTab pages={pages} />}

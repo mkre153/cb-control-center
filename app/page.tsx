@@ -12,8 +12,8 @@ import {
   MOCK_CURRENT_COMMAND,
   MOCK_PIPELINE_STAGES,
   MOCK_CRAWL_OUTPUT,
-  MOCK_BUSINESS_TRUTH,
-  MOCK_BLOCKERS,
+  MOCK_BUSINESS_TRUTH_SCHEMA,
+  MOCK_ENRICHED_BLOCKERS,
   MOCK_STRATEGY,
   MOCK_PAGES,
   MOCK_ACTIVITY,
@@ -35,8 +35,8 @@ export default function CBControlCenterPage() {
         />
         <ControlCenterTabs
           crawlOutput={MOCK_CRAWL_OUTPUT}
-          businessTruth={MOCK_BUSINESS_TRUTH}
-          blockers={MOCK_BLOCKERS}
+          businessTruthSchema={MOCK_BUSINESS_TRUTH_SCHEMA}
+          blockers={MOCK_ENRICHED_BLOCKERS}
           strategy={MOCK_STRATEGY}
           pages={MOCK_PAGES}
           activity={MOCK_ACTIVITY}
