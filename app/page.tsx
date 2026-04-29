@@ -1,5 +1,6 @@
 import { MockModeBanner } from '@/components/cb-control-center/MockModeBanner'
 import { ControlCenterHeader } from '@/components/cb-control-center/ControlCenterHeader'
+import { InitialInputCard } from '@/components/cb-control-center/InitialInputCard'
 import { BusinessSummaryCard } from '@/components/cb-control-center/BusinessSummaryCard'
 import { PipelineRuleStrip } from '@/components/cb-control-center/PipelineRuleStrip'
 import { CurrentCommandCard } from '@/components/cb-control-center/CurrentCommandCard'
@@ -7,6 +8,7 @@ import { PipelineStageGrid } from '@/components/cb-control-center/PipelineStageG
 import { ControlCenterTabs } from '@/components/cb-control-center/ControlCenterTabs'
 import {
   MOCK_BUSINESS,
+  MOCK_INITIAL_INPUT,
   MOCK_CURRENT_COMMAND,
   MOCK_PIPELINE_STAGES,
   MOCK_CRAWL_OUTPUT,
@@ -23,6 +25,7 @@ export default function CBControlCenterPage() {
       <div className="max-w-7xl mx-auto px-6 py-6 space-y-5">
         <MockModeBanner />
         <ControlCenterHeader />
+        <InitialInputCard input={MOCK_INITIAL_INPUT} />
         <BusinessSummaryCard business={MOCK_BUSINESS} />
         <PipelineRuleStrip />
         <CurrentCommandCard command={MOCK_CURRENT_COMMAND} />

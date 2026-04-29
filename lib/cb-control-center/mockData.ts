@@ -8,12 +8,13 @@ import type {
   StrategyRecord,
   PagePlanItem,
   ActivityEvent,
+  InitialInput,
 } from './types'
 
 export const MOCK_BUSINESS: BusinessRecord = {
   id: 'dap',
   name: 'Dental Advantage Plan',
-  websiteUrl: 'https://dentaladvantageplan.com',
+  websiteUrl: 'https://dentaladvantageplan.vercel.app',
   category: 'Dental Membership Plan',
   pipelineStatus: 'In Progress',
   currentStage: 'Business Truth JSON',
@@ -205,6 +206,16 @@ export const MOCK_PAGES: PagePlanItem[] = [
   { title: 'Affordable dental care without insurance', status: 'Not Ready', reason: 'Business Truth JSON not validated' },
   { title: 'How dental membership plans work', status: 'Not Ready', reason: 'Business Truth JSON not validated' },
 ]
+
+export const MOCK_INITIAL_INPUT: InitialInput = {
+  businessName: 'Dental Advantage Plan',
+  sourceWebsite: 'https://dentaladvantageplan.vercel.app',
+  businessType: 'Dental Membership Plan',
+  pipelineGoal: 'Create an AI-search-ready business truth record and Core 30 page system.',
+  seedCustomerDecision:
+    'Should I join this plan now so my next dental visit costs less instead of paying full price out of pocket?',
+  inputStatus: 'accepted',
+}
 
 export const MOCK_ACTIVITY: ActivityEvent[] = [
   { timestamp: 'Today 9:12 AM', description: 'Site crawl completed for Dental Advantage Plan' },

@@ -93,3 +93,14 @@ export interface ActivityEvent {
   timestamp: string
   description: string
 }
+
+export type InputStatus = "accepted" | "needs_review" | "rejected"
+
+export interface InitialInput {
+  businessName: string
+  sourceWebsite: string
+  businessType: string
+  pipelineGoal: string
+  seedCustomerDecision: string
+  inputStatus: InputStatus
+}
