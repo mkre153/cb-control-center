@@ -13,6 +13,87 @@ import type {
   EnrichedBlocker,
 } from './types'
 
+// Schema must be defined first — MOCK_BUSINESS.overallReadiness is derived from it.
+
+export const MOCK_BUSINESS_TRUTH_SCHEMA: TruthSection[] = [
+  {
+    id: 'business-identity',
+    name: 'Business Identity',
+    fields: [
+      { id: 'bi-name', label: 'Business Name', value: 'Dental Advantage Plan', status: 'confirmed' },
+      { id: 'bi-category', label: 'Category', value: 'Dental membership plan', status: 'confirmed' },
+      { id: 'bi-website', label: 'Source Website', value: 'https://dentaladvantageplan.vercel.app', status: 'confirmed' },
+    ],
+  },
+  {
+    id: 'audience',
+    name: 'Audience',
+    fields: [
+      { id: 'au-primary', label: 'Primary Customer', value: 'Patients without dental insurance who need affordable dental care', status: 'confirmed' },
+      { id: 'au-problem', label: 'Primary Problem', value: 'Patients delay care or pay full price out of pocket because they do not have insurance', status: 'confirmed' },
+      { id: 'au-segment', label: 'Secondary Segment', value: null, status: 'needs_confirmation' },
+      { id: 'au-geography', label: 'Geographic Scope', value: null, status: 'needs_confirmation' },
+    ],
+  },
+  {
+    id: 'core-offer',
+    name: 'Core Offer',
+    fields: [
+      { id: 'co-offer', label: 'Offer', value: 'A dental membership plan that gives members access to reduced dental pricing at participating practices', status: 'confirmed' },
+      { id: 'co-decision', label: 'Decision Question', value: 'Should I join this plan now so my next visit costs less instead of paying full price out of pocket?', status: 'confirmed' },
+      { id: 'co-activation', label: 'Activation Path', value: null, status: 'needs_confirmation' },
+      { id: 'co-exclusions', label: 'Plan Exclusions', value: null, status: 'missing' },
+    ],
+  },
+  {
+    id: 'pricing-savings',
+    name: 'Pricing & Savings Logic',
+    fields: [
+      { id: 'ps-individual', label: 'Individual Plan Price', value: null, status: 'needs_confirmation' },
+      { id: 'ps-family', label: 'Family Plan Price', value: null, status: 'needs_confirmation' },
+      { id: 'ps-savings-example', label: 'Savings Example (Patient-Facing)', value: null, status: 'needs_confirmation' },
+      { id: 'ps-discount-rate', label: 'Discount Rate or Range', value: null, status: 'missing' },
+      { id: 'ps-billing-model', label: 'Billing Model (Monthly / Annual)', value: null, status: 'missing' },
+    ],
+  },
+  {
+    id: 'practice-availability',
+    name: 'Practice Availability',
+    fields: [
+      { id: 'pa-count', label: 'Number of Participating Practices', value: null, status: 'needs_confirmation' },
+      { id: 'pa-locations', label: 'Practice Locations / Geographic Coverage', value: null, status: 'needs_confirmation' },
+      { id: 'pa-source', label: 'Practice Data Source of Truth', value: null, status: 'needs_confirmation' },
+    ],
+  },
+  {
+    id: 'trust-proof',
+    name: 'Trust & Proof',
+    fields: [
+      { id: 'tp-no-claims', label: 'No Insurance Claims Required', value: 'Confirmed — no claims process', status: 'confirmed' },
+      { id: 'tp-no-waiting', label: 'No Waiting Period', value: 'Confirmed — use plan immediately', status: 'confirmed' },
+      { id: 'tp-testimonials', label: 'Patient Testimonials', value: null, status: 'missing' },
+      { id: 'tp-savings-proof', label: 'Verified Savings Examples', value: null, status: 'blocked' },
+    ],
+  },
+  {
+    id: 'decision-logic',
+    name: 'Decision Logic',
+    fields: [
+      { id: 'dl-trigger', label: 'Primary Purchase Trigger', value: 'Upcoming dental visit without insurance coverage', status: 'confirmed' },
+      { id: 'dl-objection', label: 'Primary Objection', value: null, status: 'needs_confirmation' },
+      { id: 'dl-urgency', label: 'Urgency Signal', value: null, status: 'needs_confirmation' },
+      { id: 'dl-comparison', label: 'Key Comparison (Plan vs. Insurance)', value: null, status: 'blocked' },
+    ],
+  },
+]
+
+// 27 fields: 10 confirmed, 11 needs_confirmation, 4 missing, 2 blocked
+function schemaReadiness(schema: TruthSection[]): number {
+  const total = schema.reduce((n, s) => n + s.fields.length, 0)
+  const confirmed = schema.reduce((n, s) => n + s.fields.filter(f => f.status === 'confirmed').length, 0)
+  return total > 0 ? Math.round((confirmed / total) * 100) : 0
+}
+
 export const MOCK_BUSINESS: BusinessRecord = {
   id: 'dap',
   name: 'Dental Advantage Plan',
@@ -20,7 +101,7 @@ export const MOCK_BUSINESS: BusinessRecord = {
   category: 'Dental Membership Plan',
   pipelineStatus: 'In Progress',
   currentStage: 'Business Truth JSON',
-  overallReadiness: 42,
+  overallReadiness: schemaReadiness(MOCK_BUSINESS_TRUTH_SCHEMA),
   primaryDecision:
     'Should I join this plan now so my next dental visit costs less instead of paying full price out of pocket?',
 }
@@ -224,78 +305,6 @@ export const MOCK_ACTIVITY: ActivityEvent[] = [
   { timestamp: 'Today 9:15 AM', description: 'Business Truth JSON draft created' },
   { timestamp: 'Today 9:18 AM', description: 'Pricing blocker detected — pipeline paused at Business Truth JSON' },
   { timestamp: 'Today 9:22 AM', description: 'Pipeline status set to Blocked' },
-]
-
-export const MOCK_BUSINESS_TRUTH_SCHEMA: TruthSection[] = [
-  {
-    id: 'business-identity',
-    name: 'Business Identity',
-    fields: [
-      { id: 'bi-name', label: 'Business Name', value: 'Dental Advantage Plan', status: 'confirmed' },
-      { id: 'bi-category', label: 'Category', value: 'Dental membership plan', status: 'confirmed' },
-      { id: 'bi-website', label: 'Source Website', value: 'https://dentaladvantageplan.vercel.app', status: 'confirmed' },
-    ],
-  },
-  {
-    id: 'audience',
-    name: 'Audience',
-    fields: [
-      { id: 'au-primary', label: 'Primary Customer', value: 'Patients without dental insurance who need affordable dental care', status: 'confirmed' },
-      { id: 'au-problem', label: 'Primary Problem', value: 'Patients delay care or pay full price out of pocket because they do not have insurance', status: 'confirmed' },
-      { id: 'au-segment', label: 'Secondary Segment', value: null, status: 'needs_confirmation' },
-      { id: 'au-geography', label: 'Geographic Scope', value: null, status: 'needs_confirmation' },
-    ],
-  },
-  {
-    id: 'core-offer',
-    name: 'Core Offer',
-    fields: [
-      { id: 'co-offer', label: 'Offer', value: 'A dental membership plan that gives members access to reduced dental pricing at participating practices', status: 'confirmed' },
-      { id: 'co-decision', label: 'Decision Question', value: 'Should I join this plan now so my next visit costs less instead of paying full price out of pocket?', status: 'confirmed' },
-      { id: 'co-activation', label: 'Activation Path', value: null, status: 'needs_confirmation' },
-      { id: 'co-exclusions', label: 'Plan Exclusions', value: null, status: 'missing' },
-    ],
-  },
-  {
-    id: 'pricing-savings',
-    name: 'Pricing & Savings Logic',
-    fields: [
-      { id: 'ps-individual', label: 'Individual Plan Price', value: null, status: 'needs_confirmation' },
-      { id: 'ps-family', label: 'Family Plan Price', value: null, status: 'needs_confirmation' },
-      { id: 'ps-savings-example', label: 'Savings Example (Patient-Facing)', value: null, status: 'needs_confirmation' },
-      { id: 'ps-discount-rate', label: 'Discount Rate or Range', value: null, status: 'missing' },
-      { id: 'ps-billing-model', label: 'Billing Model (Monthly / Annual)', value: null, status: 'missing' },
-    ],
-  },
-  {
-    id: 'practice-availability',
-    name: 'Practice Availability',
-    fields: [
-      { id: 'pa-count', label: 'Number of Participating Practices', value: null, status: 'needs_confirmation' },
-      { id: 'pa-locations', label: 'Practice Locations / Geographic Coverage', value: null, status: 'needs_confirmation' },
-      { id: 'pa-source', label: 'Practice Data Source of Truth', value: null, status: 'needs_confirmation' },
-    ],
-  },
-  {
-    id: 'trust-proof',
-    name: 'Trust & Proof',
-    fields: [
-      { id: 'tp-no-claims', label: 'No Insurance Claims Required', value: 'Confirmed — no claims process', status: 'confirmed' },
-      { id: 'tp-no-waiting', label: 'No Waiting Period', value: 'Confirmed — use plan immediately', status: 'confirmed' },
-      { id: 'tp-testimonials', label: 'Patient Testimonials', value: null, status: 'missing' },
-      { id: 'tp-savings-proof', label: 'Verified Savings Examples', value: null, status: 'blocked' },
-    ],
-  },
-  {
-    id: 'decision-logic',
-    name: 'Decision Logic',
-    fields: [
-      { id: 'dl-trigger', label: 'Primary Purchase Trigger', value: 'Upcoming dental visit without insurance coverage', status: 'confirmed' },
-      { id: 'dl-objection', label: 'Primary Objection', value: null, status: 'needs_confirmation' },
-      { id: 'dl-urgency', label: 'Urgency Signal', value: null, status: 'needs_confirmation' },
-      { id: 'dl-comparison', label: 'Key Comparison (Plan vs. Insurance)', value: null, status: 'blocked' },
-    ],
-  },
 ]
 
 export const MOCK_ENRICHED_BLOCKERS: EnrichedBlocker[] = [
