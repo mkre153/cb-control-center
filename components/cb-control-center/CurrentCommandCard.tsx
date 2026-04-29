@@ -62,16 +62,19 @@ export function CurrentCommandCard({ command }: { command: CurrentCommand }) {
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2 pt-3 border-t border-gray-100">
-        <button disabled className="px-3 py-1.5 text-xs font-medium rounded-md border border-gray-200 text-gray-400 cursor-not-allowed opacity-60">
-          Review Crawl Output
-        </button>
-        <button disabled className="px-3 py-1.5 text-xs font-medium rounded-md border border-gray-200 text-gray-400 cursor-not-allowed opacity-60">
-          Edit Business Truth JSON
-        </button>
-        <button disabled className="px-3 py-1.5 text-xs font-medium rounded-md border border-gray-200 text-gray-400 cursor-not-allowed opacity-60">
-          Mark Pricing Confirmed
-        </button>
+      <div className="pt-3 border-t border-gray-100">
+        <div className="flex flex-wrap gap-2 mb-2">
+          <button disabled className="px-3 py-1.5 text-xs font-medium rounded-md border border-gray-200 text-gray-500 cursor-not-allowed bg-gray-50">
+            Review Crawl Output
+          </button>
+          <button disabled className="px-3 py-1.5 text-xs font-medium rounded-md border border-gray-200 text-gray-500 cursor-not-allowed bg-gray-50">
+            Edit Truth Draft
+          </button>
+          <button disabled className="px-3 py-1.5 text-xs font-medium rounded-md border border-gray-200 text-gray-500 cursor-not-allowed bg-gray-50">
+            Mark Pricing Confirmed
+          </button>
+        </div>
+        <p className="text-xs text-gray-400">Actions disabled in mock mode.</p>
       </div>
     </div>
   )

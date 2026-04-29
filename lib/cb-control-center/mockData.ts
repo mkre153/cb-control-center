@@ -18,6 +18,8 @@ export const MOCK_BUSINESS: BusinessRecord = {
   pipelineStatus: 'In Progress',
   currentStage: 'Business Truth JSON',
   overallReadiness: 42,
+  primaryDecision:
+    'Should I join this plan now so my next dental visit costs less instead of paying full price out of pocket?',
 }
 
 export const MOCK_CURRENT_COMMAND: CurrentCommand = {

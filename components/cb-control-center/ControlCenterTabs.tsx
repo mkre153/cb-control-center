@@ -16,16 +16,7 @@ import type {
   ActivityEvent,
 } from '@/lib/cb-control-center/types'
 
-const TABS = [
-  { id: 'crawl-output', label: 'Crawl Output' },
-  { id: 'business-truth-json', label: 'Business Truth JSON' },
-  { id: 'blockers', label: 'Blockers' },
-  { id: 'strategy', label: 'Strategy' },
-  { id: 'pages', label: 'Pages' },
-  { id: 'activity', label: 'Activity' },
-] as const
-
-type TabId = (typeof TABS)[number]['id']
+type TabId = 'crawl-output' | 'business-truth-json' | 'blockers' | 'strategy' | 'pages' | 'activity'
 
 interface ControlCenterTabsProps {
   crawlOutput: CrawlOutput
@@ -46,10 +37,19 @@ export function ControlCenterTabs({
 }: ControlCenterTabsProps) {
   const [activeTab, setActiveTab] = useState<TabId>('crawl-output')
 
+  const tabs: { id: TabId; label: string }[] = [
+    { id: 'crawl-output', label: 'Crawl Output' },
+    { id: 'business-truth-json', label: 'Business Truth JSON' },
+    { id: 'blockers', label: `Blockers (${blockers.length})` },
+    { id: 'strategy', label: 'Strategy' },
+    { id: 'pages', label: 'Pages' },
+    { id: 'activity', label: 'Activity' },
+  ]
+
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4">
       <div className="flex flex-wrap gap-1 mb-5 border-b border-gray-100 pb-3">
-        {TABS.map((tab) => (
+        {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}

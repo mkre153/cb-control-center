@@ -9,6 +9,7 @@ export interface BusinessRecord {
   pipelineStatus: string
   currentStage: string
   overallReadiness: number
+  primaryDecision: string
 }
 
 export interface PipelineStage {

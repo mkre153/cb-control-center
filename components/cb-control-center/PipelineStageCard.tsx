@@ -21,14 +21,34 @@ const borderColor: Record<PipelineStatus, string> = {
   not_started: 'border-gray-200',
 }
 
-export function PipelineStageCard({ stage }: { stage: PipelineStage }) {
+interface PipelineStageCardProps {
+  stage: PipelineStage
+  isCurrent?: boolean
+}
+
+export function PipelineStageCard({ stage, isCurrent }: PipelineStageCardProps) {
+  const isCurrentBlocked = isCurrent && stage.status === 'blocked'
+
   return (
-    <div className={`bg-white rounded-lg border ${borderColor[stage.status]} p-4 flex flex-col gap-3`}>
-      <div className="flex items-start justify-between gap-2">
+    <div
+      className={`bg-white rounded-lg border p-4 flex flex-col gap-3 ${
+        isCurrentBlocked
+          ? 'border-red-300 border-l-4 border-l-red-500 shadow-sm'
+          : borderColor[stage.status]
+      }`}
+    >
+      <div className="flex items-start justify-between gap-2 flex-wrap">
         <h3 className="text-sm font-semibold text-gray-900 leading-tight">{stage.name}</h3>
-        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium shrink-0 ${statusBadge[stage.status]}`}>
-          {statusLabel[stage.status]}
-        </span>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {isCurrent && (
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-gray-900 text-white">
+              Current
+            </span>
+          )}
+          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium shrink-0 ${statusBadge[stage.status]}`}>
+            {statusLabel[stage.status]}
+          </span>
+        </div>
       </div>
 
       <p className="text-xs text-gray-500 leading-relaxed">{stage.summary}</p>
@@ -57,8 +77,15 @@ export function PipelineStageCard({ stage }: { stage: PipelineStage }) {
         </div>
       )}
 
-      <button disabled className="mt-auto w-full text-xs text-gray-400 border border-gray-100 rounded-md py-1.5 cursor-not-allowed opacity-60 bg-gray-50">
-        {stage.primaryAction}
+      <button
+        disabled
+        className={`mt-auto w-full text-xs border rounded-md py-1.5 cursor-not-allowed bg-gray-50 ${
+          isCurrentBlocked
+            ? 'border-red-200 text-red-400'
+            : 'border-gray-100 text-gray-400 opacity-60'
+        }`}
+      >
+        {isCurrentBlocked ? 'Resolve blocker' : stage.primaryAction}
       </button>
     </div>
   )

@@ -29,17 +29,23 @@ export function BusinessSummaryCard({ business }: { business: BusinessRecord }) 
         </div>
       </div>
 
+      <div className="border-t border-gray-100 pt-4 mb-4">
+        <p className="text-xs text-gray-400 mb-1">Primary Customer Decision</p>
+        <p className="text-sm text-gray-800 font-medium leading-relaxed">{business.primaryDecision}</p>
+      </div>
+
       <div>
         <div className="flex items-center justify-between mb-1">
           <span className="text-xs text-gray-400">Overall Readiness</span>
           <span className="text-xs font-semibold text-gray-700">{business.overallReadiness}%</span>
         </div>
-        <div className="w-full bg-gray-100 rounded-full h-1.5">
+        <div className="w-full bg-gray-100 rounded-full h-1.5 mb-1">
           <div
             className="bg-blue-500 h-1.5 rounded-full"
             style={{ width: `${business.overallReadiness}%` }}
           />
         </div>
+        <p className="text-xs text-gray-400">Readiness reflects completed pipeline stages and unresolved blockers.</p>
       </div>
     </div>
   )
