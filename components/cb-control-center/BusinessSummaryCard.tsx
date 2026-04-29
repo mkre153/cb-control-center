@@ -4,7 +4,10 @@ export function BusinessSummaryCard({ business }: { business: BusinessRecord }) 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4">
       <div className="flex items-center justify-between mb-4">
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Business</p>
+        <div>
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Normalized Business Profile</p>
+          <p className="text-xs text-gray-400 mt-0.5">Current system-understood profile derived from input and crawl artifacts.</p>
+        </div>
         <select className="text-sm border border-gray-200 rounded-md px-2.5 py-1 bg-white text-gray-700 outline-none">
           <option value="dap">{business.name}</option>
         </select>
