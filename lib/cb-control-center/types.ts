@@ -22,6 +22,7 @@ export interface PipelineStage {
   artifactCount: number
   primaryAction: string
   lastUpdated?: string
+  locked?: boolean
 }
 
 export interface PipelineBlocker {

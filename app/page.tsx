@@ -1,23 +1,8 @@
 import { MockModeBanner } from '@/components/cb-control-center/MockModeBanner'
 import { ControlCenterHeader } from '@/components/cb-control-center/ControlCenterHeader'
 import { InitialInputCard } from '@/components/cb-control-center/InitialInputCard'
-import { BusinessSummaryCard } from '@/components/cb-control-center/BusinessSummaryCard'
-import { PipelineRuleStrip } from '@/components/cb-control-center/PipelineRuleStrip'
-import { CurrentCommandCard } from '@/components/cb-control-center/CurrentCommandCard'
-import { PipelineStageGrid } from '@/components/cb-control-center/PipelineStageGrid'
-import { ControlCenterTabs } from '@/components/cb-control-center/ControlCenterTabs'
-import {
-  MOCK_BUSINESS,
-  MOCK_INITIAL_INPUT,
-  MOCK_CURRENT_COMMAND,
-  MOCK_PIPELINE_STAGES,
-  MOCK_CRAWL_OUTPUT,
-  MOCK_BUSINESS_TRUTH_SCHEMA,
-  MOCK_ENRICHED_BLOCKERS,
-  MOCK_STRATEGY,
-  MOCK_PAGES,
-  MOCK_ACTIVITY,
-} from '@/lib/cb-control-center/mockData'
+import { SimulationShell } from '@/components/cb-control-center/SimulationShell'
+import { MOCK_INITIAL_INPUT } from '@/lib/cb-control-center/mockData'
 
 export default function CBControlCenterPage() {
   return (
@@ -26,21 +11,7 @@ export default function CBControlCenterPage() {
         <MockModeBanner />
         <ControlCenterHeader />
         <InitialInputCard input={MOCK_INITIAL_INPUT} />
-        <BusinessSummaryCard business={MOCK_BUSINESS} />
-        <PipelineRuleStrip />
-        <CurrentCommandCard command={MOCK_CURRENT_COMMAND} />
-        <PipelineStageGrid
-          stages={MOCK_PIPELINE_STAGES}
-          currentStageName={MOCK_BUSINESS.currentStage}
-        />
-        <ControlCenterTabs
-          crawlOutput={MOCK_CRAWL_OUTPUT}
-          businessTruthSchema={MOCK_BUSINESS_TRUTH_SCHEMA}
-          blockers={MOCK_ENRICHED_BLOCKERS}
-          strategy={MOCK_STRATEGY}
-          pages={MOCK_PAGES}
-          activity={MOCK_ACTIVITY}
-        />
+        <SimulationShell />
       </div>
     </div>
   )

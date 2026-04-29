@@ -14,13 +14,6 @@ const statusBadge: Record<PipelineStatus, string> = {
   not_started: 'bg-gray-100 text-gray-500',
 }
 
-const borderColor: Record<PipelineStatus, string> = {
-  complete: 'border-green-200',
-  in_progress: 'border-blue-200',
-  blocked: 'border-red-200',
-  not_started: 'border-gray-200',
-}
-
 interface PipelineStageCardProps {
   stage: PipelineStage
   isCurrent?: boolean
@@ -28,32 +21,52 @@ interface PipelineStageCardProps {
 
 export function PipelineStageCard({ stage, isCurrent }: PipelineStageCardProps) {
   const isCurrentBlocked = isCurrent && stage.status === 'blocked'
+  const isCurrentActive = isCurrent && stage.status === 'in_progress'
+  const isLocked = stage.locked && stage.status === 'not_started'
+
+  const borderClass = isCurrentBlocked
+    ? 'border-red-300 border-l-4 border-l-red-500 shadow-sm'
+    : isCurrentActive
+    ? 'border-blue-300 border-l-4 border-l-blue-500 shadow-sm'
+    : isLocked
+    ? 'border-gray-100 bg-gray-50/50'
+    : stage.status === 'complete'
+    ? 'border-green-200'
+    : stage.status === 'in_progress'
+    ? 'border-blue-200'
+    : stage.status === 'blocked'
+    ? 'border-red-200'
+    : 'border-gray-200'
 
   return (
-    <div
-      className={`bg-white rounded-lg border p-4 flex flex-col gap-3 ${
-        isCurrentBlocked
-          ? 'border-red-300 border-l-4 border-l-red-500 shadow-sm'
-          : borderColor[stage.status]
-      }`}
-    >
+    <div className={`bg-white rounded-lg border p-4 flex flex-col gap-3 ${borderClass}`}>
       <div className="flex items-start justify-between gap-2 flex-wrap">
-        <h3 className="text-sm font-semibold text-gray-900 leading-tight">{stage.name}</h3>
+        <h3 className={`text-sm font-semibold leading-tight ${isLocked ? 'text-gray-400' : 'text-gray-900'}`}>
+          {stage.name}
+        </h3>
         <div className="flex items-center gap-1.5 flex-wrap">
           {isCurrent && (
             <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-gray-900 text-white">
               Current
             </span>
           )}
-          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium shrink-0 ${statusBadge[stage.status]}`}>
-            {statusLabel[stage.status]}
-          </span>
+          {isLocked ? (
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-400">
+              Locked
+            </span>
+          ) : (
+            <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium shrink-0 ${statusBadge[stage.status]}`}>
+              {statusLabel[stage.status]}
+            </span>
+          )}
         </div>
       </div>
 
-      <p className="text-xs text-gray-500 leading-relaxed">{stage.summary}</p>
+      <p className={`text-xs leading-relaxed ${isLocked ? 'text-gray-400' : 'text-gray-500'}`}>
+        {stage.summary}
+      </p>
 
-      {stage.blockers.length > 0 && (
+      {stage.blockers.length > 0 && !isLocked && (
         <div className="space-y-1">
           {stage.blockers.map((b, i) => (
             <p key={i} className="text-xs text-red-600 flex items-start gap-1">
@@ -64,7 +77,11 @@ export function PipelineStageCard({ stage, isCurrent }: PipelineStageCardProps) 
         </div>
       )}
 
-      <div className="flex items-center justify-between text-xs text-gray-400 pt-1 border-t border-gray-50">
+      {isLocked && (
+        <p className="text-xs text-gray-400 italic">Waiting for prerequisite stages to complete.</p>
+      )}
+
+      <div className={`flex items-center justify-between text-xs pt-1 border-t border-gray-50 ${isLocked ? 'text-gray-300' : 'text-gray-400'}`}>
         <span>{stage.artifactCount} artifact{stage.artifactCount !== 1 ? 's' : ''}</span>
         {stage.lastUpdated && <span>{stage.lastUpdated}</span>}
       </div>
@@ -79,13 +96,17 @@ export function PipelineStageCard({ stage, isCurrent }: PipelineStageCardProps) 
 
       <button
         disabled
-        className={`mt-auto w-full text-xs border rounded-md py-1.5 cursor-not-allowed bg-gray-50 ${
+        className={`mt-auto w-full text-xs border rounded-md py-1.5 cursor-not-allowed ${
           isCurrentBlocked
-            ? 'border-red-200 text-red-400'
-            : 'border-gray-100 text-gray-400 opacity-60'
+            ? 'border-red-200 text-red-400 bg-gray-50'
+            : isCurrentActive
+            ? 'border-blue-200 text-blue-400 bg-blue-50/30'
+            : isLocked
+            ? 'border-gray-100 text-gray-300 bg-gray-50'
+            : 'border-gray-100 text-gray-400 bg-gray-50 opacity-60'
         }`}
       >
-        {isCurrentBlocked ? 'Resolve blocker' : stage.primaryAction}
+        {isCurrentBlocked ? 'Resolve blocker' : isLocked ? 'Locked' : stage.primaryAction}
       </button>
     </div>
   )
