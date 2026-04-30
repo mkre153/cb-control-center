@@ -160,7 +160,7 @@ export function SimulationShell() {
                 className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800 transition-colors"
               >
                 <span>←</span>
-                <span>Back to {snap.stages[effectiveStageIndex - 1].name}</span>
+                <span>Review previous stage: {snap.stages[effectiveStageIndex - 1].name}</span>
               </button>
             </div>
           )}
