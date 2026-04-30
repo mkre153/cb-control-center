@@ -41,6 +41,15 @@ function IntakeRow({ intake }: { intake: DapPracticeOnboardingIntake }) {
       <td className="py-3 px-4 text-xs text-gray-500">
         {new Date(intake.updated_at).toLocaleString()}
       </td>
+      <td className="py-3 px-4 text-xs">
+        <Link
+          href={`/preview/dap/onboarding/${intake.id}`}
+          className="text-blue-600 hover:underline"
+          data-manage-link={intake.id}
+        >
+          Manage →
+        </Link>
+      </td>
     </tr>
   )
 }
@@ -69,6 +78,14 @@ export default async function DapOnboardingListPage() {
         </div>
       </div>
 
+      <p
+        className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded px-3 py-2"
+        data-outreach-disclaimer
+      >
+        Outreach status is internal only. Progress through outreach stages does not confirm a
+        practice as a DAP provider, validate offer terms, or publish any patient-facing claims.
+      </p>
+
       {intakes.length === 0 ? (
         <div
           className="rounded-lg border border-gray-200 bg-gray-50 px-6 py-12 text-center"
@@ -90,6 +107,7 @@ export default async function DapOnboardingListPage() {
                 <th className="py-3 px-4">Status</th>
                 <th className="py-3 px-4">Created</th>
                 <th className="py-3 px-4">Updated</th>
+                <th className="py-3 px-4">Actions</th>
               </tr>
             </thead>
             <tbody>

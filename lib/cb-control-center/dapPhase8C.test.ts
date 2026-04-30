@@ -134,14 +134,16 @@ describe('Current production route inventory', () => {
     'app/preview/dap/requests/[id]/page.tsx',
     // Internal onboarding list (Phase 9H)
     'app/preview/dap/onboarding/page.tsx',
+    // Internal onboarding detail (Phase 9I)
+    'app/preview/dap/onboarding/[id]/page.tsx',
   ]
 
-  it('exactly 16 page.tsx files in app/ (12 preview + 3 Tier 1 production, Phase 9H added onboarding list)', () => {
+  it('exactly 17 page.tsx files in app/ (12 preview + 3 Tier 1 production, Phase 9I added onboarding detail)', () => {
     const found = findFiles(join(ROOT, 'app'), f => f.endsWith('page.tsx'))
     expect(found.length).toBe(KNOWN_ROUTES.length)
   })
 
-  it('all 16 known routes exist on disk', () => {
+  it('all 17 known routes exist on disk', () => {
     for (const rel of KNOWN_ROUTES) {
       expect(existsSync(resolve(ROOT, rel)), `missing: ${rel}`).toBe(true)
     }

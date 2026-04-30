@@ -381,9 +381,9 @@ describe('API route enforces safety invariants', () => {
 // ─── Group 6: Route boundary preserved ───────────────────────────────────────
 
 describe('Route boundary preserved — no new page routes added', () => {
-  const KNOWN_PAGE_COUNT = 16 // Phase 9H added onboarding list page
+  const KNOWN_PAGE_COUNT = 17 // Phase 9I added onboarding detail page
 
-  it('total page.tsx count is 16 (Phase 9H added onboarding list page)', () => {
+  it('total page.tsx count is 17 (Phase 9I added onboarding detail page)', () => {
     const found = findFiles(join(ROOT, 'app'), f => f.endsWith('page.tsx'))
     expect(found.length).toBe(KNOWN_PAGE_COUNT)
   })

@@ -17,6 +17,11 @@ export type DapPracticeOnboardingStatus =
 export type DapPracticeOnboardingEventType =
   | 'onboarding.intake_created'
   | 'onboarding.outreach_needed'
+  | 'onboarding.outreach_started'
+  | 'onboarding.practice_responded'
+  | 'onboarding.practice_interested'
+  | 'onboarding.practice_not_interested'
+  | 'onboarding.terms_needed'
   | 'onboarding.status_changed'
   | 'onboarding.note_added'
 
@@ -60,6 +65,12 @@ export interface CreateDapPracticeOnboardingInput {
   note?: string
 }
 
+export interface DapPracticeOnboardingActionInput {
+  intakeId: string
+  actorId?: string
+  note?: string
+}
+
 // ─── Failure codes ────────────────────────────────────────────────────────────
 
 export type DapPracticeOnboardingFailureCode =
@@ -70,7 +81,14 @@ export type DapPracticeOnboardingFailureCode =
   | 'intake_create_failed'
   | 'event_insert_failed'
 
-// ─── Result type ──────────────────────────────────────────────────────────────
+export type DapPracticeOnboardingActionFailureCode =
+  | 'intake_not_found'
+  | 'vertical_scope_mismatch'
+  | 'invalid_transition'
+  | 'status_update_failed'
+  | 'event_insert_failed'
+
+// ─── Result types ─────────────────────────────────────────────────────────────
 
 export type DapPracticeOnboardingResult =
   | {
@@ -80,5 +98,16 @@ export type DapPracticeOnboardingResult =
   | {
       ok: false
       code: DapPracticeOnboardingFailureCode
+      message: string
+    }
+
+export type DapPracticeOnboardingActionResult =
+  | {
+      ok: true
+      intake: DapPracticeOnboardingIntake
+    }
+  | {
+      ok: false
+      code: DapPracticeOnboardingActionFailureCode
       message: string
     }

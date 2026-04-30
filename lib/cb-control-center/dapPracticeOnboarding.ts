@@ -103,6 +103,25 @@ export async function createOnboardingIntakeFromApprovedRequest(
   return { ok: true, intake: intake as DapPracticeOnboardingIntake }
 }
 
+// ─── getOnboardingIntakeById ──────────────────────────────────────────────────
+// Returns a single onboarding intake by its own id, or null. Read-only.
+
+export async function getOnboardingIntakeById(
+  intakeId: string,
+): Promise<DapPracticeOnboardingIntake | null> {
+  const db = getSupabaseAdminClient()
+
+  const { data, error } = await db
+    .from('dap_practice_onboarding_intakes')
+    .select('*')
+    .eq('id', intakeId)
+    .eq('vertical_key', 'dap')
+    .maybeSingle()
+
+  if (error) throw new Error(`getOnboardingIntakeById failed: ${error.message}`)
+  return data as DapPracticeOnboardingIntake | null
+}
+
 // ─── getOnboardingIntakeByRequestId ───────────────────────────────────────────
 // Returns the onboarding intake for a given request id, or null if none exists.
 // Read-only.

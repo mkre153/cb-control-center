@@ -338,7 +338,7 @@ describe('Onboarding list page exists and is read-only', () => {
     expect(src).toContain('data-empty-state')
   })
 
-  it('page count is now 16 (Phase 9H added onboarding list)', () => {
+  it('page count is now 17 (Phase 9I added onboarding detail page)', () => {
     const { readdirSync } = require('fs')
     function findPages(dir: string): string[] {
       if (!existsSync(dir)) return []
@@ -354,7 +354,7 @@ describe('Onboarding list page exists and is read-only', () => {
       return results
     }
     const pages = findPages(join(ROOT, 'app'))
-    expect(pages.length).toBe(16)
+    expect(pages.length).toBe(17)
   })
 })
 

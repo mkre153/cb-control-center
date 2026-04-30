@@ -236,9 +236,9 @@ describe('Page count is now 15 (Phase 9E added 2 new preview pages)', () => {
     return results
   }
 
-  it('total page.tsx count is 16 (13 prior + 2 review pages + 1 onboarding list)', () => {
+  it('total page.tsx count is 17 (13 prior + 2 review pages + 1 onboarding list + 1 onboarding detail)', () => {
     const pages = findPages(join(ROOT, 'app'))
-    expect(pages.length).toBe(16)
+    expect(pages.length).toBe(17)
   })
 
   it('app/preview/dap/requests/page.tsx is included in the count', () => {

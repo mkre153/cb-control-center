@@ -102,9 +102,9 @@ describe('Production route allowlist', () => {
     expect(existsSync(resolve(APP_DIR, 'preview/dap'))).toBe(true)
   })
 
-  it('exactly 16 page.tsx files in app/ (12 preview + 3 production Tier 1, Phase 9H added onboarding list)', () => {
+  it('exactly 17 page.tsx files in app/ (12 preview + 3 production Tier 1, Phase 9I added onboarding detail)', () => {
     const pages = findFiles(APP_DIR, f => f.endsWith('page.tsx'))
-    expect(pages).toHaveLength(16)
+    expect(pages).toHaveLength(17)
   })
 })
 

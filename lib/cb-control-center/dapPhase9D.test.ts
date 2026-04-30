@@ -350,7 +350,7 @@ describe('Production request routes remain absent', () => {
       return results
     }
     const pages = findPages(join(ROOT, 'app'))
-    expect(pages.length).toBe(16)
+    expect(pages.length).toBe(17)
   })
 })
 
