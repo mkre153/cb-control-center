@@ -182,9 +182,11 @@ describe('Route file inventory', () => {
     'app/dental-advantage-plan/compare/page.tsx',
     // Neil LLM Formatting preview (Phase 18B)
     'app/preview/cbseoaeo/llm-page-format/page.tsx',
+    // Page generation contract preview (Phase 18C)
+    'app/preview/cbseoaeo/page-generation-contract/page.tsx',
   ]
 
-  it('exactly 50 page.tsx files exist in app/ (Phase 18B added Neil LLM formatting preview)', () => {
+  it('exactly 51 page.tsx files exist in app/ (Phase 18C added page generation contract preview)', () => {
     const found = findFiles(join(ROOT, 'app'), f => f.endsWith('page.tsx'))
     expect(found.length).toBe(KNOWN_ROUTES.length)
   })

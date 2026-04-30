@@ -504,7 +504,7 @@ describe('Phase 15 — Page exists', () => {
   })
 
   it('total page count is now 34', () => {
-    expect(findPages(join(ROOT, 'app')).length).toBe(50)
+    expect(findPages(join(ROOT, 'app')).length).toBe(51)
   })
 })
 
@@ -512,7 +512,7 @@ describe('Phase 15 — Page exists', () => {
 
 describe('Phase 15 — Full suite guard', () => {
   it('page count is 34 (all prior pages preserved)', () => {
-    expect(findPages(join(ROOT, 'app')).length).toBe(50)
+    expect(findPages(join(ROOT, 'app')).length).toBe(51)
   })
 
   it('migration file still validates', () => {
