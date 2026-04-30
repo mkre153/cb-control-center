@@ -170,9 +170,20 @@ describe('Current production route inventory', () => {
     'app/preview/dap/admin-decision-sql-contract/page.tsx',
     // Admin decision audit + replay preview (Phase 16)
     'app/preview/dap/admin-decision-audit/page.tsx',
+    // DAP public site — static pages (Phase 1)
+    'app/dental-advantage-plan/how-it-works/page.tsx',
+    'app/dental-advantage-plan/vs-insurance/page.tsx',
+    'app/dental-advantage-plan/savings/page.tsx',
+    'app/dental-advantage-plan/find-a-dentist/page.tsx',
+    'app/dental-advantage-plan/for-practices/page.tsx',
+    'app/dental-advantage-plan/guide/page.tsx',
+    // DAP public site — generated pages (Phase 1)
+    'app/dental-advantage-plan/cities/[city]/page.tsx',
+    'app/dental-advantage-plan/dentists/[city]/page.tsx',
+    'app/dental-advantage-plan/dentists/[city]/[practiceSlug]/page.tsx',
   ]
 
-  it('exactly 34 page.tsx files in app/ (Phase 16 added admin-decision-audit preview)', () => {
+  it('exactly 43 page.tsx files in app/ (Phase 1 added DAP public site pages)', () => {
     const found = findFiles(join(ROOT, 'app'), f => f.endsWith('page.tsx'))
     expect(found.length).toBe(KNOWN_ROUTES.length)
   })

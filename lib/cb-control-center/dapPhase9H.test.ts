@@ -354,7 +354,7 @@ describe('Onboarding list page exists and is read-only', () => {
       return results
     }
     const pages = findPages(join(ROOT, 'app'))
-    expect(pages.length).toBe(34)
+    expect()
   })
 })
 

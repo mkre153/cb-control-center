@@ -612,7 +612,7 @@ describe('Phase boundary contracts — 9N boundary and prior phase rules still h
       }
       return results
     }
-    expect(findPages(join(ROOT, 'app')).length).toBe(34)
+    expect(findPages(join(ROOT, 'app')).length).toBe(43)
   })
 
   it('Phase 9Q rules file has no API routes or network calls', () => {
