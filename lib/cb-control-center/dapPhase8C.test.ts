@@ -195,9 +195,11 @@ describe('Current production route inventory', () => {
     'app/preview/cbseoaeo/llm-page-format/page.tsx',
     // Page generation contract preview (Phase 18C)
     'app/preview/cbseoaeo/page-generation-contract/page.tsx',
+    // DAP page brief builder preview (Phase 18D)
+    'app/preview/dap/page-briefs/page.tsx',
   ]
 
-  it('exactly 51 page.tsx files in app/ (Phase 18C added page generation contract preview)', () => {
+  it('exactly 52 page.tsx files in app/ (Phase 18D added DAP page brief preview)', () => {
     const found = findFiles(join(ROOT, 'app'), f => f.endsWith('page.tsx'))
     expect(found.length).toBe(KNOWN_ROUTES.length)
   })

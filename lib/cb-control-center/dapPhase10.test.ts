@@ -530,7 +530,7 @@ describe('Phase 10 — member status preview page', () => {
   })
 
   it('page count is now 26 (Phase 10 added member-status dynamic route)', () => {
-    expect(findPages(join(ROOT, 'app')).length).toBe(51)
+    expect(findPages(join(ROOT, 'app')).length).toBe(52)
   })
 })
 
