@@ -183,9 +183,11 @@ describe('Current production route inventory', () => {
     'app/dental-advantage-plan/dentists/[city]/[practiceSlug]/page.tsx',
     // Member status — public (Phase 2A)
     'app/dental-advantage-plan/member-status/[membershipId]/page.tsx',
+    // Admin rejection email previews (Phase 2B)
+    'app/preview/dap/admin-rejection-emails/page.tsx',
   ]
 
-  it('exactly 44 page.tsx files in app/ (Phase 2A added member status page)', () => {
+  it('exactly 45 page.tsx files in app/ (Phase 2B added admin rejection email preview)', () => {
     const found = findFiles(join(ROOT, 'app'), f => f.endsWith('page.tsx'))
     expect(found.length).toBe(KNOWN_ROUTES.length)
   })

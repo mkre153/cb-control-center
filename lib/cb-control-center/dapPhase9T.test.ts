@@ -464,7 +464,7 @@ describe('Phase 9T — CTA safety', () => {
 
 describe('Phase 9T — Prior phase contracts still hold', () => {
   it('page count remains 22', () => {
-    expect(findPages(join(ROOT, 'app')).length).toBe(44)
+    expect(findPages(join(ROOT, 'app')).length).toBe(45)
   })
 
   it('Phase 9S member email copy still exports 8 standings', () => {
