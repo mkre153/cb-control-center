@@ -254,8 +254,8 @@ describe('Page count is now 15 (Phase 9E added 2 new preview pages)', () => {
   it('no new production routes added in Phase 9E', () => {
     const pages = findPages(join(ROOT, 'app'))
     const productionPages = pages.filter(p => !p.includes('/preview/') && !p.includes('/api/'))
-    // Prior production pages: 4 (root + 3 Tier 1 as of Phase 9B)
-    expect(productionPages.length).toBeLessThanOrEqual(14)
+    // 14 DAP/content production pages + 3 businesses portfolio pages (Phase 17B)
+    expect(productionPages.length).toBeLessThanOrEqual(17)
   })
 })
 

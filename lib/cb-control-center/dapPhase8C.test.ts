@@ -185,9 +185,13 @@ describe('Current production route inventory', () => {
     'app/dental-advantage-plan/member-status/[membershipId]/page.tsx',
     // Admin rejection email previews (Phase 2B)
     'app/preview/dap/admin-rejection-emails/page.tsx',
+    // CB Control Center home dashboard routes (Phase 17B)
+    'app/businesses/dental-advantage-plan/build/page.tsx',
+    'app/businesses/dental-advantage-plan/page.tsx',
+    'app/businesses/new/page.tsx',
   ]
 
-  it('exactly 45 page.tsx files in app/ (Phase 2B added admin rejection email preview)', () => {
+  it('exactly 48 page.tsx files in app/ (Phase 17B added 3 business portfolio routes)', () => {
     const found = findFiles(join(ROOT, 'app'), f => f.endsWith('page.tsx'))
     expect(found.length).toBe(KNOWN_ROUTES.length)
   })

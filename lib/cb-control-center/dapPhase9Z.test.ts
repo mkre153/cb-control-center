@@ -693,7 +693,7 @@ describe('Phase 9Z — dry-run preview page renders all 16 templates', () => {
   })
 
   it('page count is now 25 (Phase 9Z added communication-dry-runs page)', () => {
-    expect(findPages(join(ROOT, 'app')).length).toBe(45)
+    expect(findPages(join(ROOT, 'app')).length).toBe(48)
   })
 })
 

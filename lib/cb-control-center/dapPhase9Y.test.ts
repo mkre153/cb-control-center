@@ -620,7 +620,7 @@ describe('Phase 9Y — communication approvals preview page exists', () => {
   })
 
   it('page count is now 24 (Phase 9Y added communication-approvals page)', () => {
-    expect(findPages(join(ROOT, 'app')).length).toBe(45)
+    expect(findPages(join(ROOT, 'app')).length).toBe(48)
   })
 })
 

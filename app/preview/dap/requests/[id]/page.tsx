@@ -5,6 +5,8 @@ import type { DapRequestEvent } from '@/lib/cb-control-center/dapRequestTypes'
 import type { DapPracticeOnboardingIntake } from '@/lib/cb-control-center/dapPracticeOnboardingTypes'
 import { approveRequestAction, rejectRequestAction, needsReviewRequestAction } from './actions'
 import { createOnboardingFromRequestAction } from './onboardingActions'
+import { getDapAdminDecisionVisibilityModel } from '@/lib/cb-control-center/dapAdminDecisionVisibility'
+import type { DapAdminDecisionVisibilityState } from '@/lib/cb-control-center/dapAdminDecisionVisibility'
 import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
@@ -65,6 +67,14 @@ function Field({ label, value }: { label: string; value: string | boolean | null
       <dd className="text-sm text-gray-900 break-all">{display}</dd>
     </div>
   )
+}
+
+function toVisibilityState(status: string): DapAdminDecisionVisibilityState {
+  if (status === 'approved') return 'approved'
+  if (status === 'rejected') return 'rejected'
+  if (status === 'needs_review') return 'needs_review'
+  if (status === 'queued_for_review') return 'queued_for_review'
+  return 'pending'
 }
 
 export default async function DapRequestDetailPage({ params }: { params: Params }) {
@@ -146,6 +156,69 @@ export default async function DapRequestDetailPage({ params }: { params: Params 
           </div>
         </form>
       </section>
+
+      {/* Decision visibility panel — read-only authority boundary */}
+      {(() => {
+        const visibility = getDapAdminDecisionVisibilityModel(toVisibilityState(request.request_status))
+        return (
+          <section
+            className="rounded-lg border border-gray-200 bg-gray-50 p-6 space-y-4"
+            data-decision-visibility-panel
+            data-decision-state={visibility.state}
+          >
+            <div className="space-y-1">
+              <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                Decision Authority
+              </h2>
+              <p className="text-xs text-gray-500">
+                Read-only. Identifies who holds decision authority for this request.
+              </p>
+            </div>
+            <dl className="space-y-1.5 text-xs font-mono">
+              <div className="flex gap-3">
+                <dt className="w-52 shrink-0 text-gray-400">decisionAuthority</dt>
+                <dd className="text-gray-800" data-decision-authority="cb_control_center">cb_control_center</dd>
+              </div>
+              <div className="flex gap-3">
+                <dt className="w-52 shrink-0 text-gray-400">crmAuthority</dt>
+                <dd className="text-green-700 font-semibold" data-crm-authority="false">false</dd>
+              </div>
+              <div className="flex gap-3">
+                <dt className="w-52 shrink-0 text-gray-400">paymentAuthorityInsideDap</dt>
+                <dd className="text-green-700 font-semibold" data-payment-authority="false">false</dd>
+              </div>
+              <div className="flex gap-3">
+                <dt className="w-52 shrink-0 text-gray-400">externalDispatchEnabled</dt>
+                <dd className="text-green-700 font-semibold" data-dispatch-enabled="false">false</dd>
+              </div>
+              <div className="flex gap-3">
+                <dt className="w-52 shrink-0 text-gray-400">communicationPreviewAvailable</dt>
+                <dd
+                  className={visibility.communicationPreviewAvailable ? 'text-blue-700 font-semibold' : 'text-gray-500'}
+                  data-comms-preview-available={String(visibility.communicationPreviewAvailable)}
+                >
+                  {String(visibility.communicationPreviewAvailable)}
+                </dd>
+              </div>
+            </dl>
+            {visibility.communicationPreviewAvailable && visibility.communicationPreviewPath && (
+              <div className="border-t border-gray-200 pt-3 space-y-1">
+                <p className="text-xs text-gray-500">
+                  Rejection email templates are available for preview. No email has been sent.
+                </p>
+                <Link
+                  href={visibility.communicationPreviewPath}
+                  className="text-xs text-blue-600 hover:underline"
+                  data-rejection-email-preview-link
+                  data-rejection-preview-path="/preview/dap/admin-rejection-emails"
+                >
+                  View rejection email templates →
+                </Link>
+              </div>
+            )}
+          </section>
+        )
+      })()}
 
       {request.request_status === 'approved' && (
         <section

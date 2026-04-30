@@ -564,7 +564,7 @@ describe('Phase 9X — Practice preview page renders MKCRM shadow payload sectio
 
 describe('Phase 9X — Full suite guard', () => {
   it('page count is still 23', () => {
-    expect(findPages(join(ROOT, 'app')).length).toBe(45)
+    expect(findPages(join(ROOT, 'app')).length).toBe(48)
   })
 
   it('Phase 9W event previews still return 8 + 8', () => {
