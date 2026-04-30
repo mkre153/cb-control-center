@@ -180,9 +180,11 @@ describe('Route file inventory', () => {
     'app/businesses/new/page.tsx',
     // DAP public site compare page (Phase 18A)
     'app/dental-advantage-plan/compare/page.tsx',
+    // Neil LLM Formatting preview (Phase 18B)
+    'app/preview/cbseoaeo/llm-page-format/page.tsx',
   ]
 
-  it('exactly 49 page.tsx files exist in app/ (Phase 18A added DAP compare route)', () => {
+  it('exactly 50 page.tsx files exist in app/ (Phase 18B added Neil LLM formatting preview)', () => {
     const found = findFiles(join(ROOT, 'app'), f => f.endsWith('page.tsx'))
     expect(found.length).toBe(KNOWN_ROUTES.length)
   })
