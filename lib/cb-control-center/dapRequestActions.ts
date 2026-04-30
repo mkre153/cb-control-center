@@ -1,4 +1,5 @@
-import type { DapRequest } from './dapRequestTypes'
+import type { DapRequest, DapRequestStatus, DapRequestEventType } from './dapRequestTypes'
+import { canTransitionDapRequestStatus } from './dapRequestRules'
 import { getSupabaseAdminClient } from './supabaseClient'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -9,18 +10,41 @@ export interface DapRequestDecisionInput {
   note?: string
 }
 
-export interface DapRequestActionResult {
-  success: boolean
-  request: DapRequest | null
-  error?: string
+export type DapRequestActionResult =
+  | {
+      ok: true
+      request: DapRequest
+      eventType: DapRequestEventType
+      previousStatus: DapRequestStatus
+      newStatus: DapRequestStatus
+    }
+  | {
+      ok: false
+      code:
+        | 'request_not_found'
+        | 'vertical_scope_mismatch'
+        | 'invalid_transition'
+        | 'status_update_failed'
+        | 'event_insert_failed'
+      message: string
+    }
+
+// ─── Internal types ───────────────────────────────────────────────────────────
+
+interface DapRequestMeta {
+  id: string
+  request_status: DapRequestStatus
+  vertical_key: string
 }
 
-// ─── Internal helpers ─────────────────────────────────────────────────────────
+// ─── fetchDapRequestForMutation ───────────────────────────────────────────────
+// Reads request metadata for mutation. Scoped by both id and vertical_key.
+// Returns null if not found or if vertical_key ≠ 'dap'.
 
-async function fetchDapRequest(
+async function fetchDapRequestForMutation(
   db: ReturnType<typeof getSupabaseAdminClient>,
   requestId: string,
-): Promise<{ id: string; request_status: string; vertical_key: string } | null> {
+): Promise<DapRequestMeta | null> {
   const { data, error } = await db
     .from('dap_requests')
     .select('id, request_status, vertical_key')
@@ -29,48 +53,67 @@ async function fetchDapRequest(
     .maybeSingle()
 
   if (error || !data) return null
-  return data as { id: string; request_status: string; vertical_key: string }
+  return data as DapRequestMeta
 }
 
-async function setDapRequestStatus(
+// ─── executeDecision ──────────────────────────────────────────────────────────
+// Shared decision execution:
+// 1. Validates the transition is allowed
+// 2. Updates request status (double-scoped by id + vertical_key)
+// 3. Inserts append-only event with full transition metadata
+// Steps 2 and 3 only run if step 1 passes — no partial events on invalid transitions.
+
+async function executeDecision(
   db: ReturnType<typeof getSupabaseAdminClient>,
-  requestId: string,
-  status: 'approved' | 'rejected' | 'needs_review',
+  existing: DapRequestMeta,
+  newStatus: 'approved' | 'rejected' | 'needs_review',
   eventType: 'request_approved' | 'request_rejected' | 'request_needs_review',
   input: DapRequestDecisionInput,
 ): Promise<DapRequestActionResult> {
-  // Double-scope the mutation: id AND vertical_key must match
+  const previousStatus = existing.request_status
+
+  if (!canTransitionDapRequestStatus(previousStatus, newStatus)) {
+    return {
+      ok: false,
+      code: 'invalid_transition',
+      message: `Cannot transition from '${previousStatus}' to '${newStatus}'`,
+    }
+  }
+
   const { data: updated, error: updateError } = await db
     .from('dap_requests')
-    .update({ request_status: status })
-    .eq('id', requestId)
+    .update({ request_status: newStatus })
+    .eq('id', existing.id)
     .eq('vertical_key', 'dap')
     .select()
     .single()
 
   if (updateError) {
-    return { success: false, request: null, error: updateError.message }
+    return { ok: false, code: 'status_update_failed', message: updateError.message }
   }
 
   const { error: eventError } = await db
     .from('dap_request_events')
     .insert({
-      request_id: requestId,
+      request_id: existing.id,
       event_type: eventType,
       actor_type: 'admin',
       event_note: input.note ?? null,
-      metadata_json: input.actorId ? { actor_id: input.actorId } : null,
+      metadata_json: {
+        previous_status: previousStatus,
+        new_status: newStatus,
+        ...(input.actorId ? { actor_id: input.actorId } : {}),
+      },
     })
 
   if (eventError) {
-    return { success: false, request: updated as DapRequest, error: eventError.message }
+    return { ok: false, code: 'event_insert_failed', message: eventError.message }
   }
 
-  return { success: true, request: updated as DapRequest }
+  return { ok: true, request: updated as DapRequest, eventType, previousStatus, newStatus }
 }
 
 // ─── approveDapRequest ────────────────────────────────────────────────────────
-// Marks a DAP request as approved by an internal admin reviewer.
 // approved ≠ provider confirmed. Does not publish a dentist page.
 // Does not validate offer terms. Does not unlock patient-facing claims.
 
@@ -78,30 +121,25 @@ export async function approveDapRequest(
   input: DapRequestDecisionInput,
 ): Promise<DapRequestActionResult> {
   const db = getSupabaseAdminClient()
-
-  const existing = await fetchDapRequest(db, input.requestId)
+  const existing = await fetchDapRequestForMutation(db, input.requestId)
   if (!existing) {
-    return { success: false, request: null, error: 'Request not found or not in DAP vertical' }
+    return { ok: false, code: 'request_not_found', message: 'Request not found or not in DAP vertical' }
   }
-
-  return setDapRequestStatus(db, input.requestId, 'approved', 'request_approved', input)
+  return executeDecision(db, existing, 'approved', 'request_approved', input)
 }
 
 // ─── rejectDapRequest ─────────────────────────────────────────────────────────
-// Marks a DAP request as rejected by an internal admin reviewer.
 // rejection does not trigger patient notification — that is a later phase.
 
 export async function rejectDapRequest(
   input: DapRequestDecisionInput,
 ): Promise<DapRequestActionResult> {
   const db = getSupabaseAdminClient()
-
-  const existing = await fetchDapRequest(db, input.requestId)
+  const existing = await fetchDapRequestForMutation(db, input.requestId)
   if (!existing) {
-    return { success: false, request: null, error: 'Request not found or not in DAP vertical' }
+    return { ok: false, code: 'request_not_found', message: 'Request not found or not in DAP vertical' }
   }
-
-  return setDapRequestStatus(db, input.requestId, 'rejected', 'request_rejected', input)
+  return executeDecision(db, existing, 'rejected', 'request_rejected', input)
 }
 
 // ─── markDapRequestNeedsReview ────────────────────────────────────────────────
@@ -111,11 +149,9 @@ export async function markDapRequestNeedsReview(
   input: DapRequestDecisionInput,
 ): Promise<DapRequestActionResult> {
   const db = getSupabaseAdminClient()
-
-  const existing = await fetchDapRequest(db, input.requestId)
+  const existing = await fetchDapRequestForMutation(db, input.requestId)
   if (!existing) {
-    return { success: false, request: null, error: 'Request not found or not in DAP vertical' }
+    return { ok: false, code: 'request_not_found', message: 'Request not found or not in DAP vertical' }
   }
-
-  return setDapRequestStatus(db, input.requestId, 'needs_review', 'request_needs_review', input)
+  return executeDecision(db, existing, 'needs_review', 'request_needs_review', input)
 }

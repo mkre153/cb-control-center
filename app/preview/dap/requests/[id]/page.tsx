@@ -8,15 +8,47 @@ export const dynamic = 'force-dynamic'
 
 type Params = Promise<{ id: string }>
 
+const DECISION_EVENT_TYPES = new Set(['request_approved', 'request_rejected', 'request_needs_review'])
+
 function EventRow({ event }: { event: DapRequestEvent }) {
+  const meta = event.metadata_json as Record<string, unknown> | null
+  const isDecision = DECISION_EVENT_TYPES.has(event.event_type)
+  const actorDisplay = meta?.actor_id ? String(meta.actor_id) : event.actor_type
+
   return (
     <tr className="border-t border-gray-100">
       <td className="py-2 px-4 text-xs text-gray-500">
         {new Date(event.event_timestamp).toLocaleString()}
       </td>
       <td className="py-2 px-4 text-sm font-mono text-gray-800">{event.event_type}</td>
-      <td className="py-2 px-4 text-xs text-gray-500">{event.actor_type}</td>
-      <td className="py-2 px-4 text-sm text-gray-600">{event.event_note ?? '—'}</td>
+      <td className="py-2 px-4 text-xs text-gray-500" data-event-actor>
+        {actorDisplay}
+      </td>
+      <td className="py-2 px-4 text-sm text-gray-600">
+        {isDecision && meta ? (
+          <div className="space-y-0.5 text-xs" data-event-transition>
+            <div>
+              <span className="text-gray-400">from:</span>{' '}
+              <span className="font-mono" data-event-previous-status>
+                {String(meta.previous_status ?? '—')}
+              </span>
+            </div>
+            <div>
+              <span className="text-gray-400">to:</span>{' '}
+              <span className="font-mono" data-event-new-status>
+                {String(meta.new_status ?? '—')}
+              </span>
+            </div>
+            {event.event_note && (
+              <div className="text-gray-500 italic" data-event-note>
+                {event.event_note}
+              </div>
+            )}
+          </div>
+        ) : (
+          <span data-event-note>{event.event_note ?? '—'}</span>
+        )}
+      </td>
     </tr>
   )
 }

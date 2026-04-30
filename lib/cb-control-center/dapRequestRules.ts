@@ -168,9 +168,11 @@ const ALLOWED_TRANSITIONS: Readonly<Record<DapRequestStatus, readonly DapRequest
   submitted:                  ['consent_verified', 'queued_for_review', 'needs_review', 'approved', 'rejected', 'closed_invalid', 'closed_duplicate'],
   consent_verified:           ['queued_for_review', 'needs_review', 'approved', 'rejected', 'practice_outreach_ready', 'closed_invalid', 'closed_duplicate'],
   queued_for_review:          ['needs_review', 'approved', 'rejected', 'practice_outreach_ready', 'closed_invalid', 'closed_duplicate', 'closed_no_response'],
-  // Phase 9F: admin review statuses — internal only, no public claim implications
+  // Phase 9F/9G: admin review statuses — internal only, no public claim implications
+  // approved → rejected requires going through needs_review first (no direct skip)
+  // rejected → approved requires going through needs_review first (no direct reversal)
   needs_review:               ['approved', 'rejected', 'queued_for_review'],
-  approved:                   ['practice_outreach_ready', 'needs_review', 'rejected'],
+  approved:                   ['practice_outreach_ready', 'needs_review'],
   rejected:                   ['needs_review'],
   practice_outreach_ready:    ['practice_contacted', 'closed_invalid', 'closed_no_response'],
   practice_contacted:         ['practice_declined', 'practice_interested', 'closed_no_response'],
@@ -188,7 +190,18 @@ export function canTransitionDapRequestStatus(
   from: DapRequestStatus,
   to: DapRequestStatus,
 ): boolean {
-  return (ALLOWED_TRANSITIONS[from] as readonly string[]).includes(to)
+  const allowed = ALLOWED_TRANSITIONS[from]
+  if (!allowed) return false  // unknown from-status: blocked, not silently allowed
+  return (allowed as readonly string[]).includes(to)
+}
+
+export function assertValidDapRequestTransition(
+  from: DapRequestStatus,
+  to: DapRequestStatus,
+): void {
+  if (!canTransitionDapRequestStatus(from, to)) {
+    throw new Error(`Invalid DAP request status transition: '${from}' → '${to}'`)
+  }
 }
 
 // ─── Safety flags ─────────────────────────────────────────────────────────────
