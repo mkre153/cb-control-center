@@ -136,14 +136,32 @@ describe('Current production route inventory', () => {
     'app/preview/dap/onboarding/page.tsx',
     // Internal onboarding detail (Phase 9I)
     'app/preview/dap/onboarding/[id]/page.tsx',
+    // Internal offer terms list (Phase 9J)
+    'app/preview/dap/offer-terms/page.tsx',
+    // Internal offer terms detail (Phase 9J)
+    'app/preview/dap/offer-terms/[id]/page.tsx',
+    // Internal provider participation list (Phase 9L)
+    'app/preview/dap/provider-participation/page.tsx',
+    // Internal provider participation detail (Phase 9L)
+    'app/preview/dap/provider-participation/[id]/page.tsx',
+    // Member status preview (Phase 9R)
+    'app/preview/dap/members/[membershipId]/status/page.tsx',
+    // Practice decision email preview (Phase 9U)
+    'app/preview/dap/practice-decision-emails/page.tsx',
+    // Communication approvals preview (Phase 9Y)
+    'app/preview/dap/communication-approvals/page.tsx',
+    // Communication dry-run preview (Phase 9Z)
+    'app/preview/dap/communication-dry-runs/page.tsx',
+    // Public member status preview (Phase 10)
+    'app/preview/dap/member-status/[membershipId]/page.tsx',
   ]
 
-  it('exactly 17 page.tsx files in app/ (12 preview + 3 Tier 1 production, Phase 9I added onboarding detail)', () => {
+  it('exactly 26 page.tsx files in app/ (Phase 10 added member-status dynamic route)', () => {
     const found = findFiles(join(ROOT, 'app'), f => f.endsWith('page.tsx'))
     expect(found.length).toBe(KNOWN_ROUTES.length)
   })
 
-  it('all 17 known routes exist on disk', () => {
+  it('all 19 known routes exist on disk', () => {
     for (const rel of KNOWN_ROUTES) {
       expect(existsSync(resolve(ROOT, rel)), `missing: ${rel}`).toBe(true)
     }

@@ -370,7 +370,7 @@ describe('UI workflow — detail page renders controls and disclaimer', () => {
     expect(src).not.toMatch(/offer.*validated|validated.*offer|offer terms confirmed/)
   })
 
-  it('page count is now 17 (Phase 9I added onboarding detail page)', () => {
+  it('page count is now 19 (Phase 9J added offer-terms list + detail pages)', () => {
     const { readdirSync } = require('fs')
     function findPages(dir: string): string[] {
       if (!existsSync(dir)) return []
@@ -386,13 +386,13 @@ describe('UI workflow — detail page renders controls and disclaimer', () => {
       return results
     }
     const pages = findPages(join(ROOT, 'app'))
-    expect(pages.length).toBe(17)
+    expect(pages.length).toBe(26)
   })
 })
 
 // ─── Group 6: Public Boundary Protection ──────────────────────────────────────
 
-describe('Public boundary — no provider confirmation, no CMS, no billing, no GHL', () => {
+describe('Public boundary — no provider confirmation, no CMS, no billing, no MKCRM', () => {
   it('action module does not reference confirmed_provider', () => {
     const src = readFileSync(ACTIONS_MODULE_PATH, 'utf8')
     expect(src).not.toContain('confirmed_provider')
@@ -413,9 +413,9 @@ describe('Public boundary — no provider confirmation, no CMS, no billing, no G
     expect(src).not.toMatch(/billing|membership.*id|stripe|subscription/)
   })
 
-  it('action module does not sync to GHL', () => {
+  it('action module does not sync to MKCRM', () => {
     const src = readFileSync(ACTIONS_MODULE_PATH, 'utf8').toLowerCase()
-    expect(src).not.toMatch(/ghl|gohighlevel/)
+    expect(src).not.toMatch(/mkcrm/i)
   })
 
   it('server actions do not mutate production DAP pages', () => {

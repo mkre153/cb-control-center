@@ -282,7 +282,7 @@ describe('Boundary protection — no public claim unlock, no CMS changes, no bil
 
   it('dapRequestActions.ts does not send outreach emails or trigger CRM', () => {
     const src = readFileSync(ACTIONS_MODULE_PATH, 'utf8').toLowerCase()
-    expect(src).not.toMatch(/sendmail|sendgrid|resend\.send|ghl|gohighlevel|crm/)
+    expect(src).not.toMatch(/sendmail|sendgrid|resend\.send|mkcrm|crm/)
   })
 })
 

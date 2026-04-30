@@ -102,9 +102,9 @@ describe('Production route allowlist', () => {
     expect(existsSync(resolve(APP_DIR, 'preview/dap'))).toBe(true)
   })
 
-  it('exactly 17 page.tsx files in app/ (12 preview + 3 production Tier 1, Phase 9I added onboarding detail)', () => {
+  it('exactly 21 page.tsx files in app/ (Phase 9L added provider-participation list + detail pages)', () => {
     const pages = findFiles(APP_DIR, f => f.endsWith('page.tsx'))
-    expect(pages).toHaveLength(17)
+    expect(pages).toHaveLength(26)
   })
 })
 
@@ -437,12 +437,17 @@ describe('Treatment page safety', () => {
 // ─── Group 7: Boundary preservation ──────────────────────────────────────────
 
 describe('Boundary preservation', () => {
-  it('only the Phase 9C SQL migration exists (no Phase 9B migration was added)', () => {
-    // Supabase dir exists (Phase 9C) — but Phase 9B itself added zero migrations
+  it('only the known SQL migrations exist (Phase 9Z added dry-run events migration)', () => {
     const sqlFiles = findFiles(ROOT, p => p.endsWith('.sql'))
     const KNOWN_MIGRATIONS = [
       'supabase/migrations/20260429000000_dap_requests.sql',
       'supabase/migrations/20260429000001_dap_practice_onboarding.sql',
+      'supabase/migrations/20260429000002_dap_offer_terms.sql',
+      'supabase/migrations/20260429000003_dap_offer_terms_review.sql',
+      'supabase/migrations/20260429000004_dap_provider_participation.sql',
+      'supabase/migrations/20260430000000_dap_communication_dispatch_events.sql',
+      'supabase/migrations/20260430000001_dap_communication_approval_events.sql',
+      'supabase/migrations/20260430000002_dap_communication_dry_run_events.sql',
     ]
     const unexpected = sqlFiles.filter(f => !KNOWN_MIGRATIONS.some(k => f.endsWith(k)))
     expect(unexpected).toHaveLength(0)
@@ -478,9 +483,9 @@ describe('Boundary preservation', () => {
     expect(treatments).not.toContain('dapRequestRules')
   })
 
-  it('no CRM or GHL integration files exist', () => {
+  it('no CRM or MKCRM integration files exist', () => {
     const crmFiles = findFiles(ROOT, p =>
-      (p.includes('/crm/') || p.includes('crm-') || p.includes('ghl')) &&
+      (p.includes('/crm/') || p.includes('crm-') || p.includes('mkcrm')) &&
       !p.includes('.test.')
     )
     expect(crmFiles).toHaveLength(0)

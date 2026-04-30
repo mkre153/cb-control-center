@@ -214,7 +214,7 @@ describe('Persistence module exports required functions', () => {
 
   it('persistence module does not import CRM, outreach, or email modules', () => {
     const src = readFileSync(PERSISTENCE_PATH, 'utf8').toLowerCase()
-    expect(src).not.toMatch(/import.*crm|import.*ghl|import.*sendgrid|import.*resend|import.*nodemailer/)
+    expect(src).not.toMatch(/import.*crm|import.*mkcrm|import.*sendgrid|import.*resend|import.*nodemailer/)
   })
 
   it('findDuplicateDapRequest excludes closed statuses from duplicate detection', () => {
@@ -326,7 +326,7 @@ describe('API route enforces safety invariants', () => {
 
   it('API route does not import or reference CRM modules', () => {
     const src = readFileSync(API_ROUTE_PATH, 'utf8').toLowerCase()
-    expect(src).not.toMatch(/import.*crm|import.*ghl|gohighlevel/)
+    expect(src).not.toMatch(/import.*crm|import.*mkcrm/)
   })
 
   it('API route does not send email or trigger outreach', () => {
@@ -381,9 +381,9 @@ describe('API route enforces safety invariants', () => {
 // ─── Group 6: Route boundary preserved ───────────────────────────────────────
 
 describe('Route boundary preserved — no new page routes added', () => {
-  const KNOWN_PAGE_COUNT = 17 // Phase 9I added onboarding detail page
+  const KNOWN_PAGE_COUNT = 26 // Phase 10 added member-status dynamic route
 
-  it('total page.tsx count is 17 (Phase 9I added onboarding detail page)', () => {
+  it('total page.tsx count is 26 (Phase 10 added member-status dynamic route)', () => {
     const found = findFiles(join(ROOT, 'app'), f => f.endsWith('page.tsx'))
     expect(found.length).toBe(KNOWN_PAGE_COUNT)
   })

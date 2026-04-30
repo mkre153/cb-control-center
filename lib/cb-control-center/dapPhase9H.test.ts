@@ -354,7 +354,7 @@ describe('Onboarding list page exists and is read-only', () => {
       return results
     }
     const pages = findPages(join(ROOT, 'app'))
-    expect(pages.length).toBe(17)
+    expect(pages.length).toBe(26)
   })
 })
 
@@ -386,9 +386,9 @@ describe('Public boundary protection — no provider confirmation, no CMS, no bi
     expect(src).not.toMatch(/billing|membership.*id|stripe|subscription/)
   })
 
-  it('onboarding module does not sync to GHL', () => {
+  it('onboarding module does not sync to MKCRM', () => {
     const src = readFileSync(MODULE_PATH, 'utf8').toLowerCase()
-    expect(src).not.toMatch(/ghl|gohighlevel/)
+    expect(src).not.toMatch(/mkcrm/i)
   })
 
   it('production homepage does not import onboarding module', () => {

@@ -739,15 +739,21 @@ describe('Database migration inventory', () => {
     expect(existsSync(resolve(ROOT, 'supabase/migrations'))).toBe(true)
   })
 
-  it('exactly the Phase 9C SQL migration exists', () => {
+  it('exactly the known SQL migrations exist (Phase 9Z added dry-run events migration)', () => {
     const sqlFiles = findFiles(ROOT, p => p.endsWith('.sql'))
     const KNOWN_MIGRATIONS = [
       'supabase/migrations/20260429000000_dap_requests.sql',
       'supabase/migrations/20260429000001_dap_practice_onboarding.sql',
+      'supabase/migrations/20260429000002_dap_offer_terms.sql',
+      'supabase/migrations/20260429000003_dap_offer_terms_review.sql',
+      'supabase/migrations/20260429000004_dap_provider_participation.sql',
+      'supabase/migrations/20260430000000_dap_communication_dispatch_events.sql',
+      'supabase/migrations/20260430000001_dap_communication_approval_events.sql',
+      'supabase/migrations/20260430000002_dap_communication_dry_run_events.sql',
     ]
     const unexpected = sqlFiles.filter(f => !KNOWN_MIGRATIONS.some(k => f.endsWith(k)))
     expect(unexpected).toHaveLength(0)
-    expect(sqlFiles).toHaveLength(2)
+    expect(sqlFiles).toHaveLength(8)
   })
 })
 
@@ -798,11 +804,11 @@ describe('Deferred integrations remain deferred', () => {
     expect(nonTestFiles).toHaveLength(0)
   })
 
-  it('no GHL webhook files exist', () => {
-    const ghlFiles = findFiles(ROOT, p =>
-      p.includes('ghl') || p.includes('gohighlevel')
+  it('no MKCRM integration files exist', () => {
+    const mkCrmFiles = findFiles(ROOT, p =>
+      p.includes('mkcrm')
     )
-    expect(ghlFiles).toHaveLength(0)
+    expect(mkCrmFiles).toHaveLength(0)
   })
 
   it('no email notification handler files exist under app/api', () => {
@@ -813,14 +819,14 @@ describe('Deferred integrations remain deferred', () => {
     expect(emailRoutes).toHaveLength(0)
   })
 
-  it('dapRequestRules.ts does not import CRM, GHL, or email packages', () => {
+  it('dapRequestRules.ts does not import CRM, MKCRM, or email packages', () => {
     const { readFileSync } = require('fs')
     const content = readFileSync(
       resolve(ROOT, 'lib/cb-control-center/dapRequestRules.ts'),
       'utf8'
     )
     expect(content).not.toMatch(/from ['"].*crm/)
-    expect(content).not.toMatch(/from ['"].*ghl/)
+    expect(content).not.toMatch(/from ['"].*mkcrm/)
     expect(content).not.toMatch(/from ['"].*resend/)
     expect(content).not.toMatch(/from ['"].*sendgrid/)
     expect(content).not.toMatch(/from ['"].*nodemailer/)

@@ -27,7 +27,7 @@ import { checkIpRateLimit, checkContactRateLimit } from '@/lib/cb-control-center
 // - Persists request + two bootstrap events (request_created, consent_captured)
 // - Returns a confirmation that explicitly states this is not enrollment
 //
-// NOT wired to: CRM, GHL, notifications, outbound messaging, provider referral, payment.
+// NOT wired to: CRM, MKCRM, notifications, outbound messaging, provider referral, payment.
 
 export async function POST(request: NextRequest): Promise<Response> {
   const ip =

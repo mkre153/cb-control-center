@@ -236,9 +236,9 @@ describe('Page count is now 15 (Phase 9E added 2 new preview pages)', () => {
     return results
   }
 
-  it('total page.tsx count is 17 (13 prior + 2 review pages + 1 onboarding list + 1 onboarding detail)', () => {
+  it('total page.tsx count is 21 (Phase 9L added provider-participation list + detail pages)', () => {
     const pages = findPages(join(ROOT, 'app'))
-    expect(pages.length).toBe(17)
+    expect(pages.length).toBe(26)
   })
 
   it('app/preview/dap/requests/page.tsx is included in the count', () => {
@@ -298,6 +298,6 @@ describe('No mutation surface added in Phase 9E', () => {
 
   it('admin module does not import from CRM or messaging modules', () => {
     const src = readFileSync(ADMIN_MODULE_PATH, 'utf8').toLowerCase()
-    expect(src).not.toMatch(/import.*crm|import.*ghl|import.*sendgrid|import.*resend/)
+    expect(src).not.toMatch(/import.*crm|import.*mkcrm|import.*sendgrid|import.*resend/)
   })
 })

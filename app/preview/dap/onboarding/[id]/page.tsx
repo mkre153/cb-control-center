@@ -4,6 +4,8 @@ import {
   getOnboardingIntakeById,
   getOnboardingIntakeEvents,
 } from '@/lib/cb-control-center/dapPracticeOnboarding'
+import { getOfferTermsDraftByOnboardingId } from '@/lib/cb-control-center/dapOfferTerms'
+import { createOfferTermsDraftAction } from '../../offer-terms/actions'
 import { canTransitionDapPracticeOnboardingStatus } from '@/lib/cb-control-center/dapPracticeOnboardingRules'
 import type {
   DapPracticeOnboardingEvent,
@@ -111,12 +113,16 @@ function EventRow({ event }: { event: DapPracticeOnboardingEvent }) {
 
 export default async function DapOnboardingDetailPage({ params }: { params: Params }) {
   const { id } = await params
-  const [intake, events] = await Promise.all([
+  const [intake, events, offerTermsDraft] = await Promise.all([
     getOnboardingIntakeById(id),
     getOnboardingIntakeEvents(id),
+    getOfferTermsDraftByOnboardingId(id),
   ])
 
   if (!intake) notFound()
+
+  const offerTermsEligible =
+    intake.status === 'interested' || intake.status === 'terms_needed'
 
   const validStatusActions = STATUS_ACTIONS.filter(a =>
     canTransitionDapPracticeOnboardingStatus(intake.status, a.status),
@@ -245,6 +251,53 @@ export default async function DapOnboardingDetailPage({ params }: { params: Para
           </div>
         </dl>
       </section>
+
+      {offerTermsEligible && (
+        <section
+          className="rounded-lg border border-indigo-200 bg-indigo-50 p-6 space-y-4"
+          data-offer-terms-panel
+        >
+          <div className="space-y-1">
+            <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+              Offer Terms Collection
+            </h2>
+            <p className="text-xs text-indigo-800">
+              Start an internal offer terms draft for this interested practice. Creating a draft
+              does not validate pricing, confirm provider participation, or publish patient-facing
+              claims.
+            </p>
+          </div>
+          {offerTermsDraft ? (
+            <div className="space-y-2" data-offer-terms-draft-exists>
+              <p className="text-sm text-gray-700">
+                Draft exists —{' '}
+                <span className="font-mono text-xs text-gray-500">
+                  {offerTermsDraft.status}
+                </span>
+              </p>
+              <Link
+                href={`/preview/dap/offer-terms/${offerTermsDraft.id}`}
+                className="text-sm text-indigo-600 hover:underline"
+                data-offer-terms-draft-link={offerTermsDraft.id}
+              >
+                View offer terms draft →
+              </Link>
+            </div>
+          ) : (
+            <form>
+              <input type="hidden" name="onboardingIntakeId" value={intake.id} />
+              <button
+                formAction={createOfferTermsDraftAction}
+                type="submit"
+                className="rounded bg-indigo-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-indigo-700"
+                data-action="create-offer-terms-draft"
+              >
+                Create offer terms draft
+              </button>
+            </form>
+          )}
+        </section>
+      )}
 
       <section className="space-y-3" data-event-log>
         <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">

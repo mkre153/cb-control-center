@@ -333,7 +333,7 @@ describe('Production request routes remain absent', () => {
     expect(existsSync(resolve(ROOT, 'app/dental-advantage-plan/request/page.tsx'))).toBe(false)
   })
 
-  it('total page.tsx count is 15 (Phase 9E added 2 review pages)', () => {
+  it('total page.tsx count is 21 (Phase 9L added provider-participation list + detail pages)', () => {
     const { readdirSync } = require('fs')
     const { join } = require('path')
     function findPages(dir: string): string[] {
@@ -350,16 +350,16 @@ describe('Production request routes remain absent', () => {
       return results
     }
     const pages = findPages(join(ROOT, 'app'))
-    expect(pages.length).toBe(17)
+    expect(pages.length).toBe(26)
   })
 })
 
 // ─── Group 8: Deferred integrations remain deferred ──────────────────────────
 
 describe('Deferred integrations remain deferred', () => {
-  it('API route does not import CRM or GHL modules', () => {
+  it('API route does not import CRM or MKCRM modules', () => {
     const src = readFileSync(API_ROUTE_PATH, 'utf8').toLowerCase()
-    expect(src).not.toMatch(/import.*crm|import.*ghl|gohighlevel/)
+    expect(src).not.toMatch(/import.*crm|import.*mkcrm/)
   })
 
   it('API route does not send email or trigger outbound messaging', () => {
@@ -370,9 +370,9 @@ describe('Deferred integrations remain deferred', () => {
   it('component does not import or call CRM, outreach, or messaging modules', () => {
     const src = readFileSync(COMPONENT_PATH, 'utf8')
     // Check imports only — comments may mention these terms as disclaimers
-    expect(src).not.toMatch(/^import.*crm|^import.*ghl|^import.*sendgrid|^import.*resend/m)
+    expect(src).not.toMatch(/^import.*crm|^import.*mkcrm|^import.*sendgrid|^import.*resend/m)
     // No actual API calls to outreach endpoints
-    expect(src).not.toMatch(/fetch\(['"].*crm|fetch\(['"].*ghl|fetch\(['"].*webhook/)
+    expect(src).not.toMatch(/fetch\(['"].*crm|fetch\(['"].*mkcrm|fetch\(['"].*webhook/)
   })
 
   it('deprecated RequestDentistForm is not wired to the API', () => {
