@@ -15,10 +15,10 @@ export function BusinessTruthTab({ schema }: { schema: TruthSection[] }) {
     <div className="space-y-5">
       <div className="flex items-start justify-between p-3 bg-blue-50 border border-blue-100 rounded-lg">
         <div>
-          <span className="text-xs font-semibold text-blue-700">Normalized Factual Record</span>
+          <span className="text-xs font-semibold text-blue-700">Truth Schema — 7 sections</span>
           <p className="text-xs text-blue-600 mt-0.5">
-            This is the source of truth that feeds downstream systems. All fields must reach
-            &ldquo;Confirmed&rdquo; status before Business Truth JSON can be finalized.
+            Canonical record gating all downstream publishing decisions. Page Eligibility Rules
+            are derived from the other six sections. Resolve blockers to unlock page types.
           </p>
         </div>
         <div className="text-right ml-4 shrink-0">
@@ -67,7 +67,8 @@ export function BusinessTruthTab({ schema }: { schema: TruthSection[] }) {
       <div className="border border-gray-100 rounded-lg p-3">
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Finalization Gate</p>
         <p className="text-xs text-gray-500">
-          Business Truth JSON cannot be finalized until all fields in <span className="font-medium text-gray-700">Pricing & Savings Logic</span> and <span className="font-medium text-gray-700">Practice Availability</span> are confirmed or explicitly deferred. Resolve blockers in the Blockers tab.
+          Truth Schema cannot be finalized until <span className="font-medium text-gray-700">Provider Participation Truth</span>, <span className="font-medium text-gray-700">Offer Truth</span>, and <span className="font-medium text-gray-700">Patient Demand Truth</span> blockers are resolved or explicitly deferred.{' '}
+          <span className="font-medium text-gray-700">Page Eligibility Rules</span> and <span className="font-medium text-gray-700">Publishing Claim Safety</span> are derived automatically from the resolved sections. Resolve blockers in the Blockers tab.
         </p>
       </div>
     </div>

@@ -84,10 +84,29 @@ export interface StrategyRecord {
   nextStrategyAction: string
 }
 
+export type DapPageTypeId =
+  | 'confirmed-provider-page'
+  | 'unconfirmed-practice-page'
+  | 'city-zip-demand-page'
+  | 'education-decision-page'
+
+export interface DapPageTypeSpec {
+  id: DapPageTypeId
+  name: string
+  shortName: string
+  gateBlocker: string | null
+  conditionalWithoutGate: boolean
+  allowedClaims: string[]
+  forbiddenClaims: string[]
+  primaryCta: string
+  color: 'green' | 'amber' | 'blue' | 'gray'
+}
+
 export interface PagePlanItem {
   title: string
   status: string
   reason: string
+  pageType: DapPageTypeId
 }
 
 export interface ActivityEvent {
@@ -104,6 +123,80 @@ export interface InitialInput {
   pipelineGoal: string
   seedCustomerDecision: string
   inputStatus: InputStatus
+}
+
+// v0.3 — Provider status + dentist page template system
+
+export type ProviderStatus =
+  | 'confirmed_dap_provider'  // signed agreement on file → Template A, Path 1
+  | 'not_confirmed'           // in dataset, not verified as offering DAP → Template B, Path 2
+  | 'recruitment_requested'   // patient submitted a request → Template B, Path 3
+  | 'pending_confirmation'    // DAP outreach made — patient still sees Path 2
+  | 'declined'                // practice declined DAP — internal only, no patient-facing template
+
+export type DentistTemplateId = 'confirmed-provider' | 'unconfirmed-practice' | 'internal_only'
+
+// Separate verification gates — each is independent of provider_status
+export type PricingStatus = 'verified' | 'unverified' | 'partial'
+export type OfferTermsStatus = 'complete' | 'incomplete' | 'pending'
+export type PublicClaimLevel = 'full' | 'limited' | 'none'
+
+export interface ProviderStatusSpec {
+  status: ProviderStatus
+  label: string
+  description: string
+  appearsInSearch: boolean
+  canLabelAsOfferingDAP: boolean
+  allowedClaims: string[]
+  forbiddenClaims: string[]
+  uiTreatment: string
+  ctaAllowed: string | null
+  dapNextAction: string
+  ifOnlyStatusInArea: string
+}
+
+export type SearchPath =
+  | 'confirmed-available'       // ≥1 confirmed_dap_provider found near patient's ZIP
+  | 'no-confirmed-nearby'       // 0 confirmed providers in patient's ZIP/area
+  | 'specific-dentist-request'  // patient names a specific practice for recruitment
+
+export interface SearchPathRule {
+  id: SearchPath
+  label: string
+  trigger: string
+  patientQuestion: string
+  systemBehavior: string[]
+  allowedClaims: string[]
+  forbiddenClaims: string[]
+  primaryCTA: string
+  ctaDestination: string
+  mockResultSummary: string
+}
+
+export interface DentistPageTemplate {
+  id: DentistTemplateId
+  name: string
+  gateCriteria: string
+  providerStatuses: ProviderStatus[]
+  sampleH1: string
+  sampleSubhead: string
+  ctaText: string
+  ctaDestination: string
+  allowedLanguage: string[]
+  forbiddenLanguage: string[]
+  requiredDisclaimer: string
+}
+
+export interface MockDentistPage {
+  id: string
+  practiceName: string
+  city: string
+  zip: string
+  provider_status: ProviderStatus
+  assignedTemplate: DentistTemplateId
+  pageSlug?: string  // absent for declined practices — no public URL exists
+  eligible: boolean
+  eligibilityReason: string
 }
 
 // v0.2 — Business Truth schema model

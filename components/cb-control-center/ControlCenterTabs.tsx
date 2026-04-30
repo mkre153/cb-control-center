@@ -4,9 +4,13 @@ import { useState } from 'react'
 import { CrawlOutputTab } from './tabs/CrawlOutputTab'
 import { BusinessTruthTab } from './tabs/BusinessTruthTab'
 import { BlockersTab } from './tabs/BlockersTab'
+import { ProviderStatusTab } from './tabs/ProviderStatusTab'
+import { SearchPathsTab } from './tabs/SearchPathsTab'
+import { TemplatesTab } from './tabs/TemplatesTab'
 import { StrategyTab } from './tabs/StrategyTab'
 import { PagesTab } from './tabs/PagesTab'
 import { ActivityTab } from './tabs/ActivityTab'
+import { SiteArchitectureTab } from './tabs/SiteArchitectureTab'
 import type {
   CrawlOutput,
   EnrichedBlocker,
@@ -16,7 +20,7 @@ import type {
   ActivityEvent,
 } from '@/lib/cb-control-center/types'
 
-type TabId = 'crawl-output' | 'business-truth-json' | 'blockers' | 'strategy' | 'pages' | 'activity'
+type TabId = 'crawl-output' | 'truth-schema' | 'blockers' | 'provider-status' | 'search-paths' | 'templates' | 'site-architecture' | 'strategy' | 'pages' | 'activity'
 
 interface ControlCenterTabsProps {
   crawlOutput: CrawlOutput
@@ -25,6 +29,7 @@ interface ControlCenterTabsProps {
   strategy: StrategyRecord
   pages: PagePlanItem[]
   activity: ActivityEvent[]
+  onResolveBlocker?: (id: string, type: 'confirm' | 'defer') => void
 }
 
 export function ControlCenterTabs({
@@ -34,44 +39,63 @@ export function ControlCenterTabs({
   strategy,
   pages,
   activity,
+  onResolveBlocker,
 }: ControlCenterTabsProps) {
   const [activeTab, setActiveTab] = useState<TabId>('crawl-output')
 
   const openBlockerCount = blockers.filter(b => b.resolutionStatus === 'open').length
 
   const tabs: { id: TabId; label: string }[] = [
-    { id: 'crawl-output', label: 'Crawl Output' },
-    { id: 'business-truth-json', label: 'Business Truth JSON' },
-    { id: 'blockers', label: `Blockers (${openBlockerCount})` },
-    { id: 'strategy', label: 'Strategy' },
-    { id: 'pages', label: 'Pages' },
-    { id: 'activity', label: 'Activity' },
+    { id: 'crawl-output',    label: 'Crawl Output' },
+    { id: 'truth-schema',    label: 'Truth Schema' },
+    { id: 'blockers',        label: `Blockers${openBlockerCount > 0 ? ` (${openBlockerCount})` : ' ✓'}` },
+    { id: 'provider-status', label: 'Provider Status' },
+    { id: 'search-paths',    label: 'Search Paths' },
+    { id: 'templates',          label: 'Templates' },
+    { id: 'site-architecture',  label: 'Site Architecture' },
+    { id: 'strategy',           label: 'Strategy' },
+    { id: 'pages',           label: 'Pages' },
+    { id: 'activity',        label: 'Activity' },
   ]
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4">
       <div className="flex flex-wrap gap-1 mb-5 border-b border-gray-100 pb-3">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`px-3 py-1.5 text-sm rounded-md font-medium transition-colors ${
-              activeTab === tab.id
-                ? 'bg-gray-900 text-white'
-                : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+        {tabs.map((tab) => {
+          const isBlockersTab = tab.id === 'blockers'
+          const hasOpenBlockers = openBlockerCount > 0
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-3 py-1.5 text-sm rounded-md font-medium transition-colors ${
+                activeTab === tab.id
+                  ? 'bg-gray-900 text-white'
+                  : isBlockersTab && hasOpenBlockers
+                  ? 'text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200'
+                  : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100'
+              }`}
+            >
+              {tab.label}
+            </button>
+          )
+        })}
       </div>
 
       <div>
         {activeTab === 'crawl-output' && <CrawlOutputTab crawlOutput={crawlOutput} />}
-        {activeTab === 'business-truth-json' && <BusinessTruthTab schema={businessTruthSchema} />}
-        {activeTab === 'blockers' && <BlockersTab blockers={blockers} />}
+        {activeTab === 'truth-schema' && <BusinessTruthTab schema={businessTruthSchema} />}
+        {activeTab === 'blockers' && (
+          <BlockersTab blockers={blockers} onResolveBlocker={onResolveBlocker} />
+        )}
+        {activeTab === 'provider-status' && <ProviderStatusTab />}
+        {activeTab === 'search-paths' && <SearchPathsTab />}
+        {activeTab === 'templates' && <TemplatesTab />}
+        {activeTab === 'site-architecture' && (
+          <SiteArchitectureTab schema={businessTruthSchema} blockers={blockers} />
+        )}
         {activeTab === 'strategy' && <StrategyTab strategy={strategy} />}
-        {activeTab === 'pages' && <PagesTab pages={pages} />}
+        {activeTab === 'pages' && <PagesTab pages={pages} blockers={blockers} />}
         {activeTab === 'activity' && <ActivityTab activity={activity} />}
       </div>
     </div>

@@ -25,7 +25,7 @@ export function SimulationControls({ currentState, onStateChange }: SimulationCo
         {SIMULATION_STATE_ORDER.map((id, index) => {
           const snap = SIMULATION_STATES[id]
           const isActive = id === currentState
-          const isReset = id === 'current_blocked'
+          const isReset = id === 'no_provider_no_data'
 
           return (
             <button
