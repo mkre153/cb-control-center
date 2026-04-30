@@ -1,15 +1,17 @@
 import type { Metadata } from 'next'
+import { DapSiteNav } from '@/components/dap/DapSiteNav'
+import { DapSiteFooter } from '@/components/dap/DapSiteFooter'
 
 export const metadata: Metadata = {
   robots: 'index, follow',
 }
 
-export default function DapHomepageLayout({ children }: { children: React.ReactNode }) {
+export default function DapPublicLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-        {children}
-      </div>
+    <div className="min-h-screen bg-white flex flex-col">
+      <DapSiteNav />
+      <main className="flex-1">{children}</main>
+      <DapSiteFooter />
     </div>
   )
 }

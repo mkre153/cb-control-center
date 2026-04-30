@@ -178,9 +178,11 @@ describe('Route file inventory', () => {
     'app/businesses/dental-advantage-plan/build/page.tsx',
     'app/businesses/dental-advantage-plan/page.tsx',
     'app/businesses/new/page.tsx',
+    // DAP public site compare page (Phase 18A)
+    'app/dental-advantage-plan/compare/page.tsx',
   ]
 
-  it('exactly 48 page.tsx files exist in app/ (Phase 17B added 3 business portfolio routes)', () => {
+  it('exactly 49 page.tsx files exist in app/ (Phase 18A added DAP compare route)', () => {
     const found = findFiles(join(ROOT, 'app'), f => f.endsWith('page.tsx'))
     expect(found.length).toBe(KNOWN_ROUTES.length)
   })

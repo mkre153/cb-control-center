@@ -610,7 +610,7 @@ describe('Phase 9W — Practice preview page renders projected dispatch event se
 
 describe('Phase 9W — Full suite guard', () => {
   it('page count is still 23', () => {
-    expect(findPages(join(ROOT, 'app')).length).toBe(48)
+    expect(findPages(join(ROOT, 'app')).length).toBe(49)
   })
 
   it('Phase 9V dispatch readiness still returns 8 practice items', () => {

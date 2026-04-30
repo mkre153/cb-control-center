@@ -286,22 +286,25 @@ describe('Homepage safety', () => {
     expect(content).not.toContain("href: '/search'")
   })
 
-  it('homepage hero CTA hrefs point to existing guide pages', () => {
+  it('homepage CTAs link to patient-facing routes (Phase 18A: redesigned as public site)', () => {
     const content = readRoute('app/dental-advantage-plan/page.tsx')
-    expect(content).toContain('/guides/')
+    // New homepage links to /dental-advantage-plan/* patient routes — not CB Control Center preview routes
+    expect(content).toContain('/dental-advantage-plan/')
+    expect(content).not.toContain('/preview/dap/')
   })
 
-  it('homepage page shows preview label as false (production mode)', () => {
+  it('homepage does not show a preview label (production mode — Phase 18A redesign)', () => {
     const content = readRoute('app/dental-advantage-plan/page.tsx')
-    expect(content).toContain('showPreviewLabel={false}')
+    // Old DapHomepageHeroPreview replaced by standalone public site components in Phase 18A
+    expect(content).not.toContain('data-preview-label')
+    expect(content).not.toContain('Design preview')
   })
 
-  it('homepage imports from existing model factories — no new business logic', () => {
+  it('homepage uses standalone page content — no CB Control Center component dependency', () => {
     const content = readRoute('app/dental-advantage-plan/page.tsx')
-    expect(content).toContain('getHomepageHeroModel')
-    expect(content).toContain('getDefaultHowItWorksModel')
-    expect(content).toContain('getDefaultComparisonModel')
-    expect(content).toContain('getDefaultFaqModel')
+    // Phase 18A rewrote homepage as a self-contained public marketing page
+    expect(content).not.toContain('DapHomepageHeroPreview')
+    expect(content).not.toContain('SimulationShell')
   })
 })
 

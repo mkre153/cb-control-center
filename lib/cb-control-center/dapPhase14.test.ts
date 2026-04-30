@@ -78,7 +78,7 @@ describe('Phase 14 — Page exists', () => {
   })
 
   it('total page count is now 33', () => {
-    expect(findPages(join(ROOT, 'app')).length).toBe(48)
+    expect(findPages(join(ROOT, 'app')).length).toBe(49)
   })
 })
 
@@ -642,7 +642,7 @@ describe('Phase 14 — Preview-only boundary', () => {
 
 describe('Phase 14 — Full suite guard', () => {
   it('page count is 33 (all prior pages preserved)', () => {
-    expect(findPages(join(ROOT, 'app')).length).toBe(48)
+    expect(findPages(join(ROOT, 'app')).length).toBe(49)
   })
 
   it('buildWriteContractsFromDemoContext still returns 9 contracts', () => {
