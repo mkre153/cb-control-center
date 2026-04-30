@@ -48,14 +48,14 @@ export function ControlCenterTabs({
   const openBlockerCount = blockers.filter(b => b.resolutionStatus === 'open').length
 
   const tabs: { id: TabId; label: string }[] = [
-    { id: 'crawl-output',    label: 'Crawl Output' },
-    { id: 'truth-schema',    label: 'Truth Schema' },
+    { id: 'crawl-output',    label: 'Crawl' },
+    { id: 'truth-schema',    label: 'Truth' },
     { id: 'blockers',        label: `Blockers${openBlockerCount > 0 ? ` (${openBlockerCount})` : ' ✓'}` },
-    { id: 'provider-status', label: 'Provider Status' },
-    { id: 'search-paths',    label: 'Search Paths' },
-    { id: 'templates',          label: 'Templates' },
-    { id: 'site-architecture',  label: 'Site Architecture' },
-    { id: 'strategy',           label: 'Strategy' },
+    { id: 'provider-status', label: 'Providers' },
+    { id: 'search-paths',    label: 'Patient Paths' },
+    { id: 'templates',       label: 'Templates' },
+    { id: 'site-architecture', label: 'Architecture' },
+    { id: 'strategy',        label: 'Strategy' },
     { id: 'pages',           label: 'Pages' },
     { id: 'activity',        label: 'Activity' },
   ]

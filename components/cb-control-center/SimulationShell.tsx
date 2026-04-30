@@ -5,6 +5,7 @@ import { CommandHeader } from './CommandHeader'
 import { PipelineBar } from './PipelineBar'
 import { CurrentStagePanel } from './CurrentStagePanel'
 import { BlockerTaskList } from './BlockerTaskList'
+import { LaunchReadinessPanel } from './LaunchReadinessPanel'
 import { BusinessSummaryCard } from './BusinessSummaryCard'
 import { InitialInputCard } from './InitialInputCard'
 import { PipelineRuleStrip } from './PipelineRuleStrip'
@@ -28,6 +29,7 @@ import {
   MOCK_ACTIVITY,
   BLOCKER_RESOLUTION_PATCHES,
 } from '@/lib/cb-control-center/mockData'
+import { getLaunchReadiness } from '@/lib/cb-control-center/launchReadiness'
 import type { EnrichedBlocker } from '@/lib/cb-control-center/types'
 
 type ResolutionType = 'confirm' | 'defer'
@@ -108,6 +110,7 @@ export function SimulationShell() {
         allBlockersResolved={allCurrentBlockersResolved}
         nextStateLabel={nextStateId ? SIMULATION_STATES[nextStateId].label : undefined}
         onAdvance={nextStateId ? () => handleStateChange(nextStateId) : undefined}
+        showMockMode
       />
 
       {/* Sticky pipeline bar — always visible */}
@@ -141,6 +144,9 @@ export function SimulationShell() {
               onResolveBlocker={handleResolveBlocker}
             />
           </div>
+
+          {/* Launch readiness */}
+          <LaunchReadinessPanel capabilities={getLaunchReadiness(effectiveBlockers)} />
 
           {/* Advance banner when all blockers resolved */}
           {allCurrentBlockersResolved && nextStateId && (
