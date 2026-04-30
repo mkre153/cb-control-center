@@ -171,16 +171,16 @@ export function SimulationShell() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-0.5">
-                    Reviewing prior stage
+                    Reviewing completed stage: {viewingStage.name}
                   </p>
-                  <h2 className="text-lg font-bold text-gray-900">{viewingStage.name}</h2>
+                  <p className="text-xs text-gray-400 mb-1">Active stage remains: {snap.command.stage}</p>
                   <p className="text-sm text-gray-500 mt-1">{viewingStage.summary}</p>
                 </div>
                 <button
                   onClick={() => setViewingStageIndex(null)}
                   className="shrink-0 text-xs text-gray-400 hover:text-gray-700 border border-gray-200 hover:border-gray-300 px-3 py-1.5 rounded-md transition-colors"
                 >
-                  Return to {snap.command.stage}
+                  Return to current stage: {snap.command.stage}
                 </button>
               </div>
 
