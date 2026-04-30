@@ -549,7 +549,7 @@ describe('UI integration — review panel in offer terms detail page', () => {
       return results
     }
     const pages = findPages(join(ROOT, 'app'))
-    expect(pages.length).toBe(26)
+    expect(pages.length).toBe(34)
   })
 })
 
@@ -629,6 +629,6 @@ describe('Public boundary — no provider confirmation, no CMS, no billing, no M
       return results
     }
     const pages = findPages(join(ROOT, 'app'))
-    expect(pages.length).toBe(26)
+    expect(pages.length).toBe(34)
   })
 })

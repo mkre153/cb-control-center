@@ -154,9 +154,25 @@ describe('Current production route inventory', () => {
     'app/preview/dap/communication-dry-runs/page.tsx',
     // Public member status preview (Phase 10)
     'app/preview/dap/member-status/[membershipId]/page.tsx',
+    // Admin decision readiness preview (Phase 11)
+    'app/preview/dap/admin-review/page.tsx',
+    // Admin event timeline preview (Phase 11)
+    'app/preview/dap/admin-timeline/page.tsx',
+    // Member admin summary preview (Phase 11)
+    'app/preview/dap/member-admin-summary/page.tsx',
+    // Action catalog preview (Phase 12)
+    'app/preview/dap/action-catalog/page.tsx',
+    // Admin decision ledger preview (Phase 13)
+    'app/preview/dap/admin-decision-ledger/page.tsx',
+    // Admin decision write contract preview (Phase 14)
+    'app/preview/dap/admin-decision-write-contract/page.tsx',
+    // Admin decision SQL contract preview (Phase 15)
+    'app/preview/dap/admin-decision-sql-contract/page.tsx',
+    // Admin decision audit + replay preview (Phase 16)
+    'app/preview/dap/admin-decision-audit/page.tsx',
   ]
 
-  it('exactly 26 page.tsx files in app/ (Phase 10 added member-status dynamic route)', () => {
+  it('exactly 34 page.tsx files in app/ (Phase 16 added admin-decision-audit preview)', () => {
     const found = findFiles(join(ROOT, 'app'), f => f.endsWith('page.tsx'))
     expect(found.length).toBe(KNOWN_ROUTES.length)
   })

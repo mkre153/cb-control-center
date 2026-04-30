@@ -573,7 +573,7 @@ describe('Full suite boundary — no new pages, no API routes, module placement 
 
   it('total page.tsx count is still 21 (Phase 9M adds no new pages)', () => {
     const pages = findPages(join(ROOT, 'app'))
-    expect(pages.length).toBe(26)
+    expect(pages.length).toBe(34)
   })
 
   it('no MKCRM sync API route created in Phase 9M', () => {
