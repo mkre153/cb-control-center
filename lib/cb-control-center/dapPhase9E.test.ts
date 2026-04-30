@@ -255,7 +255,7 @@ describe('Page count is now 15 (Phase 9E added 2 new preview pages)', () => {
     const pages = findPages(join(ROOT, 'app'))
     const productionPages = pages.filter(p => !p.includes('/preview/') && !p.includes('/api/'))
     // Prior production pages: 4 (root + 3 Tier 1 as of Phase 9B)
-    expect(productionPages.length).toBeLessThanOrEqual(13)
+    expect(productionPages.length).toBeLessThanOrEqual(14)
   })
 })
 

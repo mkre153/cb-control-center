@@ -272,6 +272,12 @@ export function getNextStep(standing: DapMemberStanding): string {
   return NEXT_STEPS[standing]
 }
 
+// ─── Membership existence check ──────────────────────────────────────────────
+
+export function isDapMembershipKnown(membershipId: string): boolean {
+  return Object.prototype.hasOwnProperty.call(FIXTURE_BILLING_EVENTS, membershipId)
+}
+
 // ─── Core public read model builder ──────────────────────────────────────────
 
 export function getDapMemberStatusReadModel(

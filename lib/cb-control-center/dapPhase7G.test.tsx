@@ -170,9 +170,11 @@ describe('Route file inventory', () => {
     'app/dental-advantage-plan/cities/[city]/page.tsx',
     'app/dental-advantage-plan/dentists/[city]/page.tsx',
     'app/dental-advantage-plan/dentists/[city]/[practiceSlug]/page.tsx',
+    // Member status — public (Phase 2A)
+    'app/dental-advantage-plan/member-status/[membershipId]/page.tsx',
   ]
 
-  it('exactly 43 page.tsx files exist in app/ (Phase 1 added DAP public site pages)', () => {
+  it('exactly 44 page.tsx files exist in app/ (Phase 2A added member status page)', () => {
     const found = findFiles(join(ROOT, 'app'), f => f.endsWith('page.tsx'))
     expect(found.length).toBe(KNOWN_ROUTES.length)
   })
