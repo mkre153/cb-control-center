@@ -121,9 +121,11 @@ describe('Route file inventory', () => {
     // Internal review routes (Phase 9E)
     'app/preview/dap/requests/page.tsx',
     'app/preview/dap/requests/[id]/page.tsx',
+    // Internal onboarding list (Phase 9H)
+    'app/preview/dap/onboarding/page.tsx',
   ]
 
-  it('exactly 15 page.tsx files exist in app/ (12 preview + 3 production Tier 1, Phase 9E added 2)', () => {
+  it('exactly 16 page.tsx files exist in app/ (12 preview + 3 production Tier 1, Phase 9H added onboarding list)', () => {
     const found = findFiles(join(ROOT, 'app'), f => f.endsWith('page.tsx'))
     expect(found.length).toBe(KNOWN_ROUTES.length)
   })

@@ -102,9 +102,9 @@ describe('Production route allowlist', () => {
     expect(existsSync(resolve(APP_DIR, 'preview/dap'))).toBe(true)
   })
 
-  it('exactly 15 page.tsx files in app/ (12 preview + 3 production Tier 1, Phase 9E added 2)', () => {
+  it('exactly 16 page.tsx files in app/ (12 preview + 3 production Tier 1, Phase 9H added onboarding list)', () => {
     const pages = findFiles(APP_DIR, f => f.endsWith('page.tsx'))
-    expect(pages).toHaveLength(15)
+    expect(pages).toHaveLength(16)
   })
 })
 
@@ -440,7 +440,10 @@ describe('Boundary preservation', () => {
   it('only the Phase 9C SQL migration exists (no Phase 9B migration was added)', () => {
     // Supabase dir exists (Phase 9C) — but Phase 9B itself added zero migrations
     const sqlFiles = findFiles(ROOT, p => p.endsWith('.sql'))
-    const KNOWN_MIGRATIONS = ['supabase/migrations/20260429000000_dap_requests.sql']
+    const KNOWN_MIGRATIONS = [
+      'supabase/migrations/20260429000000_dap_requests.sql',
+      'supabase/migrations/20260429000001_dap_practice_onboarding.sql',
+    ]
     const unexpected = sqlFiles.filter(f => !KNOWN_MIGRATIONS.some(k => f.endsWith(k)))
     expect(unexpected).toHaveLength(0)
   })

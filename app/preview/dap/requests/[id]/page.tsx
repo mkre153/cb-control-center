@@ -1,7 +1,10 @@
 import { notFound } from 'next/navigation'
 import { getDapRequest, getDapRequestEvents } from '@/lib/cb-control-center/dapRequestAdmin'
+import { getOnboardingIntakeByRequestId } from '@/lib/cb-control-center/dapPracticeOnboarding'
 import type { DapRequestEvent } from '@/lib/cb-control-center/dapRequestTypes'
+import type { DapPracticeOnboardingIntake } from '@/lib/cb-control-center/dapPracticeOnboardingTypes'
 import { approveRequestAction, rejectRequestAction, needsReviewRequestAction } from './actions'
+import { createOnboardingFromRequestAction } from './onboardingActions'
 import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
@@ -66,7 +69,11 @@ function Field({ label, value }: { label: string; value: string | boolean | null
 
 export default async function DapRequestDetailPage({ params }: { params: Params }) {
   const { id } = await params
-  const [request, events] = await Promise.all([getDapRequest(id), getDapRequestEvents(id)])
+  const [request, events, intake] = await Promise.all([
+    getDapRequest(id),
+    getDapRequestEvents(id),
+    getOnboardingIntakeByRequestId(id),
+  ])
 
   if (!request) notFound()
 
@@ -139,6 +146,59 @@ export default async function DapRequestDetailPage({ params }: { params: Params 
           </div>
         </form>
       </section>
+
+      {request.request_status === 'approved' && (
+        <section
+          className="rounded-lg border border-blue-200 bg-blue-50 p-6 space-y-4"
+          data-onboarding-panel
+        >
+          <div className="space-y-1">
+            <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+              Practice Onboarding Intake
+            </h2>
+            <p className="text-xs text-blue-800" data-onboarding-disclaimer>
+              Create an internal onboarding intake so the team can contact or evaluate this
+              practice. This does not confirm the practice as a DAP provider or publish any
+              patient-facing claims.
+            </p>
+          </div>
+
+          {intake ? (
+            <div className="space-y-2" data-intake-exists>
+              <p className="text-sm text-gray-700">
+                Intake created —{' '}
+                <span className="font-mono text-xs text-gray-500" data-intake-status={intake.status}>
+                  {intake.status}
+                </span>
+              </p>
+              <Link
+                href="/preview/dap/onboarding"
+                className="text-sm text-blue-600 hover:underline"
+              >
+                View onboarding queue →
+              </Link>
+            </div>
+          ) : (
+            <form>
+              <input type="hidden" name="requestId" value={request.id} />
+              <textarea
+                name="note"
+                placeholder="Optional note…"
+                rows={2}
+                className="w-full mb-3 rounded border border-blue-200 bg-white px-3 py-2 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+              <button
+                formAction={createOnboardingFromRequestAction}
+                type="submit"
+                className="rounded bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
+                data-action="create-onboarding-intake"
+              >
+                Create onboarding intake
+              </button>
+            </form>
+          )}
+        </section>
+      )}
 
       <section className="rounded-lg border border-gray-200 p-6 space-y-3">
         <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Status</h2>

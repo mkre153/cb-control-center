@@ -741,10 +741,13 @@ describe('Database migration inventory', () => {
 
   it('exactly the Phase 9C SQL migration exists', () => {
     const sqlFiles = findFiles(ROOT, p => p.endsWith('.sql'))
-    const KNOWN_MIGRATIONS = ['supabase/migrations/20260429000000_dap_requests.sql']
+    const KNOWN_MIGRATIONS = [
+      'supabase/migrations/20260429000000_dap_requests.sql',
+      'supabase/migrations/20260429000001_dap_practice_onboarding.sql',
+    ]
     const unexpected = sqlFiles.filter(f => !KNOWN_MIGRATIONS.some(k => f.endsWith(k)))
     expect(unexpected).toHaveLength(0)
-    expect(sqlFiles).toHaveLength(1)
+    expect(sqlFiles).toHaveLength(2)
   })
 })
 
