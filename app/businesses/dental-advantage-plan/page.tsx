@@ -1,4 +1,5 @@
 import { CB_BUSINESS_PORTFOLIO } from '@/lib/cb-control-center/cbBusinessPortfolioData'
+import { MockModeBanner } from '@/components/cb-control-center/MockModeBanner'
 
 export default function DapBusinessDetailPage() {
   const business = CB_BUSINESS_PORTFOLIO.businesses.find(
@@ -8,20 +9,29 @@ export default function DapBusinessDetailPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <MockModeBanner />
       <div className="max-w-7xl mx-auto px-6 py-4 space-y-6">
-        <nav
-          data-breadcrumb
-          className="flex items-center gap-2 text-sm text-gray-500"
-          aria-label="Breadcrumb"
-        >
-          <a href="/" className="hover:text-gray-800 transition-colors">
-            CB Control Center
-          </a>
-          <span className="text-gray-300" aria-hidden="true">/</span>
-          <span className="text-gray-800 font-medium" aria-current="page">
-            Dental Advantage Plan
+        <div className="flex items-center justify-between gap-4">
+          <nav
+            data-breadcrumb
+            className="flex items-center gap-2 text-sm text-gray-500"
+            aria-label="Breadcrumb"
+          >
+            <a href="/" className="hover:text-gray-800 transition-colors">
+              CB Control Center
+            </a>
+            <span className="text-gray-300" aria-hidden="true">/</span>
+            <span className="text-gray-800 font-medium" aria-current="page">
+              Dental Advantage Plan
+            </span>
+          </nav>
+          <span
+            data-workspace-mode-badge
+            className="text-xs font-mono font-semibold text-blue-600 bg-blue-50 border border-blue-200 rounded px-2 py-0.5"
+          >
+            Simulation Preview
           </span>
-        </nav>
+        </div>
 
         <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
           <div className="flex items-start justify-between gap-4">

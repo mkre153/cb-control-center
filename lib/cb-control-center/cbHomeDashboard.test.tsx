@@ -307,3 +307,71 @@ describe('Group 6 — CbHomeDashboard renders correctly', () => {
     expect(html).not.toContain('emailBody')
   })
 })
+
+// ─── Group 7: System Contracts section ───────────────────────────────────────
+
+describe('Group 7 — System Contracts section', () => {
+  function render() {
+    return renderToString(React.createElement(CbHomeDashboard))
+  }
+
+  it('has data-system-contracts container', () => {
+    expect(render()).toContain('data-system-contracts')
+  })
+
+  it('renders link to LLM Page Formatting Standard', () => {
+    expect(render()).toContain('/preview/cbseoaeo/llm-page-format')
+  })
+
+  it('renders link to Page Generation Contracts', () => {
+    expect(render()).toContain('/preview/cbseoaeo/page-generation-contract')
+  })
+
+  it('renders link to DAP Page Briefs', () => {
+    expect(render()).toContain('/preview/dap/page-briefs')
+  })
+
+  it('renders link to DAP Onboarding Preview', () => {
+    expect(render()).toContain('/preview/dap/onboarding')
+  })
+
+  it('renders link to DAP Member Status Preview', () => {
+    expect(render()).toContain('/preview/dap/member-status')
+  })
+
+  it('has data-system-contract-link on contract links', () => {
+    expect(render()).toContain('data-system-contract-link')
+  })
+
+  it('has View System Contracts header action', () => {
+    expect(render()).toContain('View System Contracts')
+  })
+})
+
+// ─── Group 8: Workspace mode ──────────────────────────────────────────────────
+
+describe('Group 8 — Workspace mode', () => {
+  function render() {
+    return renderToString(React.createElement(CbHomeDashboard))
+  }
+
+  it('has data-workspace-mode-badge', () => {
+    expect(render()).toContain('data-workspace-mode-badge')
+  })
+
+  it('badge text contains Workspace Mock Mode', () => {
+    expect(render()).toContain('Workspace Mock Mode')
+  })
+
+  it('MockModeBanner renders with Mock Mode text', () => {
+    expect(render()).toContain('Mock Mode')
+  })
+
+  it('MockModeBanner renders with amber styling', () => {
+    expect(render()).toContain('amber')
+  })
+
+  it('MockModeBanner text confirms no real connections', () => {
+    expect(render()).toContain('No crawler')
+  })
+})

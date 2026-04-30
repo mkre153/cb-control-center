@@ -1,5 +1,14 @@
 import type { CbBusinessInstance, CbBusinessStatus } from '@/lib/cb-control-center/cbBusinessPortfolioTypes'
 import { CB_BUSINESS_PORTFOLIO } from '@/lib/cb-control-center/cbBusinessPortfolioData'
+import { MockModeBanner } from '@/components/cb-control-center/MockModeBanner'
+
+const SYSTEM_CONTRACTS = [
+  { label: 'LLM Page Formatting Standard', href: '/preview/cbseoaeo/llm-page-format' },
+  { label: 'Page Generation Contracts', href: '/preview/cbseoaeo/page-generation-contract' },
+  { label: 'DAP Page Briefs', href: '/preview/dap/page-briefs' },
+  { label: 'DAP Onboarding Preview', href: '/preview/dap/onboarding' },
+  { label: 'DAP Member Status Preview', href: '/preview/dap/member-status' },
+] as const
 
 const STATUS_PILL: Record<CbBusinessStatus, string> = {
   blocked: 'bg-red-100 text-red-700 border border-red-200',
@@ -86,6 +95,8 @@ export function CbHomeDashboard() {
 
   return (
     <div data-cb-home-dashboard className="min-h-screen bg-gray-50">
+      <MockModeBanner />
+
       {/* Dark command header */}
       <div className="bg-gray-900 px-6 py-8">
         <div className="max-w-7xl mx-auto">
@@ -95,6 +106,12 @@ export function CbHomeDashboard() {
               <p className="text-sm text-gray-400 mt-1">
                 Manage markets, sites, directories, and business systems from one place.
               </p>
+              <span
+                data-workspace-mode-badge
+                className="inline-block mt-2 text-xs font-mono font-semibold text-amber-400 bg-amber-900/20 border border-amber-800/30 rounded px-2 py-0.5"
+              >
+                Workspace Mock Mode
+              </span>
             </div>
             <div className="flex items-center gap-3">
               {dapBusiness?.buildPath && (
@@ -106,6 +123,13 @@ export function CbHomeDashboard() {
                   Resume Dental Advantage Plan →
                 </a>
               )}
+              <a
+                href="/preview/dap/page-briefs"
+                data-view-system-contracts
+                className="text-xs font-medium text-gray-400 hover:text-gray-200 transition-colors"
+              >
+                View System Contracts ↗
+              </a>
               <a
                 href={newBusinessAction.path}
                 data-start-new-business
@@ -178,6 +202,33 @@ export function CbHomeDashboard() {
                 Create new business
               </a>
             </div>
+          </div>
+        </div>
+
+        {/* System Contracts */}
+        <div data-system-contracts>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+              System Contracts
+            </h2>
+            <a
+              href="/preview/dap/page-briefs"
+              className="text-xs font-medium text-gray-500 hover:text-gray-800 transition-colors"
+            >
+              View System Contracts ↗
+            </a>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+            {SYSTEM_CONTRACTS.map(c => (
+              <a
+                key={c.href}
+                href={c.href}
+                data-system-contract-link
+                className="bg-white border border-gray-200 rounded-lg px-4 py-3 text-xs font-medium text-gray-600 hover:border-gray-300 hover:text-gray-900 transition-colors"
+              >
+                {c.label} ↗
+              </a>
+            ))}
           </div>
         </div>
       </div>
