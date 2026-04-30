@@ -30,6 +30,7 @@ interface ControlCenterTabsProps {
   pages: PagePlanItem[]
   activity: ActivityEvent[]
   onResolveBlocker?: (id: string, type: 'confirm' | 'defer') => void
+  defaultTab?: TabId
 }
 
 export function ControlCenterTabs({
@@ -40,8 +41,9 @@ export function ControlCenterTabs({
   pages,
   activity,
   onResolveBlocker,
+  defaultTab = 'crawl-output',
 }: ControlCenterTabsProps) {
-  const [activeTab, setActiveTab] = useState<TabId>('crawl-output')
+  const [activeTab, setActiveTab] = useState<TabId>(defaultTab)
 
   const openBlockerCount = blockers.filter(b => b.resolutionStatus === 'open').length
 
