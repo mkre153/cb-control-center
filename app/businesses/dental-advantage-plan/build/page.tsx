@@ -1,9 +1,10 @@
 import { SimulationShell } from '@/components/cb-control-center/SimulationShell'
+import { DapBuildLedgerPanel } from '@/components/cb-control-center/DapBuildLedgerPanel'
 
 export default function DapBuildPipelinePage() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-6 py-4 space-y-6">
+      <div className="max-w-7xl mx-auto px-6 py-4 space-y-8">
         <nav
           data-breadcrumb
           className="flex items-center gap-2 text-sm text-gray-500"
@@ -24,7 +25,14 @@ export default function DapBuildPipelinePage() {
             Build Pipeline
           </span>
         </nav>
+
+        {/* Forward-looking pipeline view */}
         <SimulationShell />
+
+        {/* Backward-looking completion ledger */}
+        <div className="border-t border-gray-200 pt-8">
+          <DapBuildLedgerPanel />
+        </div>
       </div>
     </div>
   )
