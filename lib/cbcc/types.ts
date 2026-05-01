@@ -120,6 +120,13 @@ export interface CbccStageDefinition {
   order: number
   title: string
   description: string
+  // Optional — adapters that want to surface a stage purpose distinct from
+  // the description (e.g. "why this stage exists") populate it here.
+  purpose?: string
+  // Optional — adapters that want to declare a primary deliverable/artifact
+  // contract per stage populate it here. The page model surfaces it as
+  // requiredArtifact. Both fields are independent of evidence requirements.
+  artifact?: CbccStagePageArtifact
   requirements: ReadonlyArray<CbccStageRequirement>
   requiredApprovals: ReadonlyArray<string>
 }
@@ -184,4 +191,90 @@ export interface CbccProjectAdapter {
   getStageArtifact(projectId: string, stageId: CbccStageId): Promise<unknown | null> | unknown | null
   validateStageArtifact(stageId: CbccStageId, artifact: unknown): { valid: boolean; errors?: ReadonlyArray<string> }
   getEvidenceForStage(projectId: string, stageId: CbccStageId): Promise<ReadonlyArray<CbccEvidenceItem>> | ReadonlyArray<CbccEvidenceItem>
+}
+
+// ─── Stage page model (Part 3) ────────────────────────────────────────────────
+//
+// Pure data model that powers a full stage detail page. UI is not part of the
+// engine — the model just answers "given a project, current stage, locking,
+// and evidence, what should the page display?". A renderer (later) maps this
+// model to React components.
+
+export type CbccStagePageAction =
+  | 'submit_evidence'
+  | 'request_ai_review'
+  | 'approve_stage'
+  | 'reject_stage'
+  | 'unlock_previous_stage'
+  | 'view_previous_stage'
+  | 'view_next_stage'
+
+export type CbccStagePageBlockerSeverity = 'info' | 'warning' | 'blocking'
+
+export interface CbccStagePageBlocker {
+  code: string
+  message: string
+  severity: CbccStagePageBlockerSeverity
+}
+
+export interface CbccStagePageNavigation {
+  previousStageId?: CbccStageId
+  nextStageId?: CbccStageId
+  isFirstStage: boolean
+  isLastStage: boolean
+}
+
+export interface CbccStagePageArtifact {
+  title: string
+  description: string
+  required: boolean
+}
+
+export type CbccStagePageAiReviewStatus =
+  | 'not_requested'
+  | 'pending'
+  | 'available'
+  | 'not_applicable'
+
+export interface CbccStagePageAiReviewPlaceholder {
+  status: CbccStagePageAiReviewStatus
+  summary?: string
+}
+
+export interface CbccStagePageModel {
+  projectId: string
+  stageId: CbccStageId
+  stageIndex: number
+  stageTitle: string
+  stageDescription?: string
+  stageStatus: CbccStageStatus
+
+  lock: {
+    isLocked: boolean
+    reason?: string
+  }
+
+  navigation: CbccStagePageNavigation
+
+  purpose?: string
+  requiredArtifact?: CbccStagePageArtifact
+
+  evidence: {
+    requirements: ReadonlyArray<CbccEvidenceRequirement>
+    summary: CbccEvidenceSummary
+    validation: CbccEvidenceValidationResult
+  }
+
+  blockers: ReadonlyArray<CbccStagePageBlocker>
+
+  approval: {
+    isReadyForApproval: boolean
+    canApprove: boolean
+    canReject: boolean
+    reason?: string
+  }
+
+  availableActions: ReadonlyArray<CbccStagePageAction>
+
+  aiReview: CbccStagePageAiReviewPlaceholder
 }
