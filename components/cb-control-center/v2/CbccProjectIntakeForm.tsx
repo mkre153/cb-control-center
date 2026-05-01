@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useActionState } from 'react'
 import {
   createProjectAction,
@@ -27,7 +27,9 @@ function sourceLabel(raw: string): string {
 }
 
 export function CbccProjectIntakeForm({ defaultShowIntake = false }: { defaultShowIntake?: boolean } = {}) {
-  const [manualMode, setManualMode] = useState(defaultShowIntake)
+  // isUrlPhase is the single source of truth for which phase is shown.
+  // useEffect drives the transition when prefill succeeds.
+  const [isUrlPhase, setIsUrlPhase] = useState(!defaultShowIntake)
   const [prefillState, prefillAction, prefillPending] = useActionState<PrefillResult | null, FormData>(
     prefillFromUrlAction,
     INITIAL_PREFILL
@@ -37,7 +39,10 @@ export function CbccProjectIntakeForm({ defaultShowIntake = false }: { defaultSh
     INITIAL_CREATE
   )
 
-  const showIntakeForm = manualMode || (prefillState?.ok === true)
+  useEffect(() => {
+    if (prefillState?.ok) setIsUrlPhase(false)
+  }, [prefillState?.ok])
+
   const prefilled: PrefillFields = prefillState?.ok ? prefillState.fields : EMPTY_FIELDS
 
   return (
@@ -49,7 +54,7 @@ export function CbccProjectIntakeForm({ defaultShowIntake = false }: { defaultSh
           ← Back to Projects
         </Link>
 
-        {!showIntakeForm ? (
+        {isUrlPhase ? (
           /* ── Phase 1: URL entry ── */
           <div className="rounded-lg border border-gray-800 bg-gray-900">
             <div className="px-6 pt-6 pb-2">
@@ -89,7 +94,7 @@ export function CbccProjectIntakeForm({ defaultShowIntake = false }: { defaultSh
               <div className="mt-4 text-center">
                 <button
                   type="button"
-                  onClick={() => setManualMode(true)}
+                  onClick={() => setIsUrlPhase(false)}
                   className="text-xs text-gray-500 hover:text-gray-400 underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
                 >
                   Skip — fill manually
@@ -114,7 +119,7 @@ export function CbccProjectIntakeForm({ defaultShowIntake = false }: { defaultSh
                   <span>Pre-filled from {sourceLabel(prefillState.fields.sourceUrlsNotes)}</span>
                   <button
                     type="button"
-                    onClick={() => setManualMode(false)}
+                    onClick={() => setIsUrlPhase(true)}
                     className="ml-3 underline hover:text-blue-300 focus:outline-none"
                   >
                     ← Change URL

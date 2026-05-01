@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { useActionState } from 'react'
+import { useActionState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import type { CbccProject } from '@/lib/cb-control-center/cbccProjectTypes'
 import {
   generateCharterAction,
@@ -17,6 +18,7 @@ interface Props {
 const INITIAL: ActionResult | null = null
 
 export function CbccCharterPanel({ project }: Props) {
+  const router = useRouter()
   const [genResult, genAction, genPending] = useActionState<ActionResult | null, FormData>(
     generateCharterAction,
     INITIAL
@@ -25,6 +27,16 @@ export function CbccCharterPanel({ project }: Props) {
     approveCharterAction,
     INITIAL
   )
+
+  // Re-fetch the page after approval so the stale client prop updates
+  useEffect(() => {
+    if (approveResult?.ok) router.refresh()
+  }, [approveResult?.ok, router])
+
+  // Re-fetch after charter generation so the charter content appears
+  useEffect(() => {
+    if (genResult?.ok) router.refresh()
+  }, [genResult?.ok, router])
 
   const charter = project.charterJson
 

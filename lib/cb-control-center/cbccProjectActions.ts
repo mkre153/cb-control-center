@@ -134,18 +134,26 @@ export async function createProjectAction(_prevState: ActionResult | null, formD
 
   const slug = slugify(name)
 
-  await createProject({
-    name,
-    slug,
-    businessType: (formData.get('businessType') as string).trim(),
-    primaryGoal: (formData.get('primaryGoal') as string).trim(),
-    targetCustomer: (formData.get('targetCustomer') as string).trim(),
-    knownConstraints: (formData.get('knownConstraints') as string).trim(),
-    forbiddenClaims: (formData.get('forbiddenClaims') as string).trim(),
-    sourceUrlsNotes: (formData.get('sourceUrlsNotes') as string).trim(),
-    desiredOutputType: (formData.get('desiredOutputType') as string).trim(),
-    approvalOwner: (formData.get('approvalOwner') as string).trim(),
-  })
+  try {
+    await createProject({
+      name,
+      slug,
+      businessType: (formData.get('businessType') as string).trim(),
+      primaryGoal: (formData.get('primaryGoal') as string).trim(),
+      targetCustomer: (formData.get('targetCustomer') as string).trim(),
+      knownConstraints: (formData.get('knownConstraints') as string).trim(),
+      forbiddenClaims: (formData.get('forbiddenClaims') as string).trim(),
+      sourceUrlsNotes: (formData.get('sourceUrlsNotes') as string).trim(),
+      desiredOutputType: (formData.get('desiredOutputType') as string).trim(),
+      approvalOwner: (formData.get('approvalOwner') as string).trim(),
+    })
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : ''
+    if (msg.includes('duplicate') || msg.includes('unique') || msg.includes('slug')) {
+      return { ok: false, code: 'slug_conflict', message: 'A project with this name already exists. Choose a different name.' }
+    }
+    return { ok: false, code: 'db_error', message: 'Failed to create project. Please try again.' }
+  }
 
   redirect(`/projects/${slug}`)
 }
@@ -173,7 +181,11 @@ export async function generateCharterAction(_prevState: ActionResult | null, for
     return { ok: false, code: result.code, message: result.message }
   }
 
-  await saveCharter(project.id, result.charter)
+  try {
+    await saveCharter(project.id, result.charter)
+  } catch (err) {
+    return { ok: false, code: 'db_error', message: `Failed to save charter: ${err instanceof Error ? err.message : 'unknown error'}` }
+  }
   revalidatePath(`/projects/${slug}`)
   revalidatePath(`/projects/${slug}/charter`)
   return { ok: true }
@@ -197,7 +209,11 @@ export async function approveCharterAction(_prevState: ActionResult | null, form
     }
   }
 
-  await approveCharter(project.id, approvedBy)
+  try {
+    await approveCharter(project.id, approvedBy)
+  } catch (err) {
+    return { ok: false, code: 'db_error', message: `Failed to approve charter: ${err instanceof Error ? err.message : 'unknown error'}` }
+  }
   revalidatePath(`/projects/${slug}`)
   revalidatePath(`/projects/${slug}/charter`)
   return { ok: true }
