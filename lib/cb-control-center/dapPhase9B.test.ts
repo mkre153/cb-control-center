@@ -93,7 +93,10 @@ describe('Production route allowlist', () => {
 
   it('only the Phase 9C route handler exists under app/api (no unauthorized API routes)', () => {
     const routeFiles = findFiles(APP_DIR, p => p.endsWith('route.ts') || p.endsWith('route.tsx'))
-    const KNOWN_ROUTES = ['app/api/dap/requests/route.ts']
+    const KNOWN_ROUTES = [
+      'app/api/dap/requests/route.ts',
+      'app/api/businesses/dental-advantage-plan/stages/review/route.ts',
+    ]
     const unexpected = routeFiles.filter(r => !KNOWN_ROUTES.some(k => r.endsWith(k)))
     expect(unexpected).toHaveLength(0)
   })
@@ -459,7 +462,10 @@ describe('Boundary preservation', () => {
 
   it('only the Phase 9C route handler exists (Phase 9B added zero API routes)', () => {
     const routeFiles = findFiles(ROOT, f => f.endsWith('route.ts') || f.endsWith('route.tsx'))
-    const KNOWN_ROUTES = ['app/api/dap/requests/route.ts']
+    const KNOWN_ROUTES = [
+      'app/api/dap/requests/route.ts',
+      'app/api/businesses/dental-advantage-plan/stages/review/route.ts',
+    ]
     const unexpected = routeFiles.filter(r => !KNOWN_ROUTES.some(k => r.endsWith(k)))
     expect(unexpected).toHaveLength(0)
   })

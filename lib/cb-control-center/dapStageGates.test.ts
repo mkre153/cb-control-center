@@ -191,13 +191,13 @@ describe('Group 3 — Sequence integrity', () => {
   })
 
   it('stage 7 must be the last stage (stageNumber 7)', () => {
-    const stage7 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-07-launch')
+    const stage7 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-07-build-launch')
     expect(stage7?.stageNumber).toBe(7)
   })
 
   it('stages 6 and 7 are not unlocked', () => {
-    const s6 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-06-qa-review')!
-    const s7 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-07-launch')!
+    const s6 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-06-page-architecture')!
+    const s7 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-07-build-launch')!
     expect(s6.nextStageUnlocked, 'stage-06 should not be unlocked yet').toBe(false)
     expect(s7.nextStageUnlocked, 'stage-07 should not be unlocked yet').toBe(false)
   })
@@ -310,9 +310,9 @@ describe('Group 6 — Ledger cross-reference', () => {
     expect(entry?.status).toBe('complete')
   })
 
-  it('stage-05 ledger reference resolves to a complete entry', () => {
-    const s5 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-05-homepage-build')!
-    const entry = DAP_BUILD_LEDGER.find(e => e.id === s5.ledgerPhaseId)
+  it('stage-03 ledger reference resolves to a complete entry', () => {
+    const s3 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-03-truth-schema')!
+    const entry = DAP_BUILD_LEDGER.find(e => e.id === s3.ledgerPhaseId)
     expect(entry).toBeDefined()
     expect(entry?.status).toBe('complete')
   })
@@ -321,30 +321,25 @@ describe('Group 6 — Ledger cross-reference', () => {
 // ─── Group 7: Content accuracy ────────────────────────────────────────────────
 
 describe('Group 7 — Content accuracy', () => {
-  it('Stage 5 (homepage build) is awaiting_owner_approval', () => {
-    const s5 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-05-homepage-build')
-    expect(s5).toBeDefined()
-    expect(s5?.status).toBe('awaiting_owner_approval')
+  it('Stage 7 (build/launch) is not_started', () => {
+    const s7 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-07-build-launch')
+    expect(s7).toBeDefined()
+    expect(s7?.status).toBe('not_started')
   })
 
-  it('Stage 5 evidence includes Phase 19A commit a853380', () => {
-    const s5 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-05-homepage-build')!
-    expect(s5.implementationEvidence.commit).toBe('a853380')
+  it('Stage 7 directive references Phase 19A commit a853380', () => {
+    const s7 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-07-build-launch')!
+    expect(s7.directive).toContain('a853380')
   })
 
-  it('Stage 5 evidence includes rebuild/dap-site-v2 branch', () => {
-    const s5 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-05-homepage-build')!
-    expect(s5.implementationEvidence.branch).toBe('rebuild/dap-site-v2')
+  it('Stage 7 directive references rebuild/dap-site-v2 branch', () => {
+    const s7 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-07-build-launch')!
+    expect(s7.directive).toContain('rebuild/dap-site-v2')
   })
 
-  it('Stage 5 evidence tests string contains 49', () => {
-    const s5 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-05-homepage-build')!
-    expect(s5.implementationEvidence.tests).toContain('49')
-  })
-
-  it('Stage 5 has 4 requiredApprovals', () => {
-    const s5 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-05-homepage-build')!
-    expect(s5.requiredApprovals.length).toBe(4)
+  it('Stage 7 has 4 requiredApprovals', () => {
+    const s7 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-07-build-launch')!
+    expect(s7.requiredApprovals.length).toBe(4)
   })
 
   it('Stage 1 (business definition) is approved', () => {
@@ -359,27 +354,27 @@ describe('Group 7 — Content accuracy', () => {
     expect(s1.nextStageUnlocked).toBe(true)
   })
 
-  it('Stage 2 (truth schema) is awaiting_owner_approval', () => {
-    const s2 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-02-truth-schema')
-    expect(s2).toBeDefined()
-    expect(s2?.status).toBe('awaiting_owner_approval')
-  })
-
-  it('Stage 4 (page strategy) is awaiting_owner_approval', () => {
-    const s4 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-04-page-strategy')
-    expect(s4).toBeDefined()
-    expect(s4?.status).toBe('awaiting_owner_approval')
-  })
-
-  it('Stage 3 (brandscript) is not_started', () => {
-    const s3 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-03-brandscript-positioning')
+  it('Stage 3 (truth schema) is awaiting_owner_approval', () => {
+    const s3 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-03-truth-schema')
     expect(s3).toBeDefined()
-    expect(s3?.status).toBe('not_started')
+    expect(s3?.status).toBe('awaiting_owner_approval')
+  })
+
+  it('Stage 2 (discovery audit) is not_started', () => {
+    const s2 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-02-discovery-audit')
+    expect(s2).toBeDefined()
+    expect(s2?.status).toBe('not_started')
+  })
+
+  it('Stage 4 (positioning) is not_started', () => {
+    const s4 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-04-positioning')
+    expect(s4).toBeDefined()
+    expect(s4?.status).toBe('not_started')
   })
 
   it('getActiveStageGate returns the first non-approved stage', () => {
     const active = getActiveStageGate()
-    expect(active.stageId).toBe('stage-02-truth-schema')
+    expect(active.stageId).toBe('stage-02-discovery-audit')
   })
 
   it('getApprovedStageGates returns only Stage 1', () => {
@@ -447,12 +442,12 @@ describe('Group 8 — Blocker integrity', () => {
 describe('Group 9 — Slug and routing', () => {
   const EXPECTED_SLUGS = [
     '1-business-definition',
-    '2-truth-schema',
-    '3-brandscript',
-    '4-page-generation',
-    '5-site-build',
-    '6-qa-acceptance',
-    '7-production-release',
+    '2-discovery-audit',
+    '3-truth-schema',
+    '4-positioning',
+    '5-seo-strategy',
+    '6-page-architecture',
+    '7-build-launch',
   ]
 
   it('all 7 stages have a non-empty slug', () => {
@@ -503,7 +498,7 @@ describe('Group 9 — Slug and routing', () => {
   })
 
   it('getNextDapStageGate returns undefined for the last stage', () => {
-    const s7 = getDapStageGateBySlug('7-production-release')!
+    const s7 = getDapStageGateBySlug('7-build-launch')!
     expect(getNextDapStageGate(s7)).toBeUndefined()
   })
 

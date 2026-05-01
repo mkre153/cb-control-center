@@ -12,8 +12,11 @@
 export type StageArtifactType =
   | 'business_definition'
   | 'truth_schema'
+  | 'discovery_audit'
   | 'brandscript'
+  | 'seo_strategy'
   | 'site_strategy'
+  | 'page_architecture'
   | 'page_contract'
   | 'implementation_plan'
   | 'build_output'

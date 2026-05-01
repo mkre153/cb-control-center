@@ -4,6 +4,7 @@ import { StageArtifactPanel } from './StageArtifactPanel'
 import { StageEvidencePanel } from './StageEvidencePanel'
 import { StageApprovalChecklist } from './StageApprovalChecklist'
 import { StageDirectivePanel } from './StageDirectivePanel'
+import { StageAiReviewPanel } from './StageAiReviewPanel'
 
 // ─── Status display ───────────────────────────────────────────────────────────
 
@@ -250,6 +251,9 @@ export function StageDetailPage({ stage }: { stage: DapStageGate }) {
             </p>
           )}
         </Section>
+
+        {/* Opus 4.7 AI Review */}
+        <StageAiReviewPanel stageSlug={stage.slug} stageTitle={stage.title} />
 
         {/* Back to overview */}
         <div className="pt-2">

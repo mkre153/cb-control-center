@@ -10,6 +10,15 @@
  *
  * Approval is deliberate — update approvedByOwner, approvedAt, status, and
  * nextStageUnlocked in this file, then commit. Every approval is auditable in git.
+ *
+ * CORRECTED PROCESS MODEL (retracted prior ordering 2026-04-30):
+ *   1. Business Intake & Definition
+ *   2. Discovery / Initial Scrape / Existing Asset Audit  ← was missing
+ *   3. Truth Schema / Compliance / Claims Lock            ← was Stage 2
+ *   4. Positioning / StoryBrand / Messaging               ← was Stage 3
+ *   5. SEO / AEO / Core30 / Content Strategy              ← was missing
+ *   6. Page Architecture / Wireframes / Content Briefs    ← was Stage 4
+ *   7. Build / QA / Launch                                ← collapses old 5+6+7
  */
 
 import {
@@ -17,6 +26,7 @@ import {
   type StageArtifact,
 } from './dapBusinessDefinition'
 import { DAP_TRUTH_SCHEMA_ARTIFACT } from './dapTruthSchemaArtifact'
+import { DAP_DISCOVERY_AUDIT_PLACEHOLDER } from './dapDiscoveryAuditArtifact'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -68,11 +78,13 @@ export interface DapStageGate {
 
 export const DAP_STAGE_GATES: readonly DapStageGate[] = [
 
+  // ── Stage 1: Business Intake & Definition ─────────────────────────────────
+
   {
     stageId: 'stage-01-business-definition',
     stageNumber: 1,
     slug: '1-business-definition',
-    title: 'Business Definition',
+    title: 'Business Intake / Definition',
     description:
       'Establish what DAP is, who the customer is, what the conversion goal is, and what claims are allowed or forbidden. Register the business in the CBCC portfolio.',
     whyItMatters:
@@ -114,11 +126,73 @@ export const DAP_STAGE_GATES: readonly DapStageGate[] = [
     artifact: DAP_BUSINESS_DEFINITION,
   },
 
+  // ── Stage 2: Discovery / Initial Scrape / Existing Asset Audit ───────────
+
   {
-    stageId: 'stage-02-truth-schema',
+    stageId: 'stage-02-discovery-audit',
     stageNumber: 2,
-    slug: '2-truth-schema',
-    title: 'Truth Schema',
+    slug: '2-discovery-audit',
+    title: 'Discovery / Scrape / Existing Asset Audit',
+    description:
+      'Systematically audit the existing DAP site: scrape all pages, inventory content, audit copy for compliance, audit CTAs, audit SEO/AEO signals, identify stale or broken assets, and produce a customer-facing change summary.',
+    whyItMatters:
+      'Without knowing what exists, redesign is speculation. Discovery answers: what is the current site saying? Where does it contradict truth rules? What CTAs are wrong? What content survives into the rebuild? This is the stage most commonly skipped and most commonly regretted.',
+    filesExpected: [
+      'lib/cb-control-center/dapDiscoveryAudit.ts',
+      'lib/cb-control-center/dapDiscoveryAudit.test.ts',
+    ],
+    status: 'not_started',
+    directiveIssued: false,
+    directive: `# Stage 2 — Discovery / Initial Scrape / Existing Asset Audit
+
+Conduct a full audit of the existing DAP site. Do not begin any rebuild work until this stage is approved.
+
+Sub-deliverables (all required):
+1. Current site scrape — crawl all public URLs, record status codes, page titles, word counts
+2. Pages inventory — list of all routes with purpose classification (landing / content / utility / broken)
+3. Copy audit — identify copy that contradicts the 7 truth rules or uses forbidden claims
+4. CTA audit — map every call-to-action and verify against the allowed CTA list from Stage 1
+5. SEO/AEO audit — check title tags, meta descriptions, H1s, structured data, and answer-box eligibility
+6. Design audit — visual consistency, layout issues, mobile breakpoints, legacy prototype components
+7. Stale/broken assets — broken links, 404s, outdated images, legacy /v5/ routes still linked
+8. Customer-facing change summary — plain-language summary of what patients will see changed in the rebuild
+
+Produce: lib/cb-control-center/dapDiscoveryAudit.ts with typed audit results.
+Produce: lib/cb-control-center/dapDiscoveryAudit.test.ts with structural tests.
+
+Stop condition: evidence submitted to CBCC (branch, commit, test count, audit findings).
+Do not begin Stage 3 (Truth Schema) until owner approval is recorded.`,
+    approvedByOwner: false,
+    approvedAt: null,
+    nextStageUnlocked: false,
+    requirements: [
+      'All public URLs crawled and status-coded',
+      'Pages inventory complete with purpose classification',
+      'Copy audit: every forbidden claim identified with URL',
+      'CTA audit: every CTA mapped and assessed',
+      'SEO/AEO audit: all metadata and schema gaps identified',
+      'Design audit: all visual/layout issues catalogued',
+      'Stale/broken assets: all broken links and legacy routes listed',
+      'Customer-facing change summary: plain-language, owner-readable',
+    ],
+    implementationEvidence: {},
+    requiredApprovals: [
+      'Site scrape and pages inventory accepted',
+      'Copy and CTA audit accepted',
+      'SEO/AEO audit accepted',
+      'Change summary accepted — owner understands what will change for patients',
+    ],
+    blockers: [],
+    artifact: DAP_DISCOVERY_AUDIT_PLACEHOLDER,
+  },
+
+  // ── Stage 3: Truth Schema / Compliance / Claims Lock ──────────────────────
+
+  {
+    stageId: 'stage-03-truth-schema',
+    stageNumber: 3,
+    slug: '3-truth-schema',
+    title: 'Truth Schema / Compliance / Claims Lock',
     description:
       'Lock what DAP is, what DAP is not, all 7 truth rules, forbidden claims, required disclaimers, and compliance boundaries. No downstream page may contradict this schema.',
     whyItMatters:
@@ -129,7 +203,7 @@ export const DAP_STAGE_GATES: readonly DapStageGate[] = [
     ],
     status: 'awaiting_owner_approval',
     directiveIssued: true,
-    directive: `# Stage 2 — Truth Schema Review
+    directive: `# Stage 3 — Truth Schema Review
 
 Review the DAP truth schema contracts in CBCC. Confirm all 7 truth rules, forbidden claims,
 and required disclaimers are accurate and complete.
@@ -146,7 +220,7 @@ Stop condition: confirm review complete, then update CBCC stage gate:
   approvedAt: '<today>'
   nextStageUnlocked: true
 
-Do not begin Stage 3 until this approval is recorded.`,
+Do not begin Stage 4 until this approval is recorded.`,
     approvedByOwner: false,
     approvedAt: null,
     nextStageUnlocked: false,
@@ -178,11 +252,13 @@ Do not begin Stage 3 until this approval is recorded.`,
     artifact: DAP_TRUTH_SCHEMA_ARTIFACT,
   },
 
+  // ── Stage 4: Positioning / StoryBrand / Messaging ─────────────────────────
+
   {
-    stageId: 'stage-03-brandscript-positioning',
-    stageNumber: 3,
-    slug: '3-brandscript',
-    title: 'BrandScript / Positioning',
+    stageId: 'stage-04-positioning',
+    stageNumber: 4,
+    slug: '4-positioning',
+    title: 'Positioning / StoryBrand / Messaging',
     description:
       'Define the customer problem, guide positioning, the plan, CTA strategy, stakes, success outcome, and tone and voice for DAP. This governs every patient-facing message.',
     whyItMatters:
@@ -193,7 +269,7 @@ Do not begin Stage 3 until this approval is recorded.`,
     ],
     status: 'not_started',
     directiveIssued: false,
-    directive: `# Stage 3 — BrandScript / Positioning
+    directive: `# Stage 4 — Positioning / StoryBrand / Messaging
 
 Build the DAP BrandScript contract in CBCC.
 
@@ -210,7 +286,7 @@ Create lib/cb-control-center/dapBrandScript.ts with typed contracts.
 Create lib/cb-control-center/dapBrandScript.test.ts with tests.
 
 Stop condition: evidence submitted to CBCC (branch, commit, test count).
-Do not begin Stage 4 until owner approval is recorded.`,
+Do not begin Stage 5 until owner approval is recorded.`,
     approvedByOwner: false,
     approvedAt: null,
     nextStageUnlocked: false,
@@ -232,307 +308,211 @@ Do not begin Stage 4 until owner approval is recorded.`,
       'Tone and voice accepted',
     ],
     blockers: [
-      'Stage 2 (Truth Schema) must be owner-approved before Stage 3 directive is issued',
+      'Stage 3 (Truth Schema) must be owner-approved before Stage 4 directive is issued',
     ],
   },
 
-  {
-    stageId: 'stage-04-page-strategy',
-    stageNumber: 4,
-    slug: '4-page-generation',
-    title: 'Page Strategy',
-    description:
-      'Define the full page type strategy: homepage sections, SEO/AEO role, conversion role, FAQ strategy, comparison table strategy, and local/practice-page strategy for all 8 DAP page types.',
-    whyItMatters:
-      'Page strategy governs what sections appear on each page type, what claims are allowed, and what the conversion path is. Without it, implementation produces pages that contradict the truth schema or underserve the patient.',
-    filesExpected: [
-      'lib/cb-control-center/cbSeoAeoPageGeneration.ts',
-      'lib/cb-control-center/dapPageBriefBuilder.ts',
-    ],
-    status: 'awaiting_owner_approval',
-    directiveIssued: true,
-    directive: `# Stage 4 — Page Strategy Review
-
-Review the DAP page strategy contracts in CBCC. Confirm all 8 page types, required sections,
-forbidden patterns, and brief builder output are accurate.
-
-Files to review:
-- lib/cb-control-center/cbSeoAeoPageGeneration.ts (page contracts for all 8 types)
-- lib/cb-control-center/dapPageBriefBuilder.ts (brief builder for each type)
-
-Evidence submitted: 243 + 277 tests passing. No new implementation required.
-
-Stop condition: confirm review complete, then update CBCC stage gate:
-  status: 'approved'
-  approvedByOwner: true
-  approvedAt: '<today>'
-  nextStageUnlocked: true
-
-Do not begin Stage 5 implementation until this approval is recorded.`,
-    approvedByOwner: false,
-    approvedAt: null,
-    nextStageUnlocked: false,
-    requirements: [
-      'All 8 page types defined with required sections',
-      'Forbidden claims per page type locked',
-      'Homepage wireframe order defined',
-      'CTA rules per page type defined',
-      'Generation prompt seeds defined',
-      'Brief builder producing correct output for all 8 types',
-      'Test suite passing',
-    ],
-    implementationEvidence: {
-      branch: 'main',
-      tests: '243 passing (cbSeoAeoPageGeneration) + 277 passing (dapPageBriefBuilder)',
-      filesChanged: [
-        'lib/cb-control-center/cbSeoAeoPageGeneration.ts',
-        'lib/cb-control-center/dapPageBriefBuilder.ts',
-        'app/preview/dap/page-briefs/page.tsx',
-      ],
-    },
-    requiredApprovals: [
-      'All 8 page type contracts accepted',
-      'Homepage wireframe order accepted',
-      'CTA strategy per page type accepted',
-      'Brief builder output accepted',
-    ],
-    blockers: [],
-    ledgerPhaseId: 'phase-18d-dap-page-brief-builder',
-    artifact: {
-      type: 'site_strategy',
-      title: 'DAP Page Strategy',
-      status: 'reviewable',
-      summary:
-        'Defines the full page type strategy for all 8 DAP page types: required sections, SEO/AEO role, conversion role, CTA rules, forbidden patterns, and brief builder output. Governs every patient-facing page.',
-      sourceFiles: [
-        'lib/cb-control-center/cbSeoAeoPageGeneration.ts',
-        'lib/cb-control-center/dapPageBriefBuilder.ts',
-        'app/preview/dap/page-briefs/page.tsx',
-      ],
-    } as StageArtifact,
-  },
+  // ── Stage 5: SEO / AEO / Core30 / Content Strategy ───────────────────────
 
   {
-    stageId: 'stage-05-homepage-build',
+    stageId: 'stage-05-seo-strategy',
     stageNumber: 5,
-    slug: '5-site-build',
-    title: 'Homepage Build',
+    slug: '5-seo-strategy',
+    title: 'SEO / AEO / Core30 / Content Strategy',
     description:
-      'Implement the DAP homepage foundation on rebuild/dap-site-v2. Replace the monolithic page.tsx with 7 modular server-component sections governed by the Phase 18C/D contracts. Enforce all 7 truth rules. Add safety tests.',
+      'Define the keyword strategy, AEO answer targets, Core30 keyword set, content calendar structure, and cluster architecture for DAP. The Core30 keyword set is the primary deliverable.',
     whyItMatters:
-      'The homepage is the first patient-facing surface. It must open with patient problem framing, include the ZIP/search tool, and enforce the truth schema — with no forbidden claims and no prototype or admin language.',
+      'Without a defined keyword strategy, page generation is untargeted and the DAP site will not rank or answer patient questions. The Core30 set defines the 30 highest-priority keywords that govern homepage, city pages, and guide content.',
     filesExpected: [
-      'src/app/page.tsx (in dentaladvantageplan repo)',
-      'src/components/homepage/ (in dentaladvantageplan repo)',
-      'src/lib/homepage.test.ts (in dentaladvantageplan repo)',
-    ],
-    status: 'awaiting_owner_approval',
-    directiveIssued: true,
-    directive: `# Stage 5 — Homepage Build (Phase 19A) — EVIDENCE SUBMITTED
-
-This stage has been implemented. Evidence submitted. Awaiting owner approval.
-
-Branch: rebuild/dap-site-v2
-Commit: a853380
-Tests: 49 passing
-
-Evidence:
-- src/app/page.tsx: 22 lines (7-component composition, no inline content)
-- src/components/homepage/: 7 modular section components
-- src/lib/homepage.test.ts: 40 safety tests (Group 1–4)
-- vitest.config.ts: resolves @/ alias, excludes e2e
-
-Visual check passed:
-- Hero opens with "No dental insurance? Start here."
-- ZIP/search tool above the fold
-- No /v5/ links, no admin language
-- CTAs: #find-dentists + /the-plan
-
-Stop condition: awaiting owner approval in CBCC before Stage 6 begins.`,
-    approvedByOwner: false,
-    approvedAt: null,
-    nextStageUnlocked: false,
-    requirements: [
-      'Homepage route exists at src/app/page.tsx',
-      'All 7 DAP truth rules enforced in rendered output',
-      'No forbidden claims present',
-      'ZIP/search tool visible above fold',
-      'No /v5/ legacy routes linked from homepage',
-      'No admin or CBCC language on homepage',
-      'Safety test suite passing',
-      'Visual acceptance check completed',
-    ],
-    implementationEvidence: {
-      branch: 'rebuild/dap-site-v2',
-      commit: 'a853380',
-      tests: '49 passing (homepage suite)',
-      previewUrl: '',
-      filesChanged: [
-        'src/app/page.tsx',
-        'src/components/homepage/HomepageHero.tsx',
-        'src/components/homepage/HomepageHowItWorks.tsx',
-        'src/components/homepage/HomepageWhatIsIncluded.tsx',
-        'src/components/homepage/HomepageComparison.tsx',
-        'src/components/homepage/HomepageWhoIsThisFor.tsx',
-        'src/components/homepage/HomepageFaqPreview.tsx',
-        'src/components/homepage/HomepageFinalCta.tsx',
-        'src/lib/homepage.test.ts',
-        'vitest.config.ts',
-      ],
-      unresolvedIssues: [],
-    },
-    requiredApprovals: [
-      'Visual acceptance — hero opens patient-first',
-      'Truth-rule acceptance — all 7 rules present',
-      'CTA acceptance — #find-dentists and /the-plan only',
-      'Mobile acceptance — layout does not break on small screens',
-    ],
-    blockers: [],
-    ledgerPhaseId: 'phase-19a-dap-homepage-foundation',
-    artifact: {
-      type: 'build_output',
-      title: 'DAP Homepage — Phase 19A',
-      status: 'reviewable',
-      summary:
-        'Rebuilt root homepage from a 1,132-line monolith to 7 modular server-component sections. All 7 DAP truth rules enforced. No forbidden claims present. ZIP/search tool above the fold. Visual acceptance check passed.',
-      sourceFiles: [
-        'src/app/page.tsx (rebuild/dap-site-v2)',
-        'src/components/homepage/HomepageHero.tsx',
-        'src/components/homepage/HomepageHowItWorks.tsx',
-        'src/components/homepage/HomepageWhatIsIncluded.tsx',
-        'src/components/homepage/HomepageComparison.tsx',
-        'src/components/homepage/HomepageWhoIsThisFor.tsx',
-        'src/components/homepage/HomepageFaqPreview.tsx',
-        'src/components/homepage/HomepageFinalCta.tsx',
-        'src/lib/homepage.test.ts',
-      ],
-    } as StageArtifact,
-  },
-
-  {
-    stageId: 'stage-06-qa-review',
-    stageNumber: 6,
-    slug: '6-qa-acceptance',
-    title: 'QA Review',
-    description:
-      'Verify truth rules, broken links, visual acceptance, mobile layout, SEO structure, CTA behavior, no forbidden claims, no stale mock data, no provider/pricing claims unless confirmed.',
-    whyItMatters:
-      'QA is the final validation gate before launch. It catches compliance drift, broken pages, and layout regressions that automated tests cannot fully cover.',
-    filesExpected: [
-      'src/app/ (all public routes in dentaladvantageplan repo)',
-      'src/components/homepage/',
+      'lib/cb-control-center/dapSeoStrategy.ts',
+      'lib/cb-control-center/dapSeoStrategy.test.ts',
     ],
     status: 'not_started',
     directiveIssued: false,
-    directive: `# Stage 6 — QA Review
+    directive: `# Stage 5 — SEO / AEO / Core30 / Content Strategy
 
-QA the DAP site on rebuild/dap-site-v2 against the following checklist:
+Define the complete SEO and AEO strategy for DAP.
 
-Truth rules:
-- All 7 DAP truth rules present on every public page
-- No page claims guaranteed savings, guaranteed coverage, or DAP is insurance
-- No page claims DAP processes claims, pays providers, or collects PHI
+Key deliverable — Core30 keyword set:
+- 30 highest-priority keywords covering: no insurance dentist, dental membership plan, affordable dental care near me, dental savings plan vs insurance, and city/state variants
+- Each keyword: intent classification (informational / navigational / commercial), estimated volume tier, target page type
+- AEO answer targets: questions DAP should own in answer boxes and AI overviews
 
-Visual:
-- Homepage visual acceptance (hero, search tool, comparison table, CTAs)
-- Mobile layout — hero, comparison table, FAQ section, final CTA
-- No broken links (especially no /v5/ links, no /admin/ links)
+Also define:
+- Content cluster architecture (hub/spoke or flat)
+- Pillar content topics (top 5)
+- City page keyword template
+- Guide content keyword map
 
-SEO:
-- <title> tags on all pages
-- <meta description> on all pages
-- H1 present and patient-facing on homepage
+Create lib/cb-control-center/dapSeoStrategy.ts with typed contracts.
+Create lib/cb-control-center/dapSeoStrategy.test.ts with tests.
 
-CTA behavior:
-- Primary CTA: #find-dentists anchor
-- Secondary CTA: /the-plan link works
-- No CTAs link to /v5/ routes
+Stop condition: evidence submitted to CBCC (branch, commit, test count, Core30 list).
+Do not begin Stage 6 until owner approval is recorded.`,
+    approvedByOwner: false,
+    approvedAt: null,
+    nextStageUnlocked: false,
+    requirements: [
+      'Core30 keyword set defined (30 keywords, each with intent + volume tier + target page)',
+      'AEO answer targets defined (at least 10 questions DAP should own)',
+      'Content cluster architecture defined',
+      'City page keyword template defined',
+      'Pillar content topics defined (5 minimum)',
+      'Test suite passing',
+    ],
+    implementationEvidence: {},
+    requiredApprovals: [
+      'Core30 keyword set accepted',
+      'AEO answer targets accepted',
+      'Content cluster architecture accepted',
+      'City page keyword strategy accepted',
+    ],
+    blockers: [
+      'Stage 4 (Positioning / StoryBrand) must be owner-approved before Stage 5 directive is issued',
+    ],
+    artifact: {
+      type: 'seo_strategy',
+      title: 'DAP SEO / AEO / Core30 Strategy',
+      status: 'not_started',
+      summary:
+        'Core30 keyword set + AEO answer targets + content cluster architecture. Not yet generated — awaiting Stage 4 (Positioning) approval.',
+      sourceFiles: [],
+    } as StageArtifact,
+  },
 
-Safety checklist:
-- No provider-specific pricing claims unless verified
-- No admin or CBCC language exposed on public pages
-- No stale mock data in production components
+  // ── Stage 6: Page Architecture / Wireframes / Content Briefs ─────────────
 
-Stop condition: submit QA report to CBCC with all checks and their pass/fail status.
+  {
+    stageId: 'stage-06-page-architecture',
+    stageNumber: 6,
+    slug: '6-page-architecture',
+    title: 'Page Architecture / Wireframes / Content Briefs',
+    description:
+      'Define the full page type strategy: required sections per page type, SEO role, conversion role, CTA rules, wireframe order, and content brief templates for all DAP page types. Supersedes the premature Phase 18C/D contracts (which were built before Discovery and Positioning).',
+    whyItMatters:
+      'Page architecture governs what sections appear on each page, what claims are allowed, and what the conversion path is. Built on Discovery + Truth Schema + Positioning — not before them.',
+    filesExpected: [
+      'lib/cb-control-center/dapPageArchitecture.ts',
+      'lib/cb-control-center/dapPageArchitecture.test.ts',
+    ],
+    status: 'not_started',
+    directiveIssued: false,
+    directive: `# Stage 6 — Page Architecture / Wireframes / Content Briefs
+
+Define the complete page architecture for DAP. Supersedes Phase 18C/D page strategy contracts.
+
+Build on:
+- Stage 2 (Discovery): what content currently exists and what must change
+- Stage 3 (Truth Schema): what every page must and cannot say
+- Stage 4 (Positioning): how every page should speak to the patient
+- Stage 5 (SEO/AEO/Core30): which keywords each page type targets
+
+Define:
+- All page types (homepage, city page, practice page, guide, comparison, FAQ, blog article)
+- Required sections per page type with wireframe order
+- CTA rules per page type (allowed and forbidden)
+- Conversion path per page type
+- Content brief template per page type (Core30-governed)
+
+Create lib/cb-control-center/dapPageArchitecture.ts with typed contracts.
+Create lib/cb-control-center/dapPageArchitecture.test.ts with tests.
+
+Stop condition: evidence submitted to CBCC (branch, commit, test count).
 Do not begin Stage 7 until owner approval is recorded.`,
     approvedByOwner: false,
     approvedAt: null,
     nextStageUnlocked: false,
     requirements: [
-      'All truth rules verified on every public page',
-      'No forbidden claims present anywhere',
-      'Mobile layout verified on at least 2 breakpoints',
-      'All links functional — no broken routes',
-      'SEO metadata present on all pages',
-      'CTA behavior verified',
-      'No stale mock data in production components',
+      'All page types defined with required sections',
+      'Forbidden claims per page type locked (inherits from Stage 3)',
+      'Homepage wireframe order defined (inherits from Stage 4 BrandScript)',
+      'CTA rules per page type defined',
+      'Content brief template per page type defined (Core30-aware)',
+      'Test suite passing',
     ],
     implementationEvidence: {},
     requiredApprovals: [
-      'Truth-rule sweep accepted',
-      'Visual acceptance accepted',
-      'Mobile layout accepted',
-      'SEO metadata accepted',
-      'CTA behavior accepted',
+      'All page type contracts accepted',
+      'Homepage wireframe order accepted',
+      'CTA strategy per page type accepted',
+      'Content brief template accepted',
     ],
     blockers: [
-      'Stage 5 (Homepage Build) must be owner-approved before QA begins',
+      'Stage 5 (SEO / AEO / Core30) must be owner-approved before Stage 6 directive is issued',
     ],
   },
 
+  // ── Stage 7: Build / QA / Launch ──────────────────────────────────────────
+
   {
-    stageId: 'stage-07-launch',
+    stageId: 'stage-07-build-launch',
     stageNumber: 7,
-    slug: '7-production-release',
-    title: 'Launch',
+    slug: '7-build-launch',
+    title: 'Build / QA / Launch',
     description:
-      'Merge rebuild/dap-site-v2 to main, confirm Vercel production deployment, run post-launch verification, and mark DAP as launched in CBCC.',
+      'Implement the DAP site based on the approved Page Architecture. QA against truth rules, visual acceptance, SEO structure, CTA behavior. Merge to main and verify production deployment.',
     whyItMatters:
-      'Launch is irreversible in the sense that real patients will see the page. Owner approval is mandatory before any merge to main, any production deploy, or any announcement.',
+      'Build without approved architecture, positioning, and SEO strategy produces a site that must be rebuilt. This stage only begins when all upstream stages are owner-approved.',
     filesExpected: [
-      'rebuild/dap-site-v2 → main (merge in dentaladvantageplan repo)',
+      'src/app/ (all routes in dentaladvantageplan repo)',
+      'src/components/ (all patient-facing components)',
+      'rebuild/dap-site-v2 → main (merge after QA)',
     ],
     status: 'not_started',
     directiveIssued: false,
-    directive: `# Stage 7 — Launch
+    directive: `# Stage 7 — Build / QA / Launch
 
-Prerequisites: Stage 6 (QA Review) must be approved before this directive is issued.
+Prerequisites: Stages 1–6 must all be owner-approved before this directive is issued.
 
-Steps:
-1. Confirm Vercel preview URL for rebuild/dap-site-v2 is working
-2. Owner reviews preview — final visual and content check
-3. Merge rebuild/dap-site-v2 to main (do NOT use --force)
-4. Verify Vercel production deployment completes
-5. Run post-launch checks:
-   - Homepage loads at production URL
-   - ZIP search returns results
-   - /the-plan route works
-   - No /v5/ links visible
-   - Disclaimer present in footer
-6. Update CBCC stage gate: status: 'approved', approvedByOwner: true
-7. Update CBCC ledger: add launch entry
+Prior work reference:
+- Phase 19A (homepage foundation on rebuild/dap-site-v2, commit a853380) was built before
+  Stages 2–6 were complete. That work should be reviewed against the approved Page Architecture
+  and rebuilt or extended as needed before QA and launch.
 
-Stop condition: evidence submitted (production URL, deployment hash, post-launch check results).
+Build phase:
+- Implement all page types from the Stage 6 Page Architecture
+- Enforce all 7 truth rules on every page
+- Use Core30 keywords from Stage 5 in page titles, H1s, and meta descriptions
+- Apply BrandScript tone from Stage 4 to all copy
+
+QA phase:
+- All 7 truth rules verified on every public page
+- No forbidden claims present anywhere
+- Mobile layout verified on at least 2 breakpoints
+- All links functional, no broken routes, no /v5/ legacy links
+- SEO metadata present on all pages
+- CTA behavior verified (primary and secondary)
+
+Launch phase:
+- Owner reviews Vercel preview — final visual and content check
+- Merge rebuild branch to main (no --force)
+- Verify Vercel production deployment completes
+- Run post-launch checks and record evidence
+
+Stop condition: evidence submitted (production URL, deployment hash, post-launch checks).
 Do not self-approve. Wait for owner approval.`,
     approvedByOwner: false,
     approvedAt: null,
     nextStageUnlocked: false,
     requirements: [
-      'Stage 6 QA Review approved',
-      'Vercel preview URL confirmed working',
-      'Owner final visual review complete',
-      'Merge to main approved',
+      'Stages 1–6 all owner-approved before build begins',
+      'All page types from Stage 6 architecture implemented',
+      'All 7 DAP truth rules enforced on every page',
+      'Core30 keywords from Stage 5 applied',
+      'BrandScript tone from Stage 4 applied',
+      'QA checklist: truth rules, visual, mobile, SEO, CTAs',
       'Production deployment verified',
       'Post-launch checklist complete',
     ],
     implementationEvidence: {},
     requiredApprovals: [
-      'Final visual review accepted',
+      'Build output accepted — all page types present',
+      'QA checklist accepted — all checks pass',
+      'Visual acceptance accepted — hero opens patient-first',
       'Production deployment confirmed',
-      'Post-launch checklist accepted',
     ],
     blockers: [
-      'Stage 6 (QA Review) must be owner-approved before launch',
+      'Stage 6 (Page Architecture) must be owner-approved before Stage 7 directive is issued',
     ],
   },
 
@@ -553,8 +533,7 @@ export function getApprovedStageGates(): DapStageGate[] {
 }
 
 export function getActiveStageGate(): DapStageGate {
-  // Active = first stage (by stageNumber) that is not 'approved' and not 'not_started'
-  // Falls back to first 'awaiting_owner_approval', then first not 'approved'
+  // Active = first stage (by stageNumber) that is not 'approved'
   const nonApproved = (DAP_STAGE_GATES as readonly DapStageGate[])
     .slice()
     .sort((a, b) => a.stageNumber - b.stageNumber)

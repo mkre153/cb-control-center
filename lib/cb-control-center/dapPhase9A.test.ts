@@ -721,7 +721,10 @@ describe('API route inventory', () => {
 
   it('only the Phase 9C route handler exists under app/', () => {
     const routeFiles = findFiles(appDir, p => p.endsWith('route.ts') || p.endsWith('route.tsx'))
-    const KNOWN_ROUTES = ['app/api/dap/requests/route.ts']
+    const KNOWN_ROUTES = [
+      'app/api/dap/requests/route.ts',
+      'app/api/businesses/dental-advantage-plan/stages/review/route.ts',
+    ]
     const unexpected = routeFiles.filter(r => !KNOWN_ROUTES.some(k => r.endsWith(k)))
     expect(unexpected).toHaveLength(0)
   })

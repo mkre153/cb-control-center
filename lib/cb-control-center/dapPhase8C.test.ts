@@ -232,7 +232,10 @@ describe('Current production route inventory', () => {
 describe('API route inventory (Phase 9C added POST /api/dap/requests)', () => {
   it('only the Phase 9C route handler exists (no other route.ts added)', () => {
     const routes = findFiles(ROOT, f => f.endsWith('route.ts') || f.endsWith('route.tsx'))
-    const KNOWN_ROUTES = ['app/api/dap/requests/route.ts']
+    const KNOWN_ROUTES = [
+      'app/api/dap/requests/route.ts',
+      'app/api/businesses/dental-advantage-plan/stages/review/route.ts',
+    ]
     const unexpected = routes.filter(r => !KNOWN_ROUTES.some(k => r.endsWith(k)))
     expect(unexpected).toHaveLength(0)
   })

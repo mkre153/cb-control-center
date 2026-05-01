@@ -35,8 +35,8 @@ describe('Group 1 — Stage detail page structure', () => {
 
   it('renders without throwing for all 7 stages', () => {
     const slugs = [
-      '1-business-definition', '2-truth-schema', '3-brandscript',
-      '4-page-generation', '5-site-build', '6-qa-acceptance', '7-production-release',
+      '1-business-definition', '2-discovery-audit', '3-truth-schema',
+      '4-positioning', '5-seo-strategy', '6-page-architecture', '7-build-launch',
     ]
     for (const slug of slugs) {
       expect(() => render(slug), `should render without throwing: ${slug}`).not.toThrow()
@@ -88,6 +88,10 @@ describe('Group 1 — Stage detail page structure', () => {
   it('approved stages show next stage unlocked', () => {
     const html = render('1-business-definition')
     expect(html).toContain('Next stage unlocked')
+  })
+
+  it('renders Opus 4.7 AI review panel', () => {
+    expect(render('1-business-definition')).toContain('data-ai-review-panel')
   })
 })
 
@@ -145,9 +149,9 @@ describe('Group 2 — Stage 1 full page (Business Definition)', () => {
 
 // ─── Group 3: Stage 2 — Truth Schema ─────────────────────────────────────────
 
-describe('Group 3 — Stage 2 full page (Truth Schema, awaiting approval)', () => {
+describe('Group 3 — Stage 3 full page (Truth Schema, awaiting approval)', () => {
   function render() {
-    const stage = getDapStageGateBySlug('2-truth-schema')!
+    const stage = getDapStageGateBySlug('3-truth-schema')!
     return renderToString(React.createElement(StageDetailPage, { stage }))
   }
 
@@ -212,20 +216,20 @@ describe('Group 4 — Pending stages render not-started state', () => {
     return renderToString(React.createElement(StageDetailPage, { stage }))
   }
 
-  it('Stage 3 (not_started) renders not-ready artifact message', () => {
-    expect(render('3-brandscript')).toContain('Not generated yet')
+  it('Stage 2 (discovery-audit, not_started) renders artifact with not_started status', () => {
+    expect(render('2-discovery-audit')).toContain('data-artifact-status="not_started"')
   })
 
-  it('Stage 3 does NOT show approved state', () => {
-    expect(render('3-brandscript')).not.toContain('Approved by Owner')
+  it('Stage 2 does NOT show approved state', () => {
+    expect(render('2-discovery-audit')).not.toContain('Approved by Owner')
   })
 
   it('Stage 6 (not_started) renders without throwing', () => {
-    expect(() => render('6-qa-acceptance')).not.toThrow()
+    expect(() => render('6-page-architecture')).not.toThrow()
   })
 
   it('Stage 7 (not_started) renders without throwing', () => {
-    expect(() => render('7-production-release')).not.toThrow()
+    expect(() => render('7-build-launch')).not.toThrow()
   })
 })
 
