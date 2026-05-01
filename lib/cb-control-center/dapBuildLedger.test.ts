@@ -250,8 +250,14 @@ describe('Group 4 — Content accuracy', () => {
     expect(entry?.status).toBe('complete')
   })
 
-  it('DAP rebuild preparation entry exists and is in_progress', () => {
+  it('DAP rebuild preparation entry exists and is complete', () => {
     const entry = DAP_BUILD_LEDGER.find(e => e.id === 'dap-rebuild-branch-preparation')
+    expect(entry).toBeDefined()
+    expect(entry?.status).toBe('complete')
+  })
+
+  it('DAP rebuild v2 branch entry exists and is in_progress', () => {
+    const entry = DAP_BUILD_LEDGER.find(e => e.id === 'dap-rebuild-v2-branch-created')
     expect(entry).toBeDefined()
     expect(entry?.status).toBe('in_progress')
   })

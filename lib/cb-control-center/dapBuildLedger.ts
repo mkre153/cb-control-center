@@ -136,22 +136,43 @@ export const DAP_BUILD_LEDGER: readonly DapBuildLedgerEntry[] = [
   {
     id: 'dap-rebuild-branch-preparation',
     title: 'DAP Site Rebuild — Branch Preparation',
-    status: 'in_progress',
+    status: 'complete',
     summary:
-      'Dirty working tree on dap-storybrand-homepage requires a commit checkpoint before rebuild/dap-site-v2 can be branched. Modified: DentistCard.tsx, DentistFinder.tsx, dentist-match.ts, docs/competitive.md. Untracked: v6 routes, zocdoc-blank, v5 design prototypes, preview routes, 6 hero iteration directives, Stitch designs.',
-    completedAt: null,
+      'Classified and resolved dirty working tree on dap-storybrand-homepage. Checkpoint commit (0951018) captured 4 modified source files (confirmed-provider filter + badge, competitive audit) and 8 untracked strategy docs (7 v6 hero directives, Stitch design spec). 24 prototype files archived to archive/dap-prototypes-pre-rebuild and removed from working tree. tsconfig.tsbuildinfo restored. dap-storybrand-homepage left clean.',
+    completedAt: '2026-04-30',
     recordedAt: '2026-04-30',
     verification: 'recorded_from_operator_report',
     evidence: [
       { type: 'git_branch', name: 'dap-storybrand-homepage' },
       {
         type: 'git_commit',
-        hash: 'd5dc443',
-        message: 'Revert "feat(dashboard): CB Control Center v0.1 — mock-data pipeline control layer"',
+        hash: '0951018',
+        message: 'checkpoint: confirmed-provider filter + hero directives + competitive audit',
+      },
+      { type: 'git_branch', name: 'archive/dap-prototypes-pre-rebuild' },
+    ],
+  },
+
+  {
+    id: 'dap-rebuild-v2-branch-created',
+    title: 'DAP Site Rebuild — rebuild/dap-site-v2 Created',
+    status: 'in_progress',
+    summary:
+      'rebuild/dap-site-v2 branched from dap-storybrand-homepage at checkpoint commit 0951018. Working tree was clean before branching — no modified files, no untracked files, tsconfig.tsbuildinfo restored. Branch pushed to remote. Ready for homepage rebuild using Phase 18C/D contracts as governing blueprint.',
+    completedAt: null,
+    recordedAt: '2026-04-30',
+    verification: 'recorded_from_operator_report',
+    evidence: [
+      { type: 'git_branch', name: 'rebuild/dap-site-v2' },
+      { type: 'git_branch', name: 'dap-storybrand-homepage' },
+      {
+        type: 'git_commit',
+        hash: '0951018',
+        message: 'checkpoint: confirmed-provider filter + hero directives + competitive audit',
       },
     ],
     nextAction:
-      'Review dap-storybrand-homepage dirty working tree. Commit real work (truth-rule fixes, hero directives). Discard or archive stale prototypes. Then branch rebuild/dap-site-v2.',
+      'Begin DAP homepage rebuild on rebuild/dap-site-v2. Use Phase 18C page generation contracts and Phase 18D page brief builder as governing blueprint. Start with homepage (type: homepage in cbSeoAeoPageGeneration).',
   },
 
 ] as const
