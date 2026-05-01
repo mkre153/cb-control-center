@@ -8,6 +8,7 @@ import {
   approveCharterAction,
   type ActionResult,
 } from '@/lib/cb-control-center/cbccProjectActions'
+import { CbccNav } from './CbccNav'
 
 interface Props {
   project: CbccProject
@@ -29,18 +30,7 @@ export function CbccCharterPanel({ project }: Props) {
 
   return (
     <div className="min-h-screen bg-gray-950 font-sans text-gray-300">
-      {/* Nav */}
-      <nav className="border-b border-gray-800 px-6 py-3 flex items-center justify-between bg-gray-900">
-        <Link href="/" className="text-blue-400 font-semibold tracking-tight hover:text-blue-300">
-          CB Control Center
-        </Link>
-        <Link
-          href="/projects/new"
-          className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors"
-        >
-          + New Project
-        </Link>
-      </nav>
+      <CbccNav />
 
       <div className="max-w-3xl mx-auto px-6 py-8">
         {/* Breadcrumb */}
@@ -163,7 +153,7 @@ function ListSection({ title, items, field }: { title: string; items: string[]; 
       <p className="text-xs text-gray-600 uppercase tracking-widest mb-2">{title}</p>
       <ul className="space-y-1">
         {items.map((item, i) => (
-          <li key={i} className="text-sm text-gray-300 before:content-['—'] before:text-gray-600 before:mr-2">
+          <li key={`${field}-${i}`} className="text-sm text-gray-300 before:content-['—'] before:text-gray-600 before:mr-2">
             {item}
           </li>
         ))}

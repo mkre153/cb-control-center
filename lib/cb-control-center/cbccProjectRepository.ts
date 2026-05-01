@@ -135,7 +135,7 @@ export async function approveCharter(projectId: string, approvedBy: string): Pro
       charter_approved: true,
       charter_approved_at: new Date().toISOString(),
       charter_approved_by: approvedBy,
-      charter_version: ((row.charter_version as number) ?? 1),
+      charter_version: ((row.charter_version as number) ?? 0) + 1,
       charter_hash: charterHash,
       project_status: 'step_0_approved',
     })

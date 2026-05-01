@@ -10,6 +10,7 @@ import {
   type PrefillResult,
   type PrefillFields,
 } from '@/lib/cb-control-center/cbccProjectActions'
+import { CbccNav } from './CbccNav'
 
 const EMPTY_FIELDS: PrefillFields = {
   name: '', businessType: '', primaryGoal: '', targetCustomer: '',
@@ -19,6 +20,11 @@ const EMPTY_FIELDS: PrefillFields = {
 
 const INITIAL_CREATE: ActionResult | null = null
 const INITIAL_PREFILL: PrefillResult | null = null
+
+function sourceLabel(raw: string): string {
+  const first = raw.trim().split(/\s+/)[0]
+  try { return new URL(first).hostname } catch { return first }
+}
 
 export function CbccProjectIntakeForm({ defaultShowIntake = false }: { defaultShowIntake?: boolean } = {}) {
   const [manualMode, setManualMode] = useState(defaultShowIntake)
@@ -36,18 +42,7 @@ export function CbccProjectIntakeForm({ defaultShowIntake = false }: { defaultSh
 
   return (
     <div className="min-h-screen bg-gray-950 font-sans text-gray-300">
-      {/* Nav bar */}
-      <nav className="border-b border-gray-800 px-6 py-3 flex items-center justify-between bg-gray-900">
-        <Link href="/" className="text-blue-400 font-semibold tracking-tight hover:text-blue-300">
-          CB Control Center
-        </Link>
-        <Link
-          href="/projects/new"
-          className="px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md opacity-50 pointer-events-none"
-        >
-          + New Project
-        </Link>
-      </nav>
+      <CbccNav newProjectDisabled />
 
       <div className="mx-auto max-w-lg px-4 py-10">
         <Link href="/" className="text-xs text-gray-500 hover:text-gray-400 mb-6 inline-block">
@@ -93,8 +88,9 @@ export function CbccProjectIntakeForm({ defaultShowIntake = false }: { defaultSh
               </form>
               <div className="mt-4 text-center">
                 <button
+                  type="button"
                   onClick={() => setManualMode(true)}
-                  className="text-xs text-gray-500 hover:text-gray-400 underline"
+                  className="text-xs text-gray-500 hover:text-gray-400 underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
                 >
                   Skip — fill manually
                 </button>
@@ -115,10 +111,11 @@ export function CbccProjectIntakeForm({ defaultShowIntake = false }: { defaultSh
             <div className="px-6 pb-6 pt-4">
               {prefillState?.ok && (
                 <div className="mb-4 rounded-md bg-blue-900/30 border border-blue-700/40 px-3 py-2 text-xs text-blue-400 flex items-center justify-between">
-                  <span>Pre-filled from {prefillState.fields.sourceUrlsNotes.split(' ')[0]}</span>
+                  <span>Pre-filled from {sourceLabel(prefillState.fields.sourceUrlsNotes)}</span>
                   <button
+                    type="button"
                     onClick={() => setManualMode(false)}
-                    className="ml-3 underline hover:text-blue-300"
+                    className="ml-3 underline hover:text-blue-300 focus:outline-none"
                   >
                     ← Change URL
                   </button>
@@ -132,15 +129,15 @@ export function CbccProjectIntakeForm({ defaultShowIntake = false }: { defaultSh
               )}
 
               <form action={createAction} className="space-y-4">
-                <Field name="name"              label="Project Name *"           placeholder="e.g., Acme Corp Platform"          defaultValue={prefilled.name} />
-                <Field name="businessType"      label="Business Type *"          placeholder="e.g., Membership marketplace"       defaultValue={prefilled.businessType} />
-                <Field name="primaryGoal"       label="Primary Goal *"           placeholder="What this project must accomplish"  defaultValue={prefilled.primaryGoal}       textarea />
-                <Field name="targetCustomer"    label="Target Customer *"        placeholder="Who this serves"                    defaultValue={prefilled.targetCustomer}    textarea />
-                <Field name="knownConstraints"  label="Known Constraints *"      placeholder="Regulatory, technical, or scope limits" defaultValue={prefilled.knownConstraints} textarea />
-                <Field name="forbiddenClaims"   label="Forbidden Claims *"       placeholder="Claims this project must never make" defaultValue={prefilled.forbiddenClaims}   textarea />
-                <Field name="sourceUrlsNotes"   label="Source URLs / Notes *"    placeholder="Research links or reference notes"  defaultValue={prefilled.sourceUrlsNotes}   textarea />
-                <Field name="desiredOutputType" label="Desired Output Type *"    placeholder="e.g., Public website, internal tool" defaultValue={prefilled.desiredOutputType} />
-                <Field name="approvalOwner"     label="Approval Owner *"         placeholder="Who approves each stage"            defaultValue={prefilled.approvalOwner} />
+                <Field name="name"              label="Project Name *"               placeholder="e.g., Acme Corp Platform"           defaultValue={prefilled.name} />
+                <Field name="businessType"      label="Business Type *"              placeholder="e.g., Membership marketplace"        defaultValue={prefilled.businessType} />
+                <Field name="primaryGoal"       label="Primary Goal *"               placeholder="What this project must accomplish"   defaultValue={prefilled.primaryGoal}       textarea />
+                <Field name="targetCustomer"    label="Target Customer *"            placeholder="Who this serves"                     defaultValue={prefilled.targetCustomer}    textarea />
+                <Field name="knownConstraints"  label="Known Constraints *"          placeholder="Regulatory, technical, or scope limits" defaultValue={prefilled.knownConstraints} textarea />
+                <Field name="forbiddenClaims"   label="Forbidden Claims *"           placeholder="Claims this project must never make"  defaultValue={prefilled.forbiddenClaims}   textarea />
+                <Field name="sourceUrlsNotes"   label="Source URLs / Notes *"        placeholder="Research links or reference notes"   defaultValue={prefilled.sourceUrlsNotes}   textarea />
+                <Field name="desiredOutputType" label="Desired Output Type *"        placeholder="e.g., Public website, internal tool" defaultValue={prefilled.desiredOutputType} />
+                <Field name="approvalOwner"     label="Approval Owner *"             placeholder="Who approves each stage"             defaultValue={prefilled.approvalOwner} />
 
                 <button
                   type="submit"
@@ -158,6 +155,9 @@ export function CbccProjectIntakeForm({ defaultShowIntake = false }: { defaultSh
   )
 }
 
+const FIELD_CLASS =
+  'mt-1 block w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-blue-600'
+
 function Field({
   name,
   label,
@@ -171,8 +171,6 @@ function Field({
   textarea?: boolean
   defaultValue?: string
 }) {
-  const base =
-    'mt-1 block w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-blue-600'
   return (
     <div>
       <label htmlFor={name} className="block text-sm text-gray-300">
@@ -187,7 +185,7 @@ function Field({
           rows={2}
           placeholder={placeholder}
           defaultValue={defaultValue}
-          className={base}
+          className={FIELD_CLASS}
         />
       ) : (
         <input
@@ -198,7 +196,7 @@ function Field({
           type="text"
           placeholder={placeholder}
           defaultValue={defaultValue}
-          className={base}
+          className={FIELD_CLASS}
         />
       )}
     </div>

@@ -1,46 +1,17 @@
 import Link from 'next/link'
 import type { CbccProject } from '@/lib/cb-control-center/cbccProjectTypes'
+import { PROJECT_STATUS_LABEL, projectProgressPct } from '@/lib/cb-control-center/cbccProjectLabels'
+import { CbccNav } from './CbccNav'
 
 interface Props {
   projects: CbccProject[]
 }
 
-const STATUS_LABEL: Record<CbccProject['projectStatus'], string> = {
-  step_0_draft:         'Charter Draft',
-  step_0_charter_ready: 'Awaiting Approval',
-  step_0_approved:      'Stage 1 Available',
-  in_progress:          'In Progress',
-  completed:            'Completed',
-  archived:             'Archived',
-}
-
-function progressPct(status: CbccProject['projectStatus']): number {
-  switch (status) {
-    case 'step_0_draft':         return 0
-    case 'step_0_charter_ready': return 10
-    case 'step_0_approved':      return 15
-    case 'in_progress':          return 50
-    case 'completed':            return 100
-    case 'archived':             return 100
-  }
-}
-
 export function CbccProjectRegistry({ projects }: Props) {
   return (
     <div data-cbcc-project-registry className="min-h-screen bg-gray-950 font-sans text-gray-300">
-      {/* Nav bar */}
-      <nav className="border-b border-gray-800 px-6 py-3 flex items-center justify-between bg-gray-900">
-        <span className="text-blue-400 font-semibold tracking-tight">CB Control Center</span>
-        <Link
-          href="/projects/new"
-          data-action="create-project"
-          className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors"
-        >
-          + New Project
-        </Link>
-      </nav>
+      <CbccNav />
 
-      {/* Content */}
       <div className="max-w-5xl mx-auto px-6 py-8">
         <div className="mb-6 flex items-center justify-between">
           <div>
@@ -65,7 +36,7 @@ export function CbccProjectRegistry({ projects }: Props) {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {projects.map(project => {
-              const pct = progressPct(project.projectStatus)
+              const pct = projectProgressPct(project.projectStatus)
               return (
                 <Link
                   key={project.id}
@@ -87,7 +58,7 @@ export function CbccProjectRegistry({ projects }: Props) {
                   </div>
                   <div className="px-5 pb-5">
                     <div className="flex items-center justify-between text-sm mb-2">
-                      <span className="text-gray-400">{STATUS_LABEL[project.projectStatus]}</span>
+                      <span className="text-gray-400">{PROJECT_STATUS_LABEL[project.projectStatus]}</span>
                       <span className="text-gray-500">{pct}% complete</span>
                     </div>
                     <div className="h-1.5 w-full rounded-full bg-gray-800">

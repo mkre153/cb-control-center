@@ -2,15 +2,8 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getProjectBySlug, getProjectStages } from '@/lib/cb-control-center/cbccProjectRepository'
 import { CbccStagePipeline } from '@/components/cb-control-center/v2/CbccStagePipeline'
-
-const STATUS_LABEL: Record<string, string> = {
-  step_0_draft:         'Charter Draft',
-  step_0_charter_ready: 'Charter Ready for Owner Approval',
-  step_0_approved:      'Charter Approved',
-  in_progress:          'In Progress',
-  completed:            'Completed',
-  archived:             'Archived',
-}
+import { CbccNav } from '@/components/cb-control-center/v2/CbccNav'
+import { PROJECT_STATUS_LABEL } from '@/lib/cb-control-center/cbccProjectLabels'
 
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
@@ -21,18 +14,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
   return (
     <div className="min-h-screen bg-gray-950 font-sans text-gray-300">
-      {/* Nav */}
-      <nav className="border-b border-gray-800 px-6 py-3 flex items-center justify-between bg-gray-900">
-        <Link href="/" className="text-blue-400 font-semibold tracking-tight hover:text-blue-300">
-          CB Control Center
-        </Link>
-        <Link
-          href="/projects/new"
-          className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors"
-        >
-          + New Project
-        </Link>
-      </nav>
+      <CbccNav />
 
       <div className="max-w-3xl mx-auto px-6 py-8">
         {/* Breadcrumb */}
@@ -46,7 +28,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-white">{project.name}</h1>
           <p data-project-status className="mt-1 text-sm text-gray-400">
-            Step 0: {STATUS_LABEL[project.projectStatus] ?? project.projectStatus}
+            Step 0: {PROJECT_STATUS_LABEL[project.projectStatus]}
           </p>
         </div>
 
