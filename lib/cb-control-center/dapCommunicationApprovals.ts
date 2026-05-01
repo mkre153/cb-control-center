@@ -13,7 +13,7 @@ import type {
 } from './dapCommunicationApprovalTypes'
 
 import type { DapCommunicationDispatchEvent } from './dapCommunicationDispatchEventTypes'
-import type { DapMkcrmDispatchShadowPayload }  from './dapMkcrmDispatchPayloadTypes'
+import type { DapMkcrmDispatchShadowPayload }  from './mkcrm/dapMkcrmDispatchPayloadTypes'
 import type { DapCommunicationType }           from './dapCommunicationDispatchEventTypes'
 
 import {
@@ -24,7 +24,7 @@ import {
 import {
   buildDapMkcrmDispatchShadowPayloadFromEvent,
   validateDapMkcrmDispatchShadowPayload,
-} from './dapMkcrmDispatchPayloads'
+} from './mkcrm/dapMkcrmDispatchPayloads'
 
 // ─── Approvable event types ───────────────────────────────────────────────────
 

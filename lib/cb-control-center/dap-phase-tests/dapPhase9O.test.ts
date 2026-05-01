@@ -32,16 +32,16 @@ import {
   mapClientBuilderBillingEventToStatusHint,
   isClientBuilderBillingPayloadSafe,
   assertClientBuilderBillingSource,
-} from '../dapClientBuilderBillingRules'
+} from '../mkcrm/dapClientBuilderBillingRules'
 import {
   ingestDapClientBuilderBillingEventShadow,
-} from '../dapClientBuilderBillingShadow'
+} from '../mkcrm/dapClientBuilderBillingShadow'
 import {
   getPublicCommercialSystemForVertical,
   getInternalCrmSystemForVertical,
   isResponsibilityAllowed,
 } from '../client/clientBuilderBoundaryRules'
-import type { DapClientBuilderBillingShadowPayload } from '../dapClientBuilderBillingTypes'
+import type { DapClientBuilderBillingShadowPayload } from '../mkcrm/dapClientBuilderBillingTypes'
 
 // ─── Project root ─────────────────────────────────────────────────────────────
 
@@ -49,9 +49,9 @@ const ROOT = resolve(__dirname, '../../..')
 
 // ─── Key paths ────────────────────────────────────────────────────────────────
 
-const TYPES_PATH   = resolve(ROOT, 'lib/cb-control-center/dapClientBuilderBillingTypes.ts')
-const RULES_PATH   = resolve(ROOT, 'lib/cb-control-center/dapClientBuilderBillingRules.ts')
-const SHADOW_PATH  = resolve(ROOT, 'lib/cb-control-center/dapClientBuilderBillingShadow.ts')
+const TYPES_PATH   = resolve(ROOT, 'lib/cb-control-center/mkcrm/dapClientBuilderBillingTypes.ts')
+const RULES_PATH   = resolve(ROOT, 'lib/cb-control-center/mkcrm/dapClientBuilderBillingRules.ts')
+const SHADOW_PATH  = resolve(ROOT, 'lib/cb-control-center/mkcrm/dapClientBuilderBillingShadow.ts')
 
 // ─── Base sample input ─────────────────────────────────────────────────────────
 
@@ -500,8 +500,8 @@ describe('Phase 9N boundary — system boundary definitions still hold', () => {
   })
 
   it('new files live in lib/ not app/', () => {
-    expect(existsSync(resolve(ROOT, 'lib/cb-control-center/dapClientBuilderBillingTypes.ts'))).toBe(true)
-    expect(existsSync(resolve(ROOT, 'lib/cb-control-center/dapClientBuilderBillingRules.ts'))).toBe(true)
-    expect(existsSync(resolve(ROOT, 'lib/cb-control-center/dapClientBuilderBillingShadow.ts'))).toBe(true)
+    expect(existsSync(resolve(ROOT, 'lib/cb-control-center/mkcrm/dapClientBuilderBillingTypes.ts'))).toBe(true)
+    expect(existsSync(resolve(ROOT, 'lib/cb-control-center/mkcrm/dapClientBuilderBillingRules.ts'))).toBe(true)
+    expect(existsSync(resolve(ROOT, 'lib/cb-control-center/mkcrm/dapClientBuilderBillingShadow.ts'))).toBe(true)
   })
 })

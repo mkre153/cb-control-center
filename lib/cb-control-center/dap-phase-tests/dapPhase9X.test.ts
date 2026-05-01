@@ -24,14 +24,14 @@ function findPages(dir: string): string[] {
 import type {
   DapMkcrmDispatchShadowEventType,
   DapMkcrmDispatchShadowPayload,
-} from '../dapMkcrmDispatchPayloadTypes'
+} from '../mkcrm/dapMkcrmDispatchPayloadTypes'
 
 import {
   buildDapMkcrmDispatchShadowPayloadFromEvent,
   getAllDapPracticeDecisionMkcrmDispatchShadowPayloadPreviews,
   getAllDapMemberStatusMkcrmDispatchShadowPayloadPreviews,
   validateDapMkcrmDispatchShadowPayload,
-} from '../dapMkcrmDispatchPayloads'
+} from '../mkcrm/dapMkcrmDispatchPayloads'
 
 import {
   getAllDapPracticeDecisionDispatchEventPreviews,
@@ -85,19 +85,19 @@ describe('Phase 9X — MKCRM dispatch shadow payload type surface exists', () =>
   })
 
   it('types file does not import from Supabase', () => {
-    const src = readFileSync(join(__dirname, '..', 'dapMkcrmDispatchPayloadTypes.ts'), 'utf8')
+    const src = readFileSync(join(__dirname, '..', 'mkcrm', 'dapMkcrmDispatchPayloadTypes.ts'), 'utf8')
     expect(src).not.toMatch(/^import.*supabase/im)
     expect(src).not.toMatch(/from ['"].*supabase/i)
   })
 
   it('payload builders file does not import from Supabase', () => {
-    const src = readFileSync(join(__dirname, '..', 'dapMkcrmDispatchPayloads.ts'), 'utf8')
+    const src = readFileSync(join(__dirname, '..', 'mkcrm', 'dapMkcrmDispatchPayloads.ts'), 'utf8')
     expect(src).not.toMatch(/^import.*supabase/im)
     expect(src).not.toMatch(/from ['"].*supabase/i)
   })
 
   it('payload builders file does not reference send/deliver/resend', () => {
-    const src = readFileSync(join(__dirname, '..', 'dapMkcrmDispatchPayloads.ts'), 'utf8')
+    const src = readFileSync(join(__dirname, '..', 'mkcrm', 'dapMkcrmDispatchPayloads.ts'), 'utf8')
     expect(src).not.toContain('resend.emails')
     expect(src).not.toContain('sendEmail(')
     expect(src).not.toContain('deliverEmail(')
@@ -408,7 +408,7 @@ describe('Phase 9X — Payloads exclude email body, PHI, payment CTA, and stored
   })
 
   it('types file does not define body or emailBody fields', () => {
-    const src = readFileSync(join(__dirname, '..', 'dapMkcrmDispatchPayloadTypes.ts'), 'utf8')
+    const src = readFileSync(join(__dirname, '..', 'mkcrm', 'dapMkcrmDispatchPayloadTypes.ts'), 'utf8')
     expect(src).not.toMatch(/\bbody\s*:/)
     expect(src).not.toContain('emailBody')
     expect(src).not.toContain('sentAt')

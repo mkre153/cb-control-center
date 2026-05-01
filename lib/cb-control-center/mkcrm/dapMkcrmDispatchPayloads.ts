@@ -4,11 +4,11 @@
 // membership standing, or dispatch approval.
 
 import type { DapMkcrmDispatchShadowPayload }    from './dapMkcrmDispatchPayloadTypes'
-import type { DapCommunicationDispatchEvent }     from './dapCommunicationDispatchEventTypes'
+import type { DapCommunicationDispatchEvent }     from '../dapCommunicationDispatchEventTypes'
 import {
   getAllDapPracticeDecisionDispatchEventPreviews,
   getAllDapMemberStatusDispatchEventPreviews,
-} from './dapCommunicationDispatchEvents'
+} from '../dapCommunicationDispatchEvents'
 
 // ─── Forbidden payload field names ────────────────────────────────────────────
 

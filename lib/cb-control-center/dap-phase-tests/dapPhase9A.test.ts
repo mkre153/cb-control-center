@@ -808,9 +808,9 @@ describe('Deferred integrations remain deferred', () => {
     expect(nonTestFiles).toHaveLength(0)
   })
 
-  it('no MKCRM integration files exist', () => {
+  it('no MKCRM integration files exist outside the deliberate mkcrm/ folder', () => {
     const mkCrmFiles = findFiles(ROOT, p =>
-      p.includes('mkcrm')
+      p.includes('mkcrm') && !p.includes('lib/cb-control-center/mkcrm/')
     )
     expect(mkCrmFiles).toHaveLength(0)
   })

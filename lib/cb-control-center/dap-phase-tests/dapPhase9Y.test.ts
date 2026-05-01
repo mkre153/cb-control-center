@@ -49,7 +49,7 @@ import {
 import {
   buildDapMkcrmDispatchShadowPayloadFromEvent,
   validateDapMkcrmDispatchShadowPayload,
-} from '../dapMkcrmDispatchPayloads'
+} from '../mkcrm/dapMkcrmDispatchPayloads'
 
 import {
   getDapPracticeDecisionEmailPreview,

@@ -5,7 +5,7 @@ import {
   deriveNextBuildSlice,
 } from './siteArchitectureEligibility'
 import { DAP_ARCHITECTURE_SPECS } from './siteArchitectureSpecs'
-import type { EnrichedBlocker, TruthSection } from './types'
+import type { EnrichedBlocker, TruthSection } from '../types'
 import type { EvaluatedPage } from './siteArchitectureTypes'
 
 // ─── Fixtures ────────────────────────────────────────────────────────────────

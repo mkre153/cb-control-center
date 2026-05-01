@@ -494,10 +494,11 @@ describe('Boundary preservation', () => {
     expect(treatments).not.toContain('dapRequestRules')
   })
 
-  it('no CRM or MKCRM integration files exist', () => {
+  it('no CRM or MKCRM integration files exist outside the deliberate mkcrm/ folder', () => {
     const crmFiles = findFiles(ROOT, p =>
       (p.includes('/crm/') || p.includes('crm-') || p.includes('mkcrm')) &&
-      !p.includes('.test.')
+      !p.includes('.test.') &&
+      !p.includes('lib/cb-control-center/mkcrm/')
     )
     expect(crmFiles).toHaveLength(0)
   })

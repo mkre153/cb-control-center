@@ -43,7 +43,7 @@ import {
 import {
   buildDapClientBuilderBillingPayload,
   assertClientBuilderBillingSource,
-} from '../dapClientBuilderBillingRules'
+} from '../mkcrm/dapClientBuilderBillingRules'
 import type { DapMemberBillingEventForStatus } from '../dapMemberStatusTypes'
 
 // ─── Project root ─────────────────────────────────────────────────────────────

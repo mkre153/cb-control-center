@@ -8,12 +8,12 @@ import type {
   DapCommunicationDispatchChannel,
   DapCommunicationDispatchStatus,
   DapCommunicationDispatchBlockerCode,
-} from './dapCommunicationDispatchTypes'
+} from '../dapCommunicationDispatchTypes'
 
 import type {
   DapCommunicationType,
   DapCommunicationDispatchEventType,
-} from './dapCommunicationDispatchEventTypes'
+} from '../dapCommunicationDispatchEventTypes'
 
 export type { DapCommunicationDispatchAudience, DapCommunicationDispatchChannel }
 

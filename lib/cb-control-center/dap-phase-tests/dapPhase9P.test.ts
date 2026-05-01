@@ -34,24 +34,24 @@ import {
   mapClientBuilderBillingEventToMkcrmSignal,
   mapBillingStatusHintToMkcrmSignal,
   assertDapMkcrmOutboxDestination,
-} from '../dapMkcrmOutboxRules'
+} from '../mkcrm/dapMkcrmOutboxRules'
 import {
   prepareDapMkcrmOutboxShadow,
   prepareDapMkcrmOutboxFromClientBuilderBillingShadow,
-} from '../dapMkcrmOutboxShadow'
+} from '../mkcrm/dapMkcrmOutboxShadow'
 import {
   buildDapClientBuilderBillingPayload,
   assertClientBuilderBillingSource,
-} from '../dapClientBuilderBillingRules'
+} from '../mkcrm/dapClientBuilderBillingRules'
 import {
   getPublicCommercialSystemForVertical,
   getInternalCrmSystemForVertical,
   isResponsibilityAllowed,
 } from '../client/clientBuilderBoundaryRules'
-import { buildPracticeApprovedPayload } from '../dapMkcrmPayloads'
-import { syncDapEventToMkcrmShadow } from '../dapMkcrmSync'
-import type { DapMkcrmOutboxPayload } from '../dapMkcrmOutboxTypes'
-import type { DapClientBuilderBillingShadowPayload } from '../dapClientBuilderBillingTypes'
+import { buildPracticeApprovedPayload } from '../mkcrm/dapMkcrmPayloads'
+import { syncDapEventToMkcrmShadow } from '../mkcrm/dapMkcrmSync'
+import type { DapMkcrmOutboxPayload } from '../mkcrm/dapMkcrmOutboxTypes'
+import type { DapClientBuilderBillingShadowPayload } from '../mkcrm/dapClientBuilderBillingTypes'
 
 // ─── Project root ─────────────────────────────────────────────────────────────
 
@@ -59,9 +59,9 @@ const ROOT = resolve(__dirname, '../../..')
 
 // ─── Key paths ────────────────────────────────────────────────────────────────
 
-const TYPES_PATH  = resolve(ROOT, 'lib/cb-control-center/dapMkcrmOutboxTypes.ts')
-const RULES_PATH  = resolve(ROOT, 'lib/cb-control-center/dapMkcrmOutboxRules.ts')
-const SHADOW_PATH = resolve(ROOT, 'lib/cb-control-center/dapMkcrmOutboxShadow.ts')
+const TYPES_PATH  = resolve(ROOT, 'lib/cb-control-center/mkcrm/dapMkcrmOutboxTypes.ts')
+const RULES_PATH  = resolve(ROOT, 'lib/cb-control-center/mkcrm/dapMkcrmOutboxRules.ts')
+const SHADOW_PATH = resolve(ROOT, 'lib/cb-control-center/mkcrm/dapMkcrmOutboxShadow.ts')
 
 // ─── Base sample inputs ────────────────────────────────────────────────────────
 
@@ -445,7 +445,7 @@ describe('Phase 9M shadow sync — still intact, still shadow-only', () => {
 
   it('Phase 9M sync has no fetch or network calls (structural)', () => {
     const src = readFileSync(
-      resolve(ROOT, 'lib/cb-control-center/dapMkcrmSync.ts'),
+      resolve(ROOT, 'lib/cb-control-center/mkcrm/dapMkcrmSync.ts'),
       'utf8'
     )
     expect(src).not.toContain('fetch(')
@@ -454,7 +454,7 @@ describe('Phase 9M shadow sync — still intact, still shadow-only', () => {
 
   it('Phase 9M and 9P shadow results are independent — neither calls the other', () => {
     const outboxSrc = readFileSync(SHADOW_PATH, 'utf8')
-    const syncSrc   = readFileSync(resolve(ROOT, 'lib/cb-control-center/dapMkcrmSync.ts'), 'utf8')
+    const syncSrc   = readFileSync(resolve(ROOT, 'lib/cb-control-center/mkcrm/dapMkcrmSync.ts'), 'utf8')
     expect(outboxSrc).not.toContain('syncDapEventToMkcrmShadow')
     expect(syncSrc).not.toContain('prepareDapMkcrmOutboxShadow')
   })

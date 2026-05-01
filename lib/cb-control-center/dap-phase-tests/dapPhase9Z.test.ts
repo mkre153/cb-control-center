@@ -51,7 +51,7 @@ import {
 
 import {
   buildDapMkcrmDispatchShadowPayloadFromEvent,
-} from '../dapMkcrmDispatchPayloads'
+} from '../mkcrm/dapMkcrmDispatchPayloads'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

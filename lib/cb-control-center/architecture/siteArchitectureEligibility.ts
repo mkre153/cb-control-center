@@ -6,7 +6,7 @@ import type {
   SiteArchitectureOutput,
   NextBuildSlice,
 } from './siteArchitectureTypes'
-import type { EnrichedBlocker, TruthSection } from './types'
+import type { EnrichedBlocker, TruthSection } from '../types'
 
 // ─── Input derivation ────────────────────────────────────────────────────────
 

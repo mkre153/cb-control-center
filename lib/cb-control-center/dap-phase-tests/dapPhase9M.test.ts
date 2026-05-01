@@ -28,12 +28,12 @@ import {
   buildMembershipEmailConfirmedPayload,
   buildMembershipStandingPayload,
   buildParticipationStatusPayload,
-} from '../dapMkcrmPayloads'
+} from '../mkcrm/dapMkcrmPayloads'
 import {
   validateDapMkcrmPayload,
   syncDapEventToMkcrmShadow,
-} from '../dapMkcrmSync'
-import type { DapMkcrmSyncPayload } from '../dapMkcrmTypes'
+} from '../mkcrm/dapMkcrmSync'
+import type { DapMkcrmSyncPayload } from '../mkcrm/dapMkcrmTypes'
 
 // ─── Project root ─────────────────────────────────────────────────────────────
 
@@ -41,9 +41,9 @@ const ROOT = resolve(__dirname, '../../..')
 
 // ─── Key paths ────────────────────────────────────────────────────────────────
 
-const TYPES_PATH    = resolve(ROOT, 'lib/cb-control-center/dapMkcrmTypes.ts')
-const PAYLOADS_PATH = resolve(ROOT, 'lib/cb-control-center/dapMkcrmPayloads.ts')
-const SYNC_PATH     = resolve(ROOT, 'lib/cb-control-center/dapMkcrmSync.ts')
+const TYPES_PATH    = resolve(ROOT, 'lib/cb-control-center/mkcrm/dapMkcrmTypes.ts')
+const PAYLOADS_PATH = resolve(ROOT, 'lib/cb-control-center/mkcrm/dapMkcrmPayloads.ts')
+const SYNC_PATH     = resolve(ROOT, 'lib/cb-control-center/mkcrm/dapMkcrmSync.ts')
 
 // ─── Sample inputs ─────────────────────────────────────────────────────────────
 
