@@ -3,6 +3,67 @@ import { getSupabaseAdminClient } from './supabaseClient'
 import { CBCC_STAGE_DEFINITIONS } from './cbccStageDefinitions'
 import type { CbccProject, CbccProjectIntake, ProjectCharter, ProjectStage } from './cbccProjectTypes'
 
+// ─── Idempotent stage seeding / self-healing ─────────────────────────────────
+//
+// `ensureProjectStages` is the canonical seeder. It is upsert-based and never
+// touches runtime state (stage_status, approved, approved_at, approved_by) on
+// existing rows — only stage_key and stage_title can drift, and those are
+// reconciled in place to the canonical CBCC_STAGE_DEFINITIONS values.
+//
+// Two pure helpers (computeMissingStages, computeDriftCorrections) keep the
+// decision logic testable without a live DB.
+
+export interface DriftCorrection {
+  stageNumber: number
+  field: 'stage_key' | 'stage_title'
+  before: string
+  after: string
+}
+
+export interface EnsureStagesReport {
+  projectId: string
+  inserted: number
+  updatedReconciled: number
+  unchanged: number
+  driftCorrected: DriftCorrection[]
+}
+
+export function computeMissingStages(
+  existingNumbers: readonly number[],
+  definitions: readonly { number: number }[],
+): number[] {
+  const have = new Set(existingNumbers)
+  return definitions.filter(d => !have.has(d.number)).map(d => d.number)
+}
+
+export function computeDriftCorrections(
+  existing: ReadonlyArray<{ stageNumber: number; stageKey: string; stageTitle: string }>,
+  canonical: typeof CBCC_STAGE_DEFINITIONS,
+): DriftCorrection[] {
+  const corrections: DriftCorrection[] = []
+  for (const row of existing) {
+    const def = canonical.find(d => d.number === row.stageNumber)
+    if (!def) continue
+    if (row.stageKey !== def.key) {
+      corrections.push({
+        stageNumber: row.stageNumber,
+        field: 'stage_key',
+        before: row.stageKey,
+        after: def.key,
+      })
+    }
+    if (row.stageTitle !== def.title) {
+      corrections.push({
+        stageNumber: row.stageNumber,
+        field: 'stage_title',
+        before: row.stageTitle,
+        after: def.title,
+      })
+    }
+  }
+  return corrections
+}
+
 function toProject(row: Record<string, unknown>): CbccProject {
   return {
     id: row.id as string,
@@ -71,20 +132,60 @@ export async function createProject(
 
   const project = toProject(row as Record<string, unknown>)
 
-  // Seed 7 locked stage rows (was a DB trigger; moved to app code for simplicity)
-  const { error: seedError } = await db
-    .from('cbcc_project_stages')
-    .insert(
-      CBCC_STAGE_DEFINITIONS.map(s => ({
-        project_id: project.id,
-        stage_number: s.number,
-        stage_key: s.key,
-        stage_title: s.title,
-      }))
-    )
+  await ensureProjectStages(project.id)
 
-  if (seedError) throw new Error(`createProject seed stages: ${seedError.message}`)
   return project
+}
+
+export async function ensureProjectStages(projectId: string): Promise<EnsureStagesReport> {
+  const db = getSupabaseAdminClient()
+
+  const { data: existingRows, error: fetchError } = await db
+    .from('cbcc_project_stages')
+    .select('stage_number, stage_key, stage_title')
+    .eq('project_id', projectId)
+    .order('stage_number', { ascending: true })
+
+  if (fetchError) throw new Error(`ensureProjectStages fetch: ${fetchError.message}`)
+
+  const existing = (existingRows ?? []).map(r => ({
+    stageNumber: r.stage_number as number,
+    stageKey: r.stage_key as string,
+    stageTitle: r.stage_title as string,
+  }))
+
+  const existingNumbers = existing.map(r => r.stageNumber)
+  const missingNumbers = computeMissingStages(existingNumbers, CBCC_STAGE_DEFINITIONS)
+  const driftCorrected = computeDriftCorrections(existing, CBCC_STAGE_DEFINITIONS)
+
+  const driftedStageNumbers = new Set(driftCorrected.map(d => d.stageNumber))
+  const unchanged = existing.filter(r => !driftedStageNumbers.has(r.stageNumber)).length
+
+  // Upsert all 7 canonical rows. Payload only includes project_id/stage_number/
+  // stage_key/stage_title — runtime fields (stage_status, approved, approved_at,
+  // approved_by) are NOT in the payload, so ON CONFLICT DO UPDATE preserves them.
+  // For missing rows, defaults from the table definition apply (stage_status='locked',
+  // approved=false).
+  const payload = CBCC_STAGE_DEFINITIONS.map(d => ({
+    project_id: projectId,
+    stage_number: d.number,
+    stage_key: d.key,
+    stage_title: d.title,
+  }))
+
+  const { error: upsertError } = await db
+    .from('cbcc_project_stages')
+    .upsert(payload, { onConflict: 'project_id,stage_number' })
+
+  if (upsertError) throw new Error(`ensureProjectStages upsert: ${upsertError.message}`)
+
+  return {
+    projectId,
+    inserted: missingNumbers.length,
+    updatedReconciled: driftedStageNumbers.size,
+    unchanged,
+    driftCorrected,
+  }
 }
 
 export async function getProjectBySlug(slug: string): Promise<CbccProject | null> {

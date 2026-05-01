@@ -352,7 +352,7 @@ describe('Route registry — Phase 11 routes exist on disk', () => {
   }
 
   it('page count is now 29 (Phase 11 added 3 admin preview routes)', () => {
-    expect(findPages(join(ROOT, 'app')).length).toBe(57)
+    expect(findPages(join(ROOT, 'app')).length).toBe(58)
   })
 })
 

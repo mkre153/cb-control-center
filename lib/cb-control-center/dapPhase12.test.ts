@@ -507,7 +507,7 @@ describe('Action catalog preview route', () => {
 
 describe('Route registry and page count — Phase 12', () => {
   it('page count is now 30 (Phase 12 added action-catalog preview)', () => {
-    expect(findPages(join(ROOT, 'app')).length).toBe(57)
+    expect(findPages(join(ROOT, 'app')).length).toBe(58)
   })
 
   it('action-catalog route is in KNOWN_ROUTES in dapPhase7G.test.tsx', () => {

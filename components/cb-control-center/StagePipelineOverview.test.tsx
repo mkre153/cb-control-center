@@ -37,7 +37,7 @@ describe('Group 1 — Overview structure', () => {
   })
 
   it('renders anti-bypass rule text', () => {
-    expect(render()).toContain('No DAP implementation phase may begin')
+    expect(render()).toContain('No implementation phase may begin')
   })
 
   it('renders active stage indicator', () => {

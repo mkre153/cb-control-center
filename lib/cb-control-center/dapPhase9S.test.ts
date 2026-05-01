@@ -409,7 +409,7 @@ describe('No sending surface — email-sending infrastructure is absent', () => 
       }
       return results
     }
-    expect(findPages(join(ROOT, 'app')).length).toBe(57)
+    expect(findPages(join(ROOT, 'app')).length).toBe(58)
   })
 })
 

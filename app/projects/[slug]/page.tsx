@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { getProjectBySlug, getProjectStages } from '@/lib/cb-control-center/cbccProjectRepository'
 import { CbccStagePipeline } from '@/components/cb-control-center/v2/CbccStagePipeline'
 import { CbccNav } from '@/components/cb-control-center/v2/CbccNav'
-import { PROJECT_STATUS_LABEL } from '@/lib/cb-control-center/cbccProjectLabels'
 
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
@@ -17,56 +16,33 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       <CbccNav />
 
       <div className="max-w-3xl mx-auto px-6 py-8">
-        {/* Breadcrumb */}
         <div className="mb-6">
           <Link href="/" className="text-xs text-gray-500 hover:text-gray-400">
             ← Projects
           </Link>
         </div>
 
-        {/* Header */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-white">{project.name}</h1>
-          <p data-project-status className="mt-1 text-sm text-gray-400">
-            Step 0: {PROJECT_STATUS_LABEL[project.projectStatus]}
-          </p>
         </div>
 
-        {/* Blocker or approved banner */}
         {!project.charterApproved ? (
           <div
             data-blocker-message
             className="mb-6 px-4 py-3 rounded-md bg-amber-900/20 border border-amber-700/40 text-sm text-amber-400"
           >
-            <strong>Blocked:</strong> Step 0 Project Charter requires owner approval before Stage 1 can begin.{' '}
-            <Link href={`/projects/${slug}/charter`} className="underline hover:text-amber-300">
-              Review Charter
-            </Link>
+            <strong>Blocked:</strong> Step 0 Project Charter requires owner approval before Stage 1 can begin.
           </div>
         ) : (
           <div className="mb-6 px-4 py-3 rounded-md bg-green-900/20 border border-green-700/40 text-sm text-green-400">
-            Charter Approved — Stage 1 is now available.{' '}
-            <Link href={`/projects/${slug}/charter`} className="underline hover:text-green-300">
-              View Charter
-            </Link>
+            Charter Approved — Stage 1 is now available.
           </div>
         )}
 
-        {/* Stage pipeline */}
         <div className="mb-8">
           <p className="text-xs text-gray-500 uppercase tracking-widest mb-3">Build Pipeline</p>
           <CbccStagePipeline project={project} stages={stages} />
         </div>
-
-        {!project.charterApproved && (
-          <Link
-            href={`/projects/${slug}/charter`}
-            data-action="go-to-charter"
-            className="inline-block px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors"
-          >
-            {project.charterJson ? 'Review & Approve Charter' : 'Generate Charter'}
-          </Link>
-        )}
       </div>
     </div>
   )

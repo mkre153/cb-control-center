@@ -193,9 +193,11 @@ describe('Route file inventory', () => {
     'app/projects/new/page.tsx',
     'app/projects/[slug]/page.tsx',
     'app/projects/[slug]/charter/page.tsx',
+    // CBCC v2 stage detail route (Step 0 + Stages 1–7)
+    'app/projects/[slug]/stages/[stageNumber]/page.tsx',
   ]
 
-  it('exactly 57 page.tsx files exist in app/ (CBCC v2 added project routes)', () => {
+  it('exactly 58 page.tsx files exist in app/ (CBCC v2 added stage detail route)', () => {
     const found = findFiles(join(ROOT, 'app'), f => f.endsWith('page.tsx'))
     expect(found.length).toBe(KNOWN_ROUTES.length)
   })

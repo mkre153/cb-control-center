@@ -72,7 +72,7 @@ describe('Phase 13 — Page exists', () => {
   })
 
   it('total page count is now 32', () => {
-    expect(findPages(join(ROOT, 'app')).length).toBe(57)
+    expect(findPages(join(ROOT, 'app')).length).toBe(58)
   })
 })
 
@@ -545,7 +545,7 @@ describe('Phase 13 — Definition coverage', () => {
 
 describe('Phase 13 — Full suite guard', () => {
   it('page count is 32 (all prior pages preserved)', () => {
-    expect(findPages(join(ROOT, 'app')).length).toBe(57)
+    expect(findPages(join(ROOT, 'app')).length).toBe(58)
   })
 
   it('buildDapAdminDecisionLedger still returns 9 events', () => {

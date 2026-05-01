@@ -69,7 +69,7 @@ describe('Group 1 — Stage detail page structure', () => {
 
   it('renders anti-bypass rule', () => {
     expect(render('1-business-definition')).toContain('data-anti-bypass-rule')
-    expect(render('1-business-definition')).toContain('No DAP implementation phase may begin')
+    expect(render('1-business-definition')).toContain('No implementation phase may begin')
   })
 
   it('renders evidence trail section', () => {

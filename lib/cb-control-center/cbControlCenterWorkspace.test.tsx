@@ -184,6 +184,6 @@ describe('Group 5 — MockModeBanner presence across pages', () => {
 describe('Group 6 — Page count invariant (52 pages, no new pages added)', () => {
   it('total page.tsx count remains 52', () => {
     const pages = findFiles(join(ROOT, 'app'), f => f.endsWith('page.tsx'))
-    expect(pages.length).toBe(57)
+    expect(pages.length).toBe(58)
   })
 })

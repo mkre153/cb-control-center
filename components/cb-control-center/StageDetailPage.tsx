@@ -5,6 +5,8 @@ import { StageEvidencePanel } from './StageEvidencePanel'
 import { StageApprovalChecklist } from './StageApprovalChecklist'
 import { StageDirectivePanel } from './StageDirectivePanel'
 import { StageAiReviewPanel } from './StageAiReviewPanel'
+import { StageSection } from './StageSection'
+import { AntiBypassBanner } from './AntiBypassBanner'
 
 // ─── Status display ───────────────────────────────────────────────────────────
 
@@ -34,59 +36,31 @@ const STATUS_BADGE: Record<DapStageStatus, string> = {
   blocked:                 'bg-red-100 text-red-700',
 }
 
-// ─── Section wrapper ──────────────────────────────────────────────────────────
-
-function Section({
-  title,
-  children,
-  accent,
-}: {
-  title: string
-  children: React.ReactNode
-  accent?: 'amber' | 'green' | 'red'
-}) {
-  const border = accent === 'amber'
-    ? 'border-amber-200'
-    : accent === 'green'
-    ? 'border-green-200'
-    : accent === 'red'
-    ? 'border-red-200'
-    : 'border-gray-200'
-
-  return (
-    <section className={`border ${border} rounded-lg bg-white overflow-hidden`}>
-      <div className={`px-5 py-3 border-b ${border} bg-gray-50`}>
-        <h2 className="text-sm font-semibold text-gray-700">{title}</h2>
-      </div>
-      <div className="px-5 py-4">{children}</div>
-    </section>
-  )
-}
-
-// ─── Anti-bypass rule ─────────────────────────────────────────────────────────
-
-function AntiBypassRule() {
-  return (
-    <div
-      data-anti-bypass-rule
-      className="text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded px-3 py-2 leading-relaxed"
-    >
-      <span className="font-semibold text-gray-700">Anti-bypass rule: </span>
-      No DAP implementation phase may begin without a CBCC-issued directive for that stage.
-      Each phase stops at evidence submission. Owner must approve before the next directive is issued.
-    </div>
-  )
-}
-
 // ─── Stage detail page ────────────────────────────────────────────────────────
 
-export function StageDetailPage({ stage }: { stage: DapStageGate }) {
+export function StageDetailPage({
+  stage,
+  breadcrumbBase = '/businesses/dental-advantage-plan/build',
+  breadcrumbTrail,
+  nextStageHref,
+}: {
+  stage: DapStageGate
+  breadcrumbBase?: string
+  breadcrumbTrail?: ReadonlyArray<{ label: string; href?: string }>
+  nextStageHref?: (nextStage: DapStageGate) => string
+}) {
   const isApproved = stage.status === 'approved'
   const isAwaiting = stage.status === 'awaiting_owner_approval'
   const isNotStarted = stage.status === 'not_started'
   const nextStage = getNextDapStageGate(stage)
 
-  const BUILD_BASE = '/businesses/dental-advantage-plan/build'
+  const BUILD_BASE = breadcrumbBase
+
+  const trail: ReadonlyArray<{ label: string; href?: string }> = breadcrumbTrail ?? [
+    { label: 'CB Control Center', href: '/' },
+    { label: 'Dental Advantage Plan', href: '/businesses/dental-advantage-plan' },
+    { label: 'Build Pipeline', href: BUILD_BASE },
+  ]
 
   return (
     <div data-stage-detail-page data-stage-id={stage.stageId} className="min-h-screen bg-gray-50">
@@ -98,14 +72,16 @@ export function StageDetailPage({ stage }: { stage: DapStageGate }) {
           className="flex items-center gap-2 text-sm text-gray-500 flex-wrap"
           aria-label="Breadcrumb"
         >
-          <a href="/" className="hover:text-gray-800 transition-colors">CB Control Center</a>
-          <span className="text-gray-300">/</span>
-          <a href="/businesses/dental-advantage-plan" className="hover:text-gray-800 transition-colors">
-            Dental Advantage Plan
-          </a>
-          <span className="text-gray-300">/</span>
-          <a href={BUILD_BASE} className="hover:text-gray-800 transition-colors">Build Pipeline</a>
-          <span className="text-gray-300">/</span>
+          {trail.map((crumb, i) => (
+            <span key={`${crumb.label}-${i}`} className="flex items-center gap-2">
+              {crumb.href ? (
+                <a href={crumb.href} className="hover:text-gray-800 transition-colors">{crumb.label}</a>
+              ) : (
+                <span>{crumb.label}</span>
+              )}
+              <span className="text-gray-300">/</span>
+            </span>
+          ))}
           <span className="text-gray-800 font-medium" aria-current="page">{stage.title}</span>
         </nav>
 
@@ -121,7 +97,7 @@ export function StageDetailPage({ stage }: { stage: DapStageGate }) {
               {stage.stageNumber}
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Stage {stage.stageNumber}: {stage.title}</h1>
+              <h1 className="text-xl font-bold text-gray-900">{stage.title}</h1>
               <p className="text-xs text-gray-400 font-mono mt-0.5">{stage.stageId}</p>
             </div>
             <span className={`ml-auto inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${STATUS_BADGE[stage.status]}`}>
@@ -143,18 +119,18 @@ export function StageDetailPage({ stage }: { stage: DapStageGate }) {
             </div>
           )}
 
-          <AntiBypassRule />
+          <AntiBypassBanner />
         </div>
 
         {/* Awaiting approval — show checklist prominently */}
         {isAwaiting && (
-          <Section title="Owner Approval Required" accent="amber">
+          <StageSection title="Owner Approval Required" accent="amber">
             <StageApprovalChecklist stage={stage} />
-          </Section>
+          </StageSection>
         )}
 
         {/* Purpose */}
-        <Section title="Purpose">
+        <StageSection title="Purpose">
           <div className="space-y-3">
             <p className="text-sm text-gray-800 leading-relaxed">{stage.description}</p>
             <div className="border-l-2 border-gray-200 pl-3">
@@ -162,43 +138,43 @@ export function StageDetailPage({ stage }: { stage: DapStageGate }) {
               <p className="text-sm text-gray-600 leading-relaxed italic">{stage.whyItMatters}</p>
             </div>
           </div>
-        </Section>
+        </StageSection>
 
         {/* Reviewable artifact */}
         {stage.artifact ? (
-          <Section title="Reviewable Artifact" accent={isAwaiting ? 'amber' : isApproved ? 'green' : undefined}>
+          <StageSection title="Reviewable Artifact" accent={isAwaiting ? 'amber' : isApproved ? 'green' : undefined}>
             <StageArtifactPanel artifact={stage.artifact} />
-          </Section>
+          </StageSection>
         ) : isNotStarted ? (
-          <Section title="Reviewable Artifact">
+          <StageSection title="Reviewable Artifact">
             <p className="text-sm text-gray-400 italic">
               Not generated yet. This stage requires prior stage approval before a directive is issued.
             </p>
-          </Section>
+          </StageSection>
         ) : null}
 
         {/* Approval checklist for approved stages */}
         {isApproved && (
-          <Section title="Approval Record" accent="green">
+          <StageSection title="Approval Record" accent="green">
             <StageApprovalChecklist stage={stage} />
-          </Section>
+          </StageSection>
         )}
 
         {/* Evidence trail */}
-        <Section title="Evidence Trail">
+        <StageSection title="Evidence Trail">
           <StageEvidencePanel evidence={stage.implementationEvidence} />
-        </Section>
+        </StageSection>
 
         {/* Claude directive */}
         {stage.directive.trim() && (
-          <Section title="Claude Directive">
+          <StageSection title="Claude Directive">
             <StageDirectivePanel directive={stage.directive} stageId={stage.stageId} />
-          </Section>
+          </StageSection>
         )}
 
         {/* Blockers */}
         {(stage.blockers.length > 0 || stage.implementationEvidence.unresolvedIssues?.length) ? (
-          <Section title="Blockers / Dependencies" accent="red">
+          <StageSection title="Blockers / Dependencies" accent="red">
             <ul className="space-y-2">
               {stage.blockers.map(b => (
                 <li key={b} className="flex items-start gap-2 text-sm text-red-700">
@@ -213,15 +189,15 @@ export function StageDetailPage({ stage }: { stage: DapStageGate }) {
                 </li>
               ))}
             </ul>
-          </Section>
+          </StageSection>
         ) : (
-          <Section title="Blockers / Dependencies">
+          <StageSection title="Blockers / Dependencies">
             <p className="text-sm text-gray-400">No blockers.</p>
-          </Section>
+          </StageSection>
         )}
 
         {/* Unlock rule */}
-        <Section title="Next-Stage Unlock Rule">
+        <StageSection title="Next-Stage Unlock Rule">
           {isApproved && stage.nextStageUnlocked ? (
             <div className="space-y-2">
               <p className="text-sm text-green-700 font-semibold">
@@ -229,7 +205,7 @@ export function StageDetailPage({ stage }: { stage: DapStageGate }) {
               </p>
               {nextStage && (
                 <a
-                  href={`${BUILD_BASE}/stages/${nextStage.slug}`}
+                  href={nextStageHref ? nextStageHref(nextStage) : `${BUILD_BASE}/stages/${nextStage.slug}`}
                   className="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-800 font-medium"
                 >
                   Open Stage {nextStage.stageNumber}: {nextStage.title} →
@@ -250,7 +226,7 @@ export function StageDetailPage({ stage }: { stage: DapStageGate }) {
               This stage must be approved before Stage {stage.stageNumber + 1} can begin.
             </p>
           )}
-        </Section>
+        </StageSection>
 
         {/* Opus 4.7 AI Review */}
         <StageAiReviewPanel stageSlug={stage.slug} stageTitle={stage.title} />

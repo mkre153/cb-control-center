@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const stage = getDapStageGateBySlug(stageSlug)
   if (!stage) return { title: 'Stage Not Found' }
   return {
-    title: `Stage ${stage.stageNumber}: ${stage.title} — DAP Build Pipeline | CB Control Center`,
+    title: `${stage.title} — DAP Build Pipeline | CB Control Center`,
   }
 }
 

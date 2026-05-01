@@ -84,7 +84,7 @@ export const DAP_STAGE_GATES: readonly DapStageGate[] = [
     stageId: 'stage-01-business-definition',
     stageNumber: 1,
     slug: '1-business-definition',
-    title: 'Business Intake / Definition',
+    title: 'Stage 1 — Business Intake / Definition',
     description:
       'Establish what DAP is, who the customer is, what the conversion goal is, and what claims are allowed or forbidden. Register the business in the CBCC portfolio.',
     whyItMatters:
@@ -132,7 +132,7 @@ export const DAP_STAGE_GATES: readonly DapStageGate[] = [
     stageId: 'stage-02-discovery-audit',
     stageNumber: 2,
     slug: '2-discovery-audit',
-    title: 'Discovery / Scrape / Existing Asset Audit',
+    title: 'Stage 2 — Discovery / Scrape / Existing Asset Audit',
     description:
       'Systematically audit the existing DAP site: scrape all pages, inventory content, audit copy for compliance, audit CTAs, audit SEO/AEO signals, identify stale or broken assets, and produce a customer-facing change summary.',
     whyItMatters:
@@ -192,7 +192,7 @@ Do not begin Stage 3 (Truth Schema) until owner approval is recorded.`,
     stageId: 'stage-03-truth-schema',
     stageNumber: 3,
     slug: '3-truth-schema',
-    title: 'Truth Schema / Compliance / Claims Lock',
+    title: 'Stage 3 — Truth Schema / Compliance / Claims Lock',
     description:
       'Lock what DAP is, what DAP is not, all 7 truth rules, forbidden claims, required disclaimers, and compliance boundaries. No downstream page may contradict this schema.',
     whyItMatters:
@@ -258,7 +258,7 @@ Do not begin Stage 4 until this approval is recorded.`,
     stageId: 'stage-04-positioning',
     stageNumber: 4,
     slug: '4-positioning',
-    title: 'Positioning / StoryBrand / Messaging',
+    title: 'Stage 4 — Positioning / StoryBrand / Messaging',
     description:
       'Define the customer problem, guide positioning, the plan, CTA strategy, stakes, success outcome, and tone and voice for DAP. This governs every patient-facing message.',
     whyItMatters:
@@ -318,7 +318,7 @@ Do not begin Stage 5 until owner approval is recorded.`,
     stageId: 'stage-05-seo-strategy',
     stageNumber: 5,
     slug: '5-seo-strategy',
-    title: 'SEO / AEO / Core30 / Content Strategy',
+    title: 'Stage 5 — SEO / AEO / Core30 / Content Strategy',
     description:
       'Define the keyword strategy, AEO answer targets, Core30 keyword set, content calendar structure, and cluster architecture for DAP. The Core30 keyword set is the primary deliverable.',
     whyItMatters:
@@ -386,7 +386,7 @@ Do not begin Stage 6 until owner approval is recorded.`,
     stageId: 'stage-06-page-architecture',
     stageNumber: 6,
     slug: '6-page-architecture',
-    title: 'Page Architecture / Wireframes / Content Briefs',
+    title: 'Stage 6 — Page Architecture / Wireframes / Content Briefs',
     description:
       'Define the full page type strategy: required sections per page type, SEO role, conversion role, CTA rules, wireframe order, and content brief templates for all DAP page types. Supersedes the premature Phase 18C/D contracts (which were built before Discovery and Positioning).',
     whyItMatters:
@@ -448,7 +448,7 @@ Do not begin Stage 7 until owner approval is recorded.`,
     stageId: 'stage-07-build-launch',
     stageNumber: 7,
     slug: '7-build-launch',
-    title: 'Build / QA / Launch',
+    title: 'Stage 7 — Build / QA / Launch',
     description:
       'Implement the DAP site based on the approved Page Architecture. QA against truth rules, visual acceptance, SEO structure, CTA behavior. Merge to main and verify production deployment.',
     whyItMatters:
