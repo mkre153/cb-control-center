@@ -22,7 +22,7 @@ export type ActionResult =
   | { ok: true }
   | { ok: false; code: string; message: string }
 
-export async function createProjectAction(formData: FormData): Promise<ActionResult> {
+export async function createProjectAction(_prevState: ActionResult | null, formData: FormData): Promise<ActionResult> {
   const name = (formData.get('name') as string | null)?.trim()
   if (!name) return { ok: false, code: 'missing_field', message: 'Project name is required' }
 
@@ -62,7 +62,7 @@ export async function createProjectAction(formData: FormData): Promise<ActionRes
   redirect(`/projects/${slug}`)
 }
 
-export async function generateCharterAction(formData: FormData): Promise<ActionResult> {
+export async function generateCharterAction(_prevState: ActionResult | null, formData: FormData): Promise<ActionResult> {
   const slug = (formData.get('slug') as string | null)?.trim()
   if (!slug) return { ok: false, code: 'missing_field', message: 'Project slug is required' }
 
@@ -91,7 +91,7 @@ export async function generateCharterAction(formData: FormData): Promise<ActionR
   return { ok: true }
 }
 
-export async function approveCharterAction(formData: FormData): Promise<ActionResult> {
+export async function approveCharterAction(_prevState: ActionResult | null, formData: FormData): Promise<ActionResult> {
   const slug = (formData.get('slug') as string | null)?.trim()
   const approvedBy = (formData.get('approvedBy') as string | null)?.trim()
 
