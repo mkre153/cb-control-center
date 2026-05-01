@@ -325,6 +325,84 @@ export interface CbccAiReviewPromptPacket {
   promptVersion?: string
 }
 
+// ─── Agent runtime (Part 5) ───────────────────────────────────────────────────
+//
+// Agents are controlled workers. They can inspect a stage, propose evidence,
+// propose an artifact, or recommend owner review. They cannot approve, unlock,
+// persist, or otherwise mutate engine state. The runtime is deterministic in
+// Part 5 — Part 6+ may wire AI behind the same shape.
+
+export type CbccAgentId = string
+
+export type CbccAgentKind =
+  | 'stage_worker'
+  | 'reviewer'
+  | 'evidence_collector'
+  | 'adapter_worker'
+
+export type CbccAgentRunStatus =
+  | 'not_started'
+  | 'running'
+  | 'completed'
+  | 'failed'
+  | 'blocked'
+
+export type CbccAgentRunDecision =
+  | 'no_change'
+  | 'evidence_proposed'
+  | 'artifact_proposed'
+  | 'owner_review_required'
+  | 'blocked'
+
+export interface CbccAgentDefinition {
+  id: CbccAgentId
+  kind: CbccAgentKind
+  name: string
+  description: string
+  // Optional whitelist of stage numbers the agent is allowed to run against.
+  // Undefined → agent is allowed on any stage.
+  allowedStages?: ReadonlyArray<number>
+  requiredInputs?: ReadonlyArray<string>
+  producesEvidence?: boolean
+  producesArtifact?: boolean
+}
+
+export interface CbccAgentRunInput {
+  projectId: string
+  projectSlug: string
+  stageNumber: number
+  agentId: CbccAgentId
+  requestedBy: string
+  prompt?: string
+  metadata?: Record<string, unknown>
+}
+
+export interface CbccAgentRuntimeContext {
+  stageLocked: boolean
+  lockReason?: string
+  stageApproved: boolean
+  stageTitle?: string
+  // Engine-shaped values are erased to `unknown` here so the runtime stays
+  // independent of the evidence ledger's internal shape — agents propose,
+  // they don't persist, and only the engine knows the canonical types.
+  requiredEvidence?: ReadonlyArray<unknown>
+  existingEvidence?: ReadonlyArray<unknown>
+  currentArtifact?: unknown
+}
+
+export interface CbccAgentRunOutput {
+  status: CbccAgentRunStatus
+  decision: CbccAgentRunDecision
+  summary: string
+  proposedArtifact?: unknown
+  proposedEvidence?: ReadonlyArray<unknown>
+  risks?: ReadonlyArray<string>
+  blockers?: ReadonlyArray<string>
+  recommendation?: string
+  completedAt?: string
+  error?: string
+}
+
 export interface CbccStagePageModel {
   projectId: string
   stageId: CbccStageId
