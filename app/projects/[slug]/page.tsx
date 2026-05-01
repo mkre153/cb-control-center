@@ -3,13 +3,25 @@ import Link from 'next/link'
 import { getProjectBySlug, getProjectStages } from '@/lib/cb-control-center/cbccProjectRepository'
 import { CbccStagePipeline } from '@/components/cb-control-center/v2/CbccStagePipeline'
 import { CbccNav } from '@/components/cb-control-center/v2/CbccNav'
+import { isEngineBackedSlug } from '@/lib/cb-control-center/cbccEngineRegistry'
+import { translateDapProjectForPipeline } from '@/lib/cb-control-center/cbccProjectPipelineTranslator'
 
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const project = await getProjectBySlug(slug)
-  if (!project) notFound()
 
-  const stages = await getProjectStages(project.id)
+  // Engine-backed projects (currently DAP only) bypass Supabase entirely and
+  // hydrate from the generic CBCC adapter. All other slugs keep the existing
+  // Supabase-backed path so generic v2 projects continue to work.
+  let project, stages
+  if (isEngineBackedSlug(slug)) {
+    const bundle = translateDapProjectForPipeline()
+    project = bundle.project
+    stages = bundle.stages
+  } else {
+    project = await getProjectBySlug(slug)
+    if (!project) notFound()
+    stages = await getProjectStages(project.id)
+  }
 
   return (
     <div className="min-h-screen bg-gray-950 font-sans text-gray-300">

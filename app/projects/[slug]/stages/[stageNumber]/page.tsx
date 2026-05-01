@@ -1,10 +1,10 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { getProjectBySlug, getProjectStages } from '@/lib/cb-control-center/cbccProjectRepository'
-import {
-  buildDapStageGate,
-  buildGenericStageGate,
-} from '@/lib/cb-control-center/cbccProjectStageAdapter'
+import { buildGenericStageGate } from '@/lib/cb-control-center/cbccProjectStageAdapter'
+import { isEngineBackedSlug } from '@/lib/cb-control-center/cbccEngineRegistry'
+import { buildDapStageGateFromEngine } from '@/lib/cb-control-center/cbccStagePageModelTranslator'
+import { translateDapProjectForPipeline } from '@/lib/cb-control-center/cbccProjectPipelineTranslator'
 import { StageDetailPage } from '@/components/cb-control-center/StageDetailPage'
 import { DeferredApprovalGate } from '@/components/cb-control-center/DeferredApprovalGate'
 
@@ -22,13 +22,16 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const { slug, stageNumber } = await params
   const n = parseStageNumber(stageNumber)
   if (!n) return { title: 'Stage Not Found — CB Control Center' }
-  const project = await getProjectBySlug(slug)
-  if (!project) return { title: 'Project Not Found — CB Control Center' }
 
   if (slug === DAP_SLUG) {
-    const gate = buildDapStageGate(n)
-    if (gate) return { title: `${gate.title} — ${project.name} | CB Control Center` }
+    const bundle = translateDapProjectForPipeline()
+    const gate = buildDapStageGateFromEngine(n)
+    if (gate) return { title: `${gate.title} — ${bundle.project.name} | CB Control Center` }
+    return { title: `Stage ${n} — ${bundle.project.name} | CB Control Center` }
   }
+
+  const project = await getProjectBySlug(slug)
+  if (!project) return { title: 'Project Not Found — CB Control Center' }
 
   return { title: `Stage ${n} — ${project.name} | CB Control Center` }
 }
@@ -38,16 +41,22 @@ export default async function ProjectStageDetailRoute({ params }: { params: Para
   const n = parseStageNumber(stageNumber)
   if (!n) notFound()
 
-  const project = await getProjectBySlug(slug)
-  if (!project) notFound()
-
-  const stages = await getProjectStages(project.id)
-  const row = stages.find(s => s.stageNumber === n)
-  if (!row) notFound()
-
-  const stage = slug === DAP_SLUG
-    ? buildDapStageGate(n)
-    : buildGenericStageGate(project, row)
+  // Engine-backed projects (currently DAP only) hydrate from the generic
+  // adapter via the page-model translator. All other slugs keep the existing
+  // Supabase-backed path.
+  let project, stage
+  if (isEngineBackedSlug(slug)) {
+    const bundle = translateDapProjectForPipeline()
+    project = bundle.project
+    stage = buildDapStageGateFromEngine(n)
+  } else {
+    project = await getProjectBySlug(slug)
+    if (!project) notFound()
+    const stages = await getProjectStages(project.id)
+    const row = stages.find(s => s.stageNumber === n)
+    if (!row) notFound()
+    stage = buildGenericStageGate(project, row)
+  }
 
   if (!stage) notFound()
 

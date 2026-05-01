@@ -351,8 +351,7 @@ describe('DAP adapter — evidence ledger integration', () => {
 
   it('summarizes ledger entries by type and status', () => {
     const seeded = seedDapEvidenceLedger('definition', { now: '2026-04-30T00:00:00.000Z' })
-    let ledger = []
-    for (const e of seeded) ledger = [...ledger, e]
+    const ledger = [...seeded]
     const sum = summarizeEvidenceForStage(ledger, DAP_PROJECT_ID, 'definition')
     expect(sum.total).toBe(seeded.length)
     expect(sum.valid).toBe(seeded.length)
