@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useActionState } from 'react'
 import { createProjectAction, type ActionResult } from '@/lib/cb-control-center/cbccProjectActions'
 
@@ -13,6 +14,11 @@ export function CbccProjectIntakeForm() {
 
   return (
     <div className="max-w-2xl mx-auto px-6 py-12">
+      <div className="mb-6">
+        <Link href="/" className="text-xs text-gray-400 hover:text-gray-600">
+          ← Project Registry
+        </Link>
+      </div>
       <h1 className="text-2xl font-semibold text-gray-900 mb-2">New Project — Step 0</h1>
       <p className="text-sm text-gray-500 mb-8">
         Complete the Project Charter intake. An AI-generated charter will be produced for owner
