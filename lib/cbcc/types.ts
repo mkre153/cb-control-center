@@ -49,6 +49,60 @@ export interface CbccEvidenceItem {
   recordedBy?: string
 }
 
+// ─── Evidence ledger ──────────────────────────────────────────────────────────
+//
+// CbccEvidenceItem is the lightweight inline reference used by stages and
+// adapters. CbccEvidenceEntry is the full ledger record — append-only, tied
+// to a specific project + stage, with id, status, and audit metadata.
+
+export type CbccEvidenceStatus =
+  | 'valid'
+  | 'pending'
+  | 'invalid'
+  | 'missing'
+
+export interface CbccEvidenceEntry {
+  id: string
+  projectId: string
+  stageId: string | number
+  type: CbccEvidenceType
+  status: CbccEvidenceStatus
+  title: string
+  description?: string
+  ref?: string
+  createdAt: string
+  createdBy?: string
+  metadata?: Record<string, unknown>
+}
+
+export type CbccEvidenceLedger = ReadonlyArray<CbccEvidenceEntry>
+
+export interface CbccEvidenceRequirement {
+  id: string
+  type: CbccEvidenceType
+  title: string
+  required: boolean
+  description?: string
+}
+
+export interface CbccEvidenceValidationResult {
+  ok: boolean
+  reason?: string
+  errors?: ReadonlyArray<string>
+}
+
+export interface CbccEvidenceSummary {
+  projectId: string
+  stageId: string | number
+  total: number
+  valid: number
+  pending: number
+  invalid: number
+  missing: number
+  byType: Record<CbccEvidenceType, number>
+  byStatus: Record<CbccEvidenceStatus, number>
+}
+
 // ─── Stage definition vs. stage instance ──────────────────────────────────────
 //
 // A *definition* is the static template (what stage 3 is for any project of
