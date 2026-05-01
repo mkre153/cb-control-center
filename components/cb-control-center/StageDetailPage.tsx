@@ -165,11 +165,30 @@ export function StageDetailPage({
           <StageEvidencePanel evidence={stage.implementationEvidence} />
         </StageSection>
 
-        {/* Claude directive */}
+        {/* Claude directive — locked stages keep the directive visible for
+            transparency but mark it as "Directive Preview — Locked" to prevent
+            social bypass. The locked signal is `blockers.length > 0`, which the
+            engine and v1 registry both populate when a predecessor is not yet
+            owner-approved. Unlocked / approved / awaiting-approval stages keep
+            the original copy. */}
         {stage.directive.trim() && (
-          <StageSection title="Claude Directive">
-            <StageDirectivePanel directive={stage.directive} stageId={stage.stageId} />
-          </StageSection>
+          stage.blockers.length > 0 ? (
+            <StageSection title="Directive Preview — Locked" accent="red">
+              <div
+                data-locked-directive-warning
+                className="mb-3 px-3 py-2 rounded-md bg-red-50 border border-red-200 text-xs text-red-800 leading-relaxed"
+              >
+                This directive is visible for planning only. It is not authorized
+                for execution until all blockers are cleared and the prior stage
+                is owner-approved.
+              </div>
+              <StageDirectivePanel directive={stage.directive} stageId={stage.stageId} locked />
+            </StageSection>
+          ) : (
+            <StageSection title="Claude Directive">
+              <StageDirectivePanel directive={stage.directive} stageId={stage.stageId} />
+            </StageSection>
+          )
         )}
 
         {/* Blockers */}
