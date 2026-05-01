@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useActionState } from 'react'
 import {
   createProjectAction,
@@ -28,7 +28,7 @@ function sourceLabel(raw: string): string {
 
 export function CbccProjectIntakeForm({ defaultShowIntake = false }: { defaultShowIntake?: boolean } = {}) {
   // isUrlPhase is the single source of truth for which phase is shown.
-  // useEffect drives the transition when prefill succeeds.
+  // Once prefill succeeds, latch to intake phase via in-render adjustment.
   const [isUrlPhase, setIsUrlPhase] = useState(!defaultShowIntake)
   const [prefillState, prefillAction, prefillPending] = useActionState<PrefillResult | null, FormData>(
     prefillFromUrlAction,
@@ -39,9 +39,9 @@ export function CbccProjectIntakeForm({ defaultShowIntake = false }: { defaultSh
     INITIAL_CREATE
   )
 
-  useEffect(() => {
-    if (prefillState?.ok) setIsUrlPhase(false)
-  }, [prefillState?.ok])
+  if (prefillState?.ok && isUrlPhase) {
+    setIsUrlPhase(false)
+  }
 
   const prefilled: PrefillFields = prefillState?.ok ? prefillState.fields : EMPTY_FIELDS
 

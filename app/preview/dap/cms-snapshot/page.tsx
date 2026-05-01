@@ -159,7 +159,7 @@ function WarningsDetail({ warnings }: { warnings: QAWarning[] }) {
             </p>
             <p className="text-xs text-gray-700">
               <span className="font-medium">Phrase:</span>{' '}
-              <span className="font-mono text-red-600">"{w.phrase}"</span>
+              <span className="font-mono text-red-600">&ldquo;{w.phrase}&rdquo;</span>
             </p>
             <p className="text-xs text-gray-500">{w.detail}</p>
           </div>

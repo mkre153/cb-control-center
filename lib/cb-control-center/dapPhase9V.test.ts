@@ -4,14 +4,13 @@
 // CB Control Center determines eligibility. MKCRM does not.
 
 import { describe, it, expect } from 'vitest'
-import { readFileSync } from 'fs'
+import { readFileSync, readdirSync, statSync } from 'fs'
 import { join } from 'path'
 
 const ROOT      = join(__dirname, '..', '..')
 const PAGE_PATH = join(ROOT, 'app/preview/dap/practice-decision-emails/page.tsx')
 
 function findPages(dir: string): string[] {
-  const { readdirSync, statSync } = require('fs')
   const results: string[] = []
   for (const entry of readdirSync(dir)) {
     const full = join(dir, entry)

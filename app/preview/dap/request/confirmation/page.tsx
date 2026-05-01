@@ -10,8 +10,8 @@ export default function RequestConfirmationPage() {
         </div>
         <h1 className="text-xl font-bold text-gray-900">Request received</h1>
         <p className="text-sm text-gray-600 max-w-sm mx-auto leading-relaxed">
-          We'll use your request to identify patient demand and may reach out to practices in your area.
-          We'll notify you if a DAP provider joins near you.
+          We&apos;ll use your request to identify patient demand and may reach out to practices in your area.
+          We&apos;ll notify you if a DAP provider joins near you.
         </p>
       </div>
 

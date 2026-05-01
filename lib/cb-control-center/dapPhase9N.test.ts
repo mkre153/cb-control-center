@@ -21,7 +21,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { readFileSync, existsSync } from 'fs'
+import { readFileSync, existsSync, readdirSync } from 'fs'
 import { resolve, join } from 'path'
 import {
   getSystemBoundary,
@@ -418,7 +418,6 @@ describe('Phase 9M shadow sync — still valid, still shadow-only, still no paym
 
   it('page count is still 21 (Phase 9N adds no new pages)', () => {
     function findPages(dir: string): string[] {
-      const { readdirSync } = require('fs')
       if (!existsSync(dir)) return []
       const results: string[] = []
       for (const entry of readdirSync(dir, { withFileTypes: true })) {

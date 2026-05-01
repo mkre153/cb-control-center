@@ -27,11 +27,11 @@ export function ProviderStatusTab() {
         <div className="px-4 py-3 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
           <div className="flex items-start gap-2">
             <span className="text-green-500 shrink-0 mt-0.5 font-bold">✓</span>
-            <span className="text-gray-700"><strong>Path 1:</strong> confirmed provider + validated offer → "Join plan" CTA allowed</span>
+            <span className="text-gray-700"><strong>Path 1:</strong> confirmed provider + validated offer → &ldquo;Join plan&rdquo; CTA allowed</span>
           </div>
           <div className="flex items-start gap-2">
             <span className="text-amber-500 shrink-0 mt-0.5 font-bold">~</span>
-            <span className="text-gray-700"><strong>Partial:</strong> confirmed provider + offer pending → "View plan details" only</span>
+            <span className="text-gray-700"><strong>Partial:</strong> confirmed provider + offer pending → &ldquo;View plan details&rdquo; only</span>
           </div>
           <div className="flex items-start gap-2">
             <span className="text-red-400 shrink-0 mt-0.5 font-bold">✕</span>

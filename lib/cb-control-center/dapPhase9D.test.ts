@@ -17,8 +17,8 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { readFileSync, existsSync } from 'fs'
-import { resolve } from 'path'
+import { readFileSync, existsSync, readdirSync } from 'fs'
+import { resolve, join } from 'path'
 
 // ─── Project root ─────────────────────────────────────────────────────────────
 
@@ -334,8 +334,6 @@ describe('Production request routes remain absent', () => {
   })
 
   it('total page.tsx count is 21 (Phase 9L added provider-participation list + detail pages)', () => {
-    const { readdirSync } = require('fs')
-    const { join } = require('path')
     function findPages(dir: string): string[] {
       if (!existsSync(dir)) return []
       const results: string[] = []

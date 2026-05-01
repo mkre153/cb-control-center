@@ -100,7 +100,7 @@ export default async function DapOfferTermsListPage() {
         >
           <p className="text-gray-500 text-sm">No offer terms drafts yet.</p>
           <p className="text-gray-400 text-xs mt-1">
-            Create a draft from an interested practice's onboarding detail page.
+            Create a draft from an interested practice&apos;s onboarding detail page.
           </p>
         </div>
       ) : (

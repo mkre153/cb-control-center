@@ -71,7 +71,7 @@ export default async function CityPage({ params }: { params: Params }) {
             No listed practices in {cityRecord.cityName} yet
           </p>
           <p className="text-xs text-gray-400">
-            Submit a request below and we'll identify patient demand in your area.
+            Submit a request below and we&apos;ll identify patient demand in your area.
           </p>
         </div>
       )}

@@ -182,7 +182,7 @@ export default function DapHomepage() {
               Where membership plans may help
             </h2>
             <p className="text-sm text-gray-500 mt-2 leading-relaxed">
-              Savings depend on the participating practice's plan. These scenarios illustrate common
+              Savings depend on the participating practice&apos;s plan. These scenarios illustrate common
               situations — not guaranteed outcomes.
             </p>
           </div>
@@ -204,7 +204,7 @@ export default function DapHomepage() {
           </div>
           <p className="text-xs text-gray-400 mt-6">
             Plan details vary by practice. Savings are not guaranteed and depend on each
-            participating practice's membership plan terms.
+            participating practice&apos;s membership plan terms.
           </p>
         </div>
       </section>

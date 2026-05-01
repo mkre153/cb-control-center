@@ -20,8 +20,8 @@ export function RequestDentistForm() {
         </div>
         <p className="text-base font-semibold text-gray-800">Request received</p>
         <p className="text-sm text-gray-500 max-w-sm mx-auto">
-          We'll use your request to identify patient demand and reach out to dental practices in your area.
-          We'll notify you if a practice near you joins DAP.
+          We&apos;ll use your request to identify patient demand and reach out to dental practices in your area.
+          We&apos;ll notify you if a practice near you joins DAP.
         </p>
         <Link
           href={DIRECTORY_ROUTE}
@@ -40,7 +40,7 @@ export function RequestDentistForm() {
           Request DAP Availability
         </p>
         <p className="text-sm text-gray-700">
-          Don't see a DAP dentist near you? Tell us where you are or who you want us to contact.
+          Don&apos;t see a DAP dentist near you? Tell us where you are or who you want us to contact.
         </p>
       </div>
 
@@ -96,7 +96,7 @@ export function RequestDentistForm() {
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
           />
           <p className="text-xs text-gray-400 mt-1">
-            We'll notify you if a DAP provider joins near your area. No spam.
+            We&apos;ll notify you if a DAP provider joins near your area. No spam.
           </p>
         </div>
 

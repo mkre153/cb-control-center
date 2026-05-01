@@ -275,7 +275,7 @@ export default function AdminDecisionAuditPreviewPage() {
         <p className="text-xs text-amber-700">
           This is an audit and replay preview only. It does not execute writes, insert rows,
           update rows, delete rows, call Supabase, or introduce any mutation path.
-          "Replay" means showing what a future write would have intended — not performing it.
+          &ldquo;Replay&rdquo; means showing what a future write would have intended — not performing it.
           No emails are sent from it. No payments are triggered.
           CB Control Center is the decision authority. MKCRM does not decide.
         </p>

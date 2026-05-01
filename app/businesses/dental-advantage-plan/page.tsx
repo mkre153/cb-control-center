@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { CB_BUSINESS_PORTFOLIO } from '@/lib/cb-control-center/cbBusinessPortfolioData'
 import { MockModeBanner } from '@/components/cb-control-center/MockModeBanner'
 
@@ -17,9 +18,9 @@ export default function DapBusinessDetailPage() {
             className="flex items-center gap-2 text-sm text-gray-500"
             aria-label="Breadcrumb"
           >
-            <a href="/" className="hover:text-gray-800 transition-colors">
+            <Link href="/" className="hover:text-gray-800 transition-colors">
               CB Control Center
-            </a>
+            </Link>
             <span className="text-gray-300" aria-hidden="true">/</span>
             <span className="text-gray-800 font-medium" aria-current="page">
               Dental Advantage Plan

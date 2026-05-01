@@ -16,8 +16,8 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { readFileSync, existsSync } from 'fs'
-import { resolve } from 'path'
+import { readFileSync, existsSync, readdirSync } from 'fs'
+import { resolve, join } from 'path'
 
 // Behavioral imports — real functions, no mocking
 import {
@@ -533,8 +533,6 @@ describe('UI integration — review panel in offer terms detail page', () => {
   })
 
   it('page count remains 19 (Phase 9K added no new pages)', () => {
-    const { readdirSync } = require('fs')
-    const { join } = require('path')
     function findPages(dir: string): string[] {
       if (!existsSync(dir)) return []
       const results: string[] = []
@@ -613,8 +611,6 @@ describe('Public boundary — no provider confirmation, no CMS, no billing, no M
   })
 
   it('no new patient-facing pages added (page count still 19)', () => {
-    const { readdirSync } = require('fs')
-    const { join } = require('path')
     function findPages(dir: string): string[] {
       if (!existsSync(dir)) return []
       const results: string[] = []

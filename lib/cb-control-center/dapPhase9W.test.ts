@@ -3,14 +3,13 @@
 // CB Control Center is the dispatch authority. MKCRM is not.
 
 import { describe, it, expect } from 'vitest'
-import { readFileSync, existsSync } from 'fs'
+import { readFileSync, existsSync, readdirSync, statSync, readFileSync as rfs } from 'fs'
 import { join } from 'path'
 
 const ROOT      = join(__dirname, '..', '..')
 const PAGE_PATH = join(ROOT, 'app/preview/dap/practice-decision-emails/page.tsx')
 
 function findPages(dir: string): string[] {
-  const { readdirSync, statSync } = require('fs')
   const results: string[] = []
   for (const entry of readdirSync(dir)) {
     const full = join(dir, entry)
@@ -118,14 +117,12 @@ describe('Phase 9W — Dispatch event type surface exists', () => {
 
   it('migration file exists', () => {
     const migDir = join(ROOT, 'supabase/migrations')
-    const { readdirSync } = require('fs')
     const files = readdirSync(migDir) as string[]
     expect(files.some(f => f.includes('dap_communication_dispatch_events'))).toBe(true)
   })
 
   it('migration enforces append-only (revokes UPDATE and DELETE)', () => {
     const migDir = join(ROOT, 'supabase/migrations')
-    const { readdirSync, readFileSync: rfs } = require('fs')
     const files = readdirSync(migDir) as string[]
     const migFile = files.find(f => f.includes('dap_communication_dispatch_events'))!
     const sql = rfs(join(migDir, migFile), 'utf8')
@@ -545,7 +542,6 @@ describe('Phase 9W — No PHI, payment CTA, or email body copy in events', () =>
 
   it('migration has no email body column', () => {
     const migDir = join(ROOT, 'supabase/migrations')
-    const { readdirSync, readFileSync: rfs } = require('fs')
     const files  = readdirSync(migDir) as string[]
     const migFile = files.find(f => f.includes('dap_communication_dispatch_events'))!
     const sql = rfs(join(migDir, migFile), 'utf8')

@@ -4,13 +4,12 @@
 // offer-term validation, or Join Plan CTA eligibility.
 
 import { describe, it, expect } from 'vitest'
-import { readFileSync } from 'fs'
+import { readFileSync, readdirSync, statSync } from 'fs'
 import { join } from 'path'
 
 const ROOT = join(__dirname, '..', '..')
 
 function findPages(dir: string): string[] {
-  const { readdirSync, statSync } = require('fs')
   const results: string[] = []
   for (const entry of readdirSync(dir)) {
     const full = join(dir, entry)

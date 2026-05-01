@@ -26,8 +26,8 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { readFileSync, existsSync } from 'fs'
-import { resolve } from 'path'
+import { readFileSync, existsSync, readdirSync, existsSync as fsExists } from 'fs'
+import { resolve, join } from 'path'
 import {
   getDapMemberStatusEmailCopy,
   getDapMemberStatusEmailTemplateKey,
@@ -394,8 +394,6 @@ describe('No sending surface — email-sending infrastructure is absent', () => 
   })
 
   it('Phase 9S adds no new UI pages (page count remains 22)', () => {
-    const { readdirSync, existsSync: fsExists } = require('fs')
-    const { join } = require('path')
     function findPages(dir: string): string[] {
       if (!fsExists(dir)) return []
       const results: string[] = []

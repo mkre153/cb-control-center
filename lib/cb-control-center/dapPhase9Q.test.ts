@@ -25,8 +25,8 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { readFileSync, existsSync } from 'fs'
-import { resolve } from 'path'
+import { readFileSync, existsSync, readdirSync, existsSync as fsExists } from 'fs'
+import { resolve, join } from 'path'
 import {
   deriveDapMemberStandingFromBillingEvents,
   deriveDapMemberStatusReadModel,
@@ -597,8 +597,6 @@ describe('Phase boundary contracts — 9N boundary and prior phase rules still h
   })
 
   it('Phase 9Q adds no new UI pages (page count remains 21)', () => {
-    const { readdirSync, existsSync: fsExists } = require('fs')
-    const { join } = require('path')
     function findPages(dir: string): string[] {
       if (!fsExists(dir)) return []
       const results: string[] = []

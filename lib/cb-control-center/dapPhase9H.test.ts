@@ -14,7 +14,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { readFileSync, existsSync } from 'fs'
+import { readFileSync, existsSync, readdirSync } from 'fs'
 import { resolve, join } from 'path'
 
 // ─── Project root ─────────────────────────────────────────────────────────────
@@ -339,7 +339,6 @@ describe('Onboarding list page exists and is read-only', () => {
   })
 
   it('page count is now 17 (Phase 9I added onboarding detail page)', () => {
-    const { readdirSync } = require('fs')
     function findPages(dir: string): string[] {
       if (!existsSync(dir)) return []
       const results: string[] = []

@@ -128,7 +128,7 @@ describe('runCbccAiReview — provider errors', () => {
   it('wraps a non-Error rejection (string) without crashing', async () => {
     const provider: CbccAiReviewProvider = {
       review: async () => {
-        // eslint-disable-next-line @typescript-eslint/no-throw-literal
+        // eslint-disable-next-line no-throw-literal
         throw 'some string'
       },
     }

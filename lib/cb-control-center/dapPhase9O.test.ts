@@ -24,7 +24,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { readFileSync, existsSync } from 'fs'
+import { readFileSync, existsSync, readdirSync } from 'fs'
 import { resolve, join } from 'path'
 import {
   buildDapClientBuilderBillingPayload,
@@ -479,7 +479,6 @@ describe('Phase 9N boundary — system boundary definitions still hold', () => {
 
   it('page count is still 21 (Phase 9O adds no new pages)', () => {
     function findPages(dir: string): string[] {
-      const { readdirSync } = require('fs')
       if (!existsSync(dir)) return []
       const results: string[] = []
       for (const entry of readdirSync(dir, { withFileTypes: true })) {

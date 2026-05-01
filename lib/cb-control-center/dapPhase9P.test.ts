@@ -25,7 +25,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { readFileSync, existsSync } from 'fs'
+import { readFileSync, existsSync, readdirSync } from 'fs'
 import { resolve, join } from 'path'
 import {
   buildDapMkcrmOutboxPayload,
@@ -512,7 +512,6 @@ describe('Outbox does not mutate standing — wouldUpdateStoredStanding is alway
 
   it('page count is still 21 (Phase 9P adds no new pages)', () => {
     function findPages(dir: string): string[] {
-      const { readdirSync } = require('fs')
       if (!existsSync(dir)) return []
       const results: string[] = []
       for (const entry of readdirSync(dir, { withFileTypes: true })) {

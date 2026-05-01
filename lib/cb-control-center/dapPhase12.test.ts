@@ -3,12 +3,11 @@
 
 import { describe, it, expect } from 'vitest'
 import { join, resolve } from 'path'
-import { existsSync, readFileSync } from 'fs'
+import { existsSync, readFileSync, readdirSync, statSync } from 'fs'
 
 const ROOT = resolve(__dirname, '../../')
 
 function findFiles(dir: string, pred: (f: string) => boolean): string[] {
-  const { readdirSync, statSync } = require('fs')
   const results: string[] = []
   function walk(d: string) {
     for (const entry of readdirSync(d)) {

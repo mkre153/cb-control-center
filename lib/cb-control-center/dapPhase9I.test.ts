@@ -14,7 +14,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { readFileSync, existsSync } from 'fs'
+import { readFileSync, existsSync, readdirSync } from 'fs'
 import { resolve, join } from 'path'
 
 // Behavioral import — real functions, no mocking
@@ -371,7 +371,6 @@ describe('UI workflow — detail page renders controls and disclaimer', () => {
   })
 
   it('page count is now 19 (Phase 9J added offer-terms list + detail pages)', () => {
-    const { readdirSync } = require('fs')
     function findPages(dir: string): string[] {
       if (!existsSync(dir)) return []
       const results: string[] = []

@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { MockModeBanner } from '@/components/cb-control-center/MockModeBanner'
 
 export default function NewBusinessPage() {
@@ -11,9 +12,9 @@ export default function NewBusinessPage() {
             className="flex items-center gap-2 text-sm text-gray-500"
             aria-label="Breadcrumb"
           >
-            <a href="/" className="hover:text-gray-800 transition-colors">
+            <Link href="/" className="hover:text-gray-800 transition-colors">
               CB Control Center
-            </a>
+            </Link>
             <span className="text-gray-300" aria-hidden="true">/</span>
             <span className="text-gray-800 font-medium" aria-current="page">
               Start New Business
@@ -148,12 +149,12 @@ export default function NewBusinessPage() {
           </form>
         </div>
 
-        <a
+        <Link
           href="/"
           className="inline-flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
         >
           ← Back to CB Control Center
-        </a>
+        </Link>
       </div>
     </div>
   )

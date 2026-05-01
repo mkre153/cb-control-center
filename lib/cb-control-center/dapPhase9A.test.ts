@@ -23,7 +23,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { existsSync, readdirSync } from 'fs'
+import { existsSync, readdirSync, readFileSync } from 'fs'
 import { resolve, join } from 'path'
 
 import {
@@ -795,7 +795,6 @@ describe('Deferred integrations remain deferred', () => {
   it('docs/dap-request-backend-architecture.md exists and documents deferred integrations', () => {
     const docPath = resolve(ROOT, 'docs/dap-request-backend-architecture.md')
     expect(existsSync(docPath)).toBe(true)
-    const { readFileSync } = require('fs')
     const content = readFileSync(docPath, 'utf8').toLowerCase()
     expect(content).toMatch(/deferred/)
   })
@@ -825,7 +824,6 @@ describe('Deferred integrations remain deferred', () => {
   })
 
   it('dapRequestRules.ts does not import CRM, MKCRM, or email packages', () => {
-    const { readFileSync } = require('fs')
     const content = readFileSync(
       resolve(ROOT, 'lib/cb-control-center/dapRequestRules.ts'),
       'utf8'
@@ -839,7 +837,6 @@ describe('Deferred integrations remain deferred', () => {
   })
 
   it('dapRequestTypes.ts contains no database driver imports', () => {
-    const { readFileSync } = require('fs')
     const content = readFileSync(
       resolve(ROOT, 'lib/cb-control-center/dapRequestTypes.ts'),
       'utf8'
@@ -851,7 +848,6 @@ describe('Deferred integrations remain deferred', () => {
   })
 
   it('architecture doc mentions all required deferred items', () => {
-    const { readFileSync } = require('fs')
     const doc = readFileSync(
       resolve(ROOT, 'docs/dap-request-backend-architecture.md'),
       'utf8'

@@ -149,7 +149,7 @@ export default function ComparePage() {
             <div className="bg-white border border-blue-100 rounded-xl p-4 space-y-2">
               <p className="font-semibold text-blue-700 text-xs uppercase tracking-wide">DAP may work well if...</p>
               <ul className="space-y-1.5 text-xs text-gray-700">
-                <li>· You don't have dental insurance</li>
+                <li>· You don&apos;t have dental insurance</li>
                 <li>· You want predictable preventive care costs</li>
                 <li>· There is a participating dentist near you</li>
                 <li>· You prefer no monthly insurance premiums</li>

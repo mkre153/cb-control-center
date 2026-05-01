@@ -15,7 +15,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { readFileSync, existsSync } from 'fs'
+import { readFileSync, existsSync, readdirSync } from 'fs'
 import { resolve, join } from 'path'
 
 // ─── Project root ─────────────────────────────────────────────────────────────
@@ -222,7 +222,6 @@ describe('Detail page uses Next.js 16 dynamic params pattern', () => {
 
 describe('Page count is now 15 (Phase 9E added 2 new preview pages)', () => {
   function findPages(dir: string): string[] {
-    const { readdirSync } = require('fs')
     if (!existsSync(dir)) return []
     const results: string[] = []
     for (const entry of readdirSync(dir, { withFileTypes: true })) {

@@ -4,14 +4,13 @@
 // CB Control Center is the authority. MKCRM is not.
 
 import { describe, it, expect } from 'vitest'
-import { readFileSync, existsSync } from 'fs'
+import { readFileSync, existsSync, readdirSync, statSync } from 'fs'
 import { join, resolve } from 'path'
 
 const ROOT      = join(__dirname, '..', '..')
 const PAGE_PATH = join(ROOT, 'app/preview/dap/communication-dry-runs/page.tsx')
 
 function findPages(dir: string): string[] {
-  const { readdirSync, statSync } = require('fs')
   const results: string[] = []
   for (const entry of readdirSync(dir)) {
     const full = join(dir, entry)
@@ -701,7 +700,6 @@ describe('Phase 9Z — dry-run preview page renders all 16 templates', () => {
 
 describe('Phase 9Z — full suite guard', () => {
   it('migration inventory has 10 known migrations', () => {
-    const { readdirSync } = require('fs')
     const dir   = resolve(ROOT, 'supabase/migrations')
     const files = readdirSync(dir).filter((f: string) => f.endsWith('.sql'))
     expect(files).toHaveLength(10)

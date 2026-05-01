@@ -10,7 +10,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { readFileSync } from 'fs'
+import { readFileSync, existsSync } from 'fs'
 import { resolve } from 'path'
 
 const ROOT = resolve(__dirname, '../..')
@@ -21,7 +21,6 @@ const CLIENT_PATH   = resolve(ROOT, 'lib/cb-control-center/anthropicClient.ts')
 
 describe('Group 1 — dapStageReviewer module exports', () => {
   it('dapStageReviewer.ts exists', () => {
-    const { existsSync } = require('fs')
     expect(existsSync(REVIEWER_PATH)).toBe(true)
   })
 
@@ -95,7 +94,6 @@ describe('Group 2 — Reviewer is read-only', () => {
   })
 
   it('anthropicClient.ts exists', () => {
-    const { existsSync } = require('fs')
     expect(existsSync(CLIENT_PATH)).toBe(true)
   })
 

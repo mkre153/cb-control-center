@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import type { CbBusinessInstance, CbBusinessStatus } from '@/lib/cb-control-center/cbBusinessPortfolioTypes'
 import { CB_BUSINESS_PORTFOLIO } from '@/lib/cb-control-center/cbBusinessPortfolioData'
 import { MockModeBanner } from '@/components/cb-control-center/MockModeBanner'
@@ -123,13 +124,13 @@ export function CbHomeDashboard() {
                   Resume Dental Advantage Plan →
                 </a>
               )}
-              <a
+              <Link
                 href="/preview/dap/page-briefs"
                 data-view-system-contracts
                 className="text-xs font-medium text-gray-400 hover:text-gray-200 transition-colors"
               >
                 View System Contracts ↗
-              </a>
+              </Link>
               <a
                 href={newBusinessAction.path}
                 data-start-new-business
@@ -211,12 +212,12 @@ export function CbHomeDashboard() {
             <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
               System Contracts
             </h2>
-            <a
+            <Link
               href="/preview/dap/page-briefs"
               className="text-xs font-medium text-gray-500 hover:text-gray-800 transition-colors"
             >
               View System Contracts ↗
-            </a>
+            </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
             {SYSTEM_CONTRACTS.map(c => (

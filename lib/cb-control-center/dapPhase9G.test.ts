@@ -15,8 +15,8 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { readFileSync, existsSync } from 'fs'
-import { resolve } from 'path'
+import { readFileSync, existsSync, readdirSync } from 'fs'
+import { resolve, join } from 'path'
 import {
   canTransitionDapRequestStatus,
   assertValidDapRequestTransition,
@@ -349,8 +349,6 @@ describe('Public boundary protection — no CMS, no Join CTA, no provider publis
   })
 
   it('no new production page routes added in Phase 9G', () => {
-    const { readdirSync } = require('fs')
-    const { join } = require('path')
     function findPages(dir: string): string[] {
       if (!existsSync(dir)) return []
       const results: string[] = []
