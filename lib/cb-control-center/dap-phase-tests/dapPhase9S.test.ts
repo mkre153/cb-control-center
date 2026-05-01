@@ -44,7 +44,7 @@ import {
   getPublicCommercialSystemForVertical,
   getInternalCrmSystemForVertical,
   isResponsibilityAllowed,
-} from '../clientBuilderBoundaryRules'
+} from '../client/clientBuilderBoundaryRules'
 import type { DapMemberStanding } from '../dapMemberStatusTypes'
 import type { DapMemberStatusEmailCopy } from '../dapMemberStatusEmailTypes'
 

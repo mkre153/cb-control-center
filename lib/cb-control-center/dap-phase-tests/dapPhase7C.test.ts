@@ -5,9 +5,9 @@ import {
   validateDapDecisionSourceRecord,
   validateDapTreatmentSourceRecord,
   validateDapCmsSourceBundle,
-} from '../dapSourceValidation'
+} from '../source/dapSourceValidation'
 import { buildValidatedDapCmsSnapshotFromSource } from '../dapPublishingPipeline'
-import { buildDapCmsSnapshotFromSource } from '../dapSourceAdapter'
+import { buildDapCmsSnapshotFromSource } from '../source/dapSourceAdapter'
 import { exportDapCmsSnapshot, buildMockSourceBundle } from '../dapCmsExport'
 import { runClaimQA } from '../dapClaimQA'
 import { REQUEST_FLOW_ROUTE } from '../dapDisplayRules'
@@ -20,7 +20,7 @@ import {
   FIXTURE_DRAFT_PRACTICE,
   FIXTURE_DECISION_PAGE,
   FIXTURE_TREATMENT_PAGE,
-} from '../dapSourceFixtures'
+} from '../source/dapSourceFixtures'
 import {
   SCENARIO_CONFIRMED_OFFER_TERMS_MISSING,
   SCENARIO_CONFIRMED_OFFER_TERMS_VALIDATED_CTA_LOCKED,
@@ -35,7 +35,7 @@ import {
   SCENARIO_DRAFT_ACCIDENTALLY_PUBLIC,
   SCENARIO_MIXED_CITY,
 } from '../dapAdminWorkflowFixtures'
-import type { DapCmsSourceBundle } from '../dapSourceTypes'
+import type { DapCmsSourceBundle } from '../source/dapSourceTypes'
 
 // ─── Test 1: Source validation result shape ───────────────────────────────────
 

@@ -39,7 +39,7 @@ import {
   getPublicCommercialSystemForVertical,
   getInternalCrmSystemForVertical,
   isResponsibilityAllowed,
-} from '../clientBuilderBoundaryRules'
+} from '../client/clientBuilderBoundaryRules'
 import {
   buildDapClientBuilderBillingPayload,
   assertClientBuilderBillingSource,

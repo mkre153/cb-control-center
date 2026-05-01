@@ -30,8 +30,8 @@ import type {
   DapCmsSnapshot,
   DentistPublicState,
 } from './dapCmsTypes'
-import { buildDapCmsSnapshotFromSource } from './dapSourceAdapter'
-import type { DapCmsSourceBundle } from './dapSourceTypes'
+import { buildDapCmsSnapshotFromSource } from './source/dapSourceAdapter'
+import type { DapCmsSourceBundle } from './source/dapSourceTypes'
 
 const COUNTY       = 'San Diego County'
 const STATE        = 'CA'

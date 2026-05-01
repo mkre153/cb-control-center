@@ -5,7 +5,7 @@ import type {
   DapDecisionSourceRecord,
   DapTreatmentSourceRecord,
   DapCmsSourceBundle,
-} from './dapSourceTypes'
+} from './source/dapSourceTypes'
 
 // ─── Base records (reused across scenarios) ───────────────────────────────────
 

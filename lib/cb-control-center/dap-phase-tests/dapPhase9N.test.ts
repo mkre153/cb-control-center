@@ -30,7 +30,7 @@ import {
   getPublicCommercialSystemForVertical,
   getInternalCrmSystemForVertical,
   classifyDapIntegrationTarget,
-} from '../clientBuilderBoundaryRules'
+} from '../client/clientBuilderBoundaryRules'
 import {
   buildPracticeApprovedPayload,
   buildMembershipEnrolledPayload,
@@ -45,8 +45,8 @@ const ROOT = resolve(__dirname, '../../..')
 
 // ─── Key paths ────────────────────────────────────────────────────────────────
 
-const TYPES_PATH    = resolve(ROOT, 'lib/cb-control-center/clientBuilderBoundaryTypes.ts')
-const RULES_PATH    = resolve(ROOT, 'lib/cb-control-center/clientBuilderBoundaryRules.ts')
+const TYPES_PATH    = resolve(ROOT, 'lib/cb-control-center/client/clientBuilderBoundaryTypes.ts')
+const RULES_PATH    = resolve(ROOT, 'lib/cb-control-center/client/clientBuilderBoundaryRules.ts')
 const MKCRM_SYNC    = resolve(ROOT, 'lib/cb-control-center/dapMkcrmSync.ts')
 const MKCRM_PAYLOADS = resolve(ROOT, 'lib/cb-control-center/dapMkcrmPayloads.ts')
 const MKCRM_TYPES   = resolve(ROOT, 'lib/cb-control-center/dapMkcrmTypes.ts')

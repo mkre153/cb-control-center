@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
-import { buildDapCmsSnapshotFromSource } from '../dapSourceAdapter'
+import { buildDapCmsSnapshotFromSource } from '../source/dapSourceAdapter'
 import { exportDapCmsSnapshot, buildMockSourceBundle } from '../dapCmsExport'
 import { runClaimQA } from '../dapClaimQA'
 import { REQUEST_FLOW_ROUTE } from '../dapDisplayRules'
@@ -22,8 +22,8 @@ import {
   FIXTURE_UNSAFE_DECISION_PAGE,
   FIXTURE_CONFIRMED_NO_CTA,
   FIXTURE_CONFIRMED_ALL_GATES_CLOSED,
-} from '../dapSourceFixtures'
-import type { DapCmsSourceBundle } from '../dapSourceTypes'
+} from '../source/dapSourceFixtures'
+import type { DapCmsSourceBundle } from '../source/dapSourceTypes'
 
 const ROOT = process.cwd()
 

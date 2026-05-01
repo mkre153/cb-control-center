@@ -47,7 +47,7 @@ import {
   getPublicCommercialSystemForVertical,
   getInternalCrmSystemForVertical,
   isResponsibilityAllowed,
-} from '../clientBuilderBoundaryRules'
+} from '../client/clientBuilderBoundaryRules'
 import { buildPracticeApprovedPayload } from '../dapMkcrmPayloads'
 import { syncDapEventToMkcrmShadow } from '../dapMkcrmSync'
 import type { DapMkcrmOutboxPayload } from '../dapMkcrmOutboxTypes'

@@ -9,8 +9,8 @@ import {
   REQUEST_FLOW_ROUTE,
   getSearchResultState,
   getPatientCtaForSearchState,
-} from './dapDisplayRules'
-import { getCityHeading, getCitySubheading } from './dapCityData'
+} from '../dapDisplayRules'
+import { getCityHeading, getCitySubheading } from '../dapCityData'
 import type {
   DapPracticeCmsRecord,
   DapCityCmsRecord,
@@ -19,8 +19,8 @@ import type {
   DapTreatmentPageCmsRecord,
   DapCmsSnapshot,
   DentistPublicState,
-} from './dapCmsTypes'
-import type { ProviderStatus, PublicClaimLevel } from './types'
+} from '../dapCmsTypes'
+import type { ProviderStatus, PublicClaimLevel } from '../types'
 import type {
   DapPracticeSourceRecord,
   DapCitySourceRecord,

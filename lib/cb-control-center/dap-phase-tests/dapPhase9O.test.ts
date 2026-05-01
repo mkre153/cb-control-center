@@ -40,7 +40,7 @@ import {
   getPublicCommercialSystemForVertical,
   getInternalCrmSystemForVertical,
   isResponsibilityAllowed,
-} from '../clientBuilderBoundaryRules'
+} from '../client/clientBuilderBoundaryRules'
 import type { DapClientBuilderBillingShadowPayload } from '../dapClientBuilderBillingTypes'
 
 // ─── Project root ─────────────────────────────────────────────────────────────

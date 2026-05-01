@@ -5,7 +5,7 @@ import type {
   DapTreatmentSourceRecord,
   DapCmsSourceBundle,
 } from './dapSourceTypes'
-import type { ProviderStatus } from './types'
+import type { ProviderStatus } from '../types'
 
 // ─── Validation result types ──────────────────────────────────────────────────
 
