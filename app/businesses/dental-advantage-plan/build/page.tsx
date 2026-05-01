@@ -1,4 +1,4 @@
-import { SimulationShell } from '@/components/cb-control-center/SimulationShell'
+import { StageGatePanel } from '@/components/cb-control-center/StageGatePanel'
 import { DapBuildLedgerPanel } from '@/components/cb-control-center/DapBuildLedgerPanel'
 
 export default function DapBuildPipelinePage() {
@@ -26,10 +26,10 @@ export default function DapBuildPipelinePage() {
           </span>
         </nav>
 
-        {/* Forward-looking pipeline view */}
-        <SimulationShell />
+        {/* Stage Gate System — forward-looking authoritative pipeline */}
+        <StageGatePanel />
 
-        {/* Backward-looking completion ledger */}
+        {/* Build Ledger — backward-looking completion record */}
         <div className="border-t border-gray-200 pt-8">
           <DapBuildLedgerPanel />
         </div>

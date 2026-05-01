@@ -160,12 +160,12 @@ describe('Group 4 — Navigation architecture', () => {
     expect(src).toContain('CbHomeDashboard')
   })
 
-  it('DAP build pipeline page imports SimulationShell', () => {
+  it('DAP build pipeline page imports StageGatePanel (stage gate is now the primary pipeline authority)', () => {
     const src = readFileSync(
       resolve(ROOT, 'app/businesses/dental-advantage-plan/build/page.tsx'),
       'utf8'
     )
-    expect(src).toContain('SimulationShell')
+    expect(src).toContain('StageGatePanel')
   })
 
   it('DAP build pipeline page has a breadcrumb back to CB Control Center', () => {
