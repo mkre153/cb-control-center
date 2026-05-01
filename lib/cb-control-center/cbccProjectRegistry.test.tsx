@@ -118,10 +118,11 @@ describe('Group 2 — Empty state', () => {
 // ─── Group 3: Intake form fields ──────────────────────────────────────────────
 
 describe('Group 3 — Intake form has all 9 data-field inputs', () => {
+  // defaultShowIntake=true bypasses the URL-entry phase so data-field inputs are visible
   let html: string
 
   it('renders without throwing', () => {
-    html = renderToString(React.createElement(CbccProjectIntakeForm))
+    html = renderToString(React.createElement(CbccProjectIntakeForm, { defaultShowIntake: true }))
     expect(html).toBeTruthy()
   })
 
@@ -139,10 +140,16 @@ describe('Group 3 — Intake form has all 9 data-field inputs', () => {
 
   for (const field of REQUIRED_FIELDS) {
     it(`has data-field="${field}"`, () => {
-      if (!html) html = renderToString(React.createElement(CbccProjectIntakeForm))
+      if (!html) html = renderToString(React.createElement(CbccProjectIntakeForm, { defaultShowIntake: true }))
       expect(html).toContain(`data-field="${field}"`)
     })
   }
+
+  it('URL phase renders data-url-entry and hides data-field inputs by default', () => {
+    const urlHtml = renderToString(React.createElement(CbccProjectIntakeForm))
+    expect(urlHtml).toContain('name="url"')
+    expect(urlHtml).not.toContain('data-field="name"')
+  })
 })
 
 // ─── Group 4: Stage pipeline — all 7 locked before charter approval ───────────
@@ -222,7 +229,10 @@ describe('Group 6 — No DAP or vertical copy in generic v2 UI', () => {
   }
 
   function intakeHtml() {
-    return renderToString(React.createElement(CbccProjectIntakeForm))
+    // Test both phases for forbidden terms
+    const urlPhase = renderToString(React.createElement(CbccProjectIntakeForm))
+    const intakePhase = renderToString(React.createElement(CbccProjectIntakeForm, { defaultShowIntake: true }))
+    return urlPhase + intakePhase
   }
 
   for (const term of FORBIDDEN_TERMS) {
