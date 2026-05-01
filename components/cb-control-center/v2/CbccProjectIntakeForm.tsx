@@ -13,43 +13,55 @@ export function CbccProjectIntakeForm() {
   )
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-12">
-      <div className="mb-6">
-        <Link href="/" className="text-xs text-gray-400 hover:text-gray-600">
-          ← Project Registry
+    <div className="min-h-screen bg-[#0d1117] font-mono text-gray-300">
+      {/* Nav bar */}
+      <nav className="border-b border-[#1e2d45] px-6 py-3 flex items-center justify-between">
+        <Link href="/" className="text-blue-400 font-semibold tracking-tight hover:text-blue-300">
+          CB Control Center
         </Link>
-      </div>
-      <h1 className="text-2xl font-semibold text-gray-900 mb-2">New Project — Step 0</h1>
-      <p className="text-sm text-gray-500 mb-8">
-        Complete the Project Charter intake. An AI-generated charter will be produced for owner
-        review and approval before any build stage begins.
-      </p>
-
-      {result && !result.ok && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded text-sm text-red-700">
-          {result.message}
-        </div>
-      )}
-
-      <form action={formAction} className="space-y-6">
-        <Field name="name" label="Project Name" required />
-        <Field name="businessType" label="Business Type" required />
-        <Field name="primaryGoal" label="Primary Goal" required textarea />
-        <Field name="targetCustomer" label="Target Customer" required textarea />
-        <Field name="knownConstraints" label="Known Constraints" required textarea />
-        <Field name="forbiddenClaims" label="Forbidden Claims" required textarea />
-        <Field name="sourceUrlsNotes" label="Source URLs / Research Notes" required textarea />
-        <Field name="desiredOutputType" label="Desired Output Type" required />
-        <Field name="approvalOwner" label="Approval Owner" required />
-
-        <button
-          type="submit"
-          disabled={pending}
-          className="w-full py-3 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700 disabled:opacity-50"
+        <Link
+          href="/projects/new"
+          className="px-4 py-1.5 bg-blue-600 text-white text-sm rounded opacity-50 pointer-events-none"
         >
-          {pending ? 'Creating project...' : 'Create Project'}
-        </button>
-      </form>
+          + New Project
+        </Link>
+      </nav>
+
+      {/* Centered form card */}
+      <div className="flex justify-center px-4 py-12">
+        <div className="w-full max-w-xl bg-[#161b27] border border-[#1e2d45] rounded-lg p-8">
+          <h2 className="text-gray-100 text-lg font-semibold mb-1">New Project</h2>
+          <p className="text-gray-500 text-sm mb-6">
+            Complete Step 0 — Project Charter intake
+          </p>
+
+          {result && !result.ok && (
+            <div className="mb-5 p-3 bg-red-900/30 border border-red-700/50 rounded text-sm text-red-400">
+              {result.message}
+            </div>
+          )}
+
+          <form action={formAction} className="space-y-4">
+            <Field name="name"             label="Project Name *"            placeholder="e.g., Acme Corp Platform" />
+            <Field name="businessType"     label="Business Type *"           placeholder="e.g., Membership marketplace" />
+            <Field name="primaryGoal"      label="Primary Goal *"            placeholder="What this project must accomplish" textarea />
+            <Field name="targetCustomer"   label="Target Customer *"         placeholder="Who this serves" textarea />
+            <Field name="knownConstraints" label="Known Constraints *"       placeholder="Regulatory, technical, or scope limits" textarea />
+            <Field name="forbiddenClaims"  label="Forbidden Claims *"        placeholder="Claims this project must never make" textarea />
+            <Field name="sourceUrlsNotes"  label="Source URLs / Notes *"     placeholder="Research links or reference notes" textarea />
+            <Field name="desiredOutputType" label="Desired Output Type *"    placeholder="e.g., Public website, internal tool" />
+            <Field name="approvalOwner"    label="Approval Owner *"          placeholder="Who approves each stage" />
+
+            <button
+              type="submit"
+              disabled={pending}
+              className="w-full mt-2 py-2.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-medium rounded transition-colors"
+            >
+              {pending ? 'Creating project...' : 'Create Project'}
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   )
 }
@@ -57,27 +69,29 @@ export function CbccProjectIntakeForm() {
 function Field({
   name,
   label,
-  required,
+  placeholder,
   textarea,
 }: {
   name: string
   label: string
-  required?: boolean
+  placeholder?: string
   textarea?: boolean
 }) {
-  const base = 'mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-900'
+  const base =
+    'mt-1 block w-full bg-[#0d1117] border border-[#1e2d45] rounded px-3 py-2 text-sm text-gray-300 placeholder-gray-600 focus:outline-none focus:border-blue-700 font-mono'
   return (
     <div>
-      <label htmlFor={name} className="block text-sm font-medium text-gray-700">
-        {label} {required && <span className="text-red-500">*</span>}
+      <label htmlFor={name} className="block text-xs text-gray-500 mb-0.5">
+        {label}
       </label>
       {textarea ? (
         <textarea
           id={name}
           name={name}
           data-field={name}
-          required={required}
-          rows={3}
+          required
+          rows={2}
+          placeholder={placeholder}
           className={base}
         />
       ) : (
@@ -85,8 +99,9 @@ function Field({
           id={name}
           name={name}
           data-field={name}
-          required={required}
+          required
           type="text"
+          placeholder={placeholder}
           className={base}
         />
       )}

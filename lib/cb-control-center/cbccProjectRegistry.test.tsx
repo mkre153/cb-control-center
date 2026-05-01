@@ -92,7 +92,7 @@ describe('Group 1 — CbccProjectRegistry renders', () => {
       React.createElement(CbccProjectRegistry, { projects: [] })
     )
     expect(html).toContain('/projects/new')
-    expect(html).toContain('Create Project')
+    expect(html).toContain('New Project')
   })
 })
 

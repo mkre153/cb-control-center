@@ -14,32 +14,39 @@ const STATUS_LABEL: Record<CbccStageStatus, string> = {
   approved:          'Approved',
 }
 
-const STATUS_STYLE: Record<CbccStageStatus, string> = {
-  locked:            'bg-gray-100 text-gray-400 border-gray-200',
-  available:         'bg-blue-50 text-blue-700 border-blue-200',
-  in_progress:       'bg-indigo-50 text-indigo-700 border-indigo-200',
-  awaiting_approval: 'bg-amber-50 text-amber-700 border-amber-200',
-  approved:          'bg-green-50 text-green-700 border-green-200',
+const STATUS_COLOR: Record<CbccStageStatus, string> = {
+  locked:            'text-gray-600',
+  available:         'text-blue-400',
+  in_progress:       'text-indigo-400',
+  awaiting_approval: 'text-amber-400',
+  approved:          'text-green-400',
 }
 
 export function CbccStagePipeline({ project, stages }: Props) {
   const visibilities = computeStageVisibilities(project, stages)
 
   return (
-    <div data-stage-pipeline className="space-y-2">
+    <div data-stage-pipeline className="space-y-1.5">
       {visibilities.map(vis => {
         const stage = stages.find(s => s.stageNumber === vis.stageNumber)
         const title = stage?.stageTitle ?? `Stage ${vis.stageNumber}`
+        const isLocked = vis.status === 'locked'
 
         return (
           <div
             key={vis.stageNumber}
             data-stage-number={vis.stageNumber}
             data-stage-status={vis.status}
-            className={`flex items-center justify-between px-4 py-3 border rounded-lg ${STATUS_STYLE[vis.status]}`}
+            className={`flex items-center justify-between px-4 py-2.5 border rounded font-mono text-sm ${
+              isLocked
+                ? 'border-[#1e2d45] bg-[#0f1520]'
+                : 'border-[#1e3a5f] bg-[#0f1f35]'
+            }`}
           >
-            <span className="text-sm font-medium">{title}</span>
-            <span className="text-xs">{STATUS_LABEL[vis.status]}</span>
+            <span className={isLocked ? 'text-gray-600' : 'text-gray-300'}>{title}</span>
+            <span className={`text-xs ${STATUS_COLOR[vis.status]}`}>
+              {STATUS_LABEL[vis.status]}
+            </span>
           </div>
         )
       })}

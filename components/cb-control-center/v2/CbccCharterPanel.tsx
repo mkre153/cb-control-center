@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useActionState } from 'react'
 import type { CbccProject } from '@/lib/cb-control-center/cbccProjectTypes'
 import {
@@ -27,134 +28,142 @@ export function CbccCharterPanel({ project }: Props) {
   const charter = project.charterJson
 
   return (
-    <div data-charter-panel className="max-w-3xl mx-auto px-6 py-10">
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold text-gray-900">Step 0 — Project Charter</h2>
-        <p
-          data-charter-status
-          className="mt-1 text-sm text-gray-500"
+    <div className="min-h-screen bg-[#0d1117] font-mono text-gray-300">
+      {/* Nav */}
+      <nav className="border-b border-[#1e2d45] px-6 py-3 flex items-center justify-between">
+        <Link href="/" className="text-blue-400 font-semibold tracking-tight hover:text-blue-300">
+          CB Control Center
+        </Link>
+        <Link
+          href="/projects/new"
+          className="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded transition-colors"
         >
-          {project.charterApproved
-            ? 'Charter Approved'
-            : charter
-            ? 'Charter Ready for Owner Approval'
-            : 'Charter Draft'}
-        </p>
-      </div>
+          + New Project
+        </Link>
+      </nav>
 
-      {!project.charterApproved && (
-        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded text-sm text-amber-800">
-          <strong>Blocked:</strong> Step 0 Project Charter requires owner approval before Stage 1
-          can begin.
+      <div className="max-w-3xl mx-auto px-6 py-10">
+        {/* Breadcrumb */}
+        <div className="mb-6">
+          <Link href={`/projects/${project.slug}`} className="text-xs text-gray-600 hover:text-gray-400">
+            ← {project.name}
+          </Link>
         </div>
-      )}
 
-      {/* Generate Charter */}
-      {!charter && (
-        <form action={genAction} className="mb-8">
-          <input type="hidden" name="slug" value={project.slug} />
-          {genResult && !genResult.ok && (
-            <p className="mb-3 text-sm text-red-600">{genResult.message}</p>
-          )}
-          <button
-            type="submit"
-            disabled={genPending}
-            data-action="generate-charter"
-            className="px-5 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-700 disabled:opacity-50"
+        {/* Header */}
+        <div data-charter-panel className="mb-8">
+          <h2 className="text-xl font-semibold text-gray-100">Step 0 — Project Charter</h2>
+          <p
+            data-charter-status
+            className="mt-1 text-xs text-gray-500"
           >
-            {genPending ? 'Generating charter...' : 'Generate Charter'}
-          </button>
-          <p className="mt-2 text-xs text-gray-400">
-            Uses Opus 4.7 to draft a scope-only charter based on your intake.
+            {project.charterApproved
+              ? 'Charter Approved'
+              : charter
+              ? 'Charter Ready for Owner Approval'
+              : 'Charter Draft'}
           </p>
-        </form>
-      )}
+        </div>
 
-      {/* Charter content */}
-      {charter && (
-        <div className="space-y-5 mb-8">
-          <CharterSection title="What This Is" content={charter.whatThisIs} field="whatThisIs" />
-          <CharterSection title="What This Is Not" content={charter.whatThisIsNot} field="whatThisIsNot" />
-          <CharterSection title="Who It Serves" content={charter.whoItServes} field="whoItServes" />
-          <CharterList title="Allowed Claims" items={charter.allowedClaims} field="allowedClaims" />
-          <CharterList title="Forbidden Claims" items={charter.forbiddenClaims} field="forbiddenClaims" />
-          <CharterList title="Required Evidence" items={charter.requiredEvidence} field="requiredEvidence" />
-          <CharterSection title="Approval Authority" content={charter.approvalAuthority} field="approvalAuthority" />
-          <div data-charter-field="scopeNote" className="p-4 bg-gray-50 border border-gray-200 rounded text-xs text-gray-500">
-            <strong>Scope Note:</strong> This charter approves project scope only. It does not
-            approve claims, positioning, compliance language, SEO strategy, page content, or build
-            decisions.
+        {/* Blocked banner */}
+        {!project.charterApproved && (
+          <div className="mb-6 px-4 py-3 bg-amber-900/20 border border-amber-700/40 rounded text-sm text-amber-400">
+            <strong>Blocked:</strong> Step 0 Project Charter requires owner approval before Stage 1 can begin.
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Approve Charter */}
-      {charter && !project.charterApproved && (
-        <form action={approveAction}>
-          <input type="hidden" name="slug" value={project.slug} />
-          <input type="hidden" name="approvedBy" value={project.approvalOwner ?? 'owner'} />
-          {approveResult && !approveResult.ok && (
-            <p className="mb-3 text-sm text-red-600">{approveResult.message}</p>
-          )}
-          <button
-            type="submit"
-            disabled={approvePending}
-            data-action="approve-charter"
-            className="px-5 py-2 bg-green-700 text-white text-sm font-medium rounded-md hover:bg-green-800 disabled:opacity-50"
-          >
-            {approvePending ? 'Approving...' : 'Approve Charter'}
-          </button>
-          <p className="mt-2 text-xs text-gray-400">
-            Approving the charter unlocks Stage 1. This action is recorded and immutable.
-          </p>
-        </form>
-      )}
+        {/* Generate Charter */}
+        {!charter && (
+          <form action={genAction} className="mb-8">
+            <input type="hidden" name="slug" value={project.slug} />
+            {genResult && !genResult.ok && (
+              <p className="mb-3 text-sm text-red-400">{genResult.message}</p>
+            )}
+            <button
+              type="submit"
+              disabled={genPending}
+              data-action="generate-charter"
+              className="px-5 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm rounded transition-colors"
+            >
+              {genPending ? 'Generating charter...' : 'Generate Charter'}
+            </button>
+            <p className="mt-2 text-xs text-gray-600">
+              Opus 4.7 drafts a scope-only charter from your intake. Approves scope only — not claims, positioning, or build decisions.
+            </p>
+          </form>
+        )}
 
-      {project.charterApproved && (
-        <div className="p-4 bg-green-50 border border-green-200 rounded text-sm text-green-800">
-          Charter approved by {project.charterApprovedBy} on{' '}
-          {project.charterApprovedAt
-            ? new Date(project.charterApprovedAt).toLocaleDateString()
-            : '—'}
-          . Stage 1 is now available.
-        </div>
-      )}
+        {/* Charter content */}
+        {charter && (
+          <div className="space-y-4 mb-8">
+            <Section title="What This Is"    content={charter.whatThisIs}      field="whatThisIs" />
+            <Section title="What This Is Not" content={charter.whatThisIsNot}  field="whatThisIsNot" />
+            <Section title="Who It Serves"   content={charter.whoItServes}     field="whoItServes" />
+            <ListSection title="Allowed Claims"   items={charter.allowedClaims}   field="allowedClaims" />
+            <ListSection title="Forbidden Claims" items={charter.forbiddenClaims} field="forbiddenClaims" />
+            <ListSection title="Required Evidence" items={charter.requiredEvidence} field="requiredEvidence" />
+            <Section title="Approval Authority" content={charter.approvalAuthority} field="approvalAuthority" />
+            <div
+              data-charter-field="scopeNote"
+              className="px-4 py-3 bg-[#0f1520] border border-[#1e2d45] rounded text-xs text-gray-600"
+            >
+              <strong className="text-gray-500">Scope Note:</strong> This charter approves project scope only. It does not approve claims, positioning, compliance language, SEO strategy, page content, or build decisions.
+            </div>
+          </div>
+        )}
+
+        {/* Approve Charter */}
+        {charter && !project.charterApproved && (
+          <form action={approveAction}>
+            <input type="hidden" name="slug" value={project.slug} />
+            <input type="hidden" name="approvedBy" value={project.approvalOwner ?? 'owner'} />
+            {approveResult && !approveResult.ok && (
+              <p className="mb-3 text-sm text-red-400">{approveResult.message}</p>
+            )}
+            <button
+              type="submit"
+              disabled={approvePending}
+              data-action="approve-charter"
+              className="px-5 py-2 bg-green-700 hover:bg-green-600 disabled:opacity-50 text-white text-sm rounded transition-colors"
+            >
+              {approvePending ? 'Approving...' : 'Approve Charter'}
+            </button>
+            <p className="mt-2 text-xs text-gray-600">
+              Approving unlocks Stage 1. This action is recorded and immutable.
+            </p>
+          </form>
+        )}
+
+        {project.charterApproved && (
+          <div className="px-4 py-3 bg-green-900/20 border border-green-700/40 rounded text-sm text-green-400">
+            Charter approved by {project.charterApprovedBy} on{' '}
+            {project.charterApprovedAt
+              ? new Date(project.charterApprovedAt).toLocaleDateString()
+              : '—'}
+            . Stage 1 is now available.
+          </div>
+        )}
+      </div>
     </div>
   )
 }
 
-function CharterSection({
-  title,
-  content,
-  field,
-}: {
-  title: string
-  content: string
-  field: string
-}) {
+function Section({ title, content, field }: { title: string; content: string; field: string }) {
   return (
-    <div data-charter-field={field}>
-      <h3 className="text-sm font-semibold text-gray-700 mb-1">{title}</h3>
-      <p className="text-sm text-gray-600">{content}</p>
+    <div data-charter-field={field} className="border border-[#1e2d45] rounded px-4 py-3 bg-[#161b27]">
+      <p className="text-xs text-gray-600 uppercase tracking-widest mb-1">{title}</p>
+      <p className="text-sm text-gray-300">{content}</p>
     </div>
   )
 }
 
-function CharterList({
-  title,
-  items,
-  field,
-}: {
-  title: string
-  items: string[]
-  field: string
-}) {
+function ListSection({ title, items, field }: { title: string; items: string[]; field: string }) {
   return (
-    <div data-charter-field={field}>
-      <h3 className="text-sm font-semibold text-gray-700 mb-1">{title}</h3>
-      <ul className="list-disc list-inside space-y-0.5">
+    <div data-charter-field={field} className="border border-[#1e2d45] rounded px-4 py-3 bg-[#161b27]">
+      <p className="text-xs text-gray-600 uppercase tracking-widest mb-2">{title}</p>
+      <ul className="space-y-1">
         {items.map((item, i) => (
-          <li key={i} className="text-sm text-gray-600">
+          <li key={i} className="text-sm text-gray-300 before:content-['—'] before:text-gray-600 before:mr-2">
             {item}
           </li>
         ))}
