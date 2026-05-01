@@ -127,6 +127,12 @@ export interface CbccStageDefinition {
   // contract per stage populate it here. The page model surfaces it as
   // requiredArtifact. Both fields are independent of evidence requirements.
   artifact?: CbccStagePageArtifact
+  // Optional — adapters that want to ship a stage directive (the operating
+  // instructions for the work to be done in this stage) populate it here.
+  // The engine does not interpret the string; it's an opaque payload the UI
+  // can render. The locked-stage UX (StageDetailPage) labels it as a preview
+  // when the stage has unresolved blockers, regardless of content.
+  directive?: string
   requirements: ReadonlyArray<CbccStageRequirement>
   requiredApprovals: ReadonlyArray<string>
 }

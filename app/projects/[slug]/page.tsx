@@ -5,16 +5,18 @@ import { CbccStagePipeline } from '@/components/cb-control-center/v2/CbccStagePi
 import { CbccNav } from '@/components/cb-control-center/v2/CbccNav'
 import { isEngineBackedSlug } from '@/lib/cb-control-center/cbccEngineRegistry'
 import { translateDapProjectForPipeline } from '@/lib/cb-control-center/cbccProjectPipelineTranslator'
+import { getDapStageApprovalStore } from '@/lib/cb-control-center/dapStageApprovalStore'
 
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
 
-  // Engine-backed projects (currently DAP only) bypass Supabase entirely and
-  // hydrate from the generic CBCC adapter. All other slugs keep the existing
-  // Supabase-backed path so generic v2 projects continue to work.
+  // Engine-backed projects (currently DAP only) hydrate from the generic
+  // adapter and overlay any persisted owner approvals from the store. Other
+  // slugs keep the existing Supabase-backed path.
   let project, stages
   if (isEngineBackedSlug(slug)) {
-    const bundle = translateDapProjectForPipeline()
+    const persistedApprovals = await getDapStageApprovalStore().list().catch(() => [])
+    const bundle = translateDapProjectForPipeline({ persistedApprovals })
     project = bundle.project
     stages = bundle.stages
   } else {

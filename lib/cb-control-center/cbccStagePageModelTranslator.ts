@@ -70,6 +70,15 @@ export interface BuildDapStageGateOptions {
   project?: EngineProject
   // Override the stage definitions array for tests.
   stageDefinitions?: ReadonlyArray<EngineStageDefinition>
+  // Per-stage status overrides (e.g. from a persistence layer that records
+  // owner approvals). Applied on top of project.stages[*].status. The map's
+  // keys are stage ids (engine-canonical, like 'definition' / 'discovery'),
+  // values are engine statuses ('approved' | 'awaiting_owner_approval' | etc.).
+  stageStatusOverrides?: Readonly<Record<string, EngineStageStatus>>
+  // Per-stage approval metadata that pairs with stageStatusOverrides. Lets
+  // the page surface "Approved by … on …" for stages whose approval came
+  // from persistence rather than the static project state.
+  approvalOverrides?: Readonly<Record<string, { approvedAt?: string | null; approvedBy?: string | null }>>
 }
 
 export function buildDapStageGateFromEngine(
@@ -86,10 +95,14 @@ export function buildDapStageGateFromEngine(
   if (!stageInstance) return null
 
   // Engine page model assembles locking + evidence. We pass the project's own
-  // stage statuses so locking matches the adapter's recorded state.
-  const stageStatuses = Object.fromEntries(
+  // stage statuses (then overlay any persisted overrides) so locking matches
+  // both the adapter's recorded state and the latest persisted approvals.
+  const baseStatuses = Object.fromEntries(
     project.stages.map(s => [s.id, s.status]),
   ) as Record<string, EngineStageStatus>
+  const stageStatuses: Record<string, EngineStageStatus> = options.stageStatusOverrides
+    ? { ...baseStatuses, ...options.stageStatusOverrides }
+    : baseStatuses
 
   // Seed the ledger from the adapter's known inline evidence so the page
   // model reflects what the adapter advertises. Status='valid' marks them
@@ -108,13 +121,18 @@ export function buildDapStageGateFromEngine(
 
   const artifact = getDapStageArtifact(def.id)
 
+  // Approval metadata: prefer persisted override → adapter's static approval.
+  const override = options.approvalOverrides?.[def.id]
+  const approvedAt = override?.approvedAt ?? stageInstance.approval?.decidedAt ?? null
+  const approvedBy = override?.approvedBy ?? stageInstance.approval?.decidedBy ?? null
+
   return translateModelToGate({
     model,
     definition: def,
     stageNumber,
     artifact,
-    approvedAt: stageInstance.approval?.decidedAt ?? null,
-    approvedBy: stageInstance.approval?.decidedBy ?? null,
+    approvedAt,
+    approvedBy,
   })
 }
 
@@ -137,6 +155,8 @@ export function translateModelToGate(input: TranslateModelToGateInput): DapStage
     .filter(b => b.severity === 'blocking')
     .map(b => b.message)
 
+  const directive = definition.directive ?? ''
+
   return {
     stageId: `dap-stage-${String(stageNumber).padStart(2, '0')}-${definition.id}`,
     stageNumber,
@@ -146,8 +166,8 @@ export function translateModelToGate(input: TranslateModelToGateInput): DapStage
     whyItMatters: definition.purpose ?? '',
     filesExpected: [],
     status: v1Status,
-    directiveIssued: false,
-    directive: '',
+    directiveIssued: directive.trim().length > 0,
+    directive,
     approvedByOwner: isApproved,
     approvedAt: isApproved ? approvedAt : null,
     nextStageUnlocked: isApproved && !model.navigation.isLastStage,

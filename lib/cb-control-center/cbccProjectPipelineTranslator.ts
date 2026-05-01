@@ -62,11 +62,51 @@ export interface TranslatedProjectBundle {
   stages: ProjectStage[]
 }
 
-export function translateEngineProjectToV2(engine: EngineProject): TranslatedProjectBundle {
-  const stage1 = engine.stages.find(s => s.order === 1) ?? null
-  const charterApproved = stage1?.status === 'approved'
-  const approvedAt = stage1?.approval?.decidedAt ?? null
-  const approvedBy = stage1?.approval?.decidedBy ?? null
+export interface PersistedStageApproval {
+  stageNumber: number
+  approved: boolean
+  approvedAt: string | null
+  approvedBy: string | null
+}
+
+export interface TranslateEngineProjectOptions {
+  // Persisted owner approvals from the storage layer. When supplied, the
+  // returned project + stage rows reflect persistence-overlaid-on-static
+  // state — this is what makes refresh-stable approval flows possible.
+  persistedApprovals?: ReadonlyArray<PersistedStageApproval>
+}
+
+export function translateEngineProjectToV2(
+  engine: EngineProject,
+  options: TranslateEngineProjectOptions = {},
+): TranslatedProjectBundle {
+  const persistedByNumber = new Map<number, PersistedStageApproval>(
+    (options.persistedApprovals ?? []).map(p => [p.stageNumber, p]),
+  )
+
+  // Effective stage state: persisted approval overlays the engine's static
+  // baseline. Stage 1 may be approved either by the engine's recorded
+  // approval or by a persisted approval; either way the charter flips.
+  const effectiveStage1 = (() => {
+    const baseline = engine.stages.find(s => s.order === 1) ?? null
+    const persisted = persistedByNumber.get(1)
+    if (persisted?.approved) {
+      return {
+        approved: true,
+        approvedAt: persisted.approvedAt,
+        approvedBy: persisted.approvedBy,
+      }
+    }
+    return {
+      approved: baseline?.status === 'approved',
+      approvedAt: baseline?.approval?.decidedAt ?? null,
+      approvedBy: baseline?.approval?.decidedBy ?? null,
+    }
+  })()
+
+  const charterApproved = effectiveStage1.approved
+  const approvedAt = effectiveStage1.approvedAt
+  const approvedBy = effectiveStage1.approvedBy
 
   const project: V2Project = {
     id: engine.id,
@@ -93,26 +133,32 @@ export function translateEngineProjectToV2(engine: EngineProject): TranslatedPro
     updatedAt: engine.updatedAt,
   }
 
-  const stages: ProjectStage[] = engine.stages.map(s => ({
-    id: `${engine.slug}-stage-${String(s.order).padStart(2, '0')}-${s.id}`,
-    projectId: engine.id,
-    stageNumber: s.order,
-    stageKey: s.id,
-    stageTitle: s.id,
-    stageStatus: mapEngineStatusToV2(s.status),
-    approved: s.status === 'approved',
-    approvedAt: s.approval?.decidedAt ?? null,
-    approvedBy: s.approval?.decidedBy ?? null,
-    createdAt: engine.createdAt,
-    updatedAt: engine.updatedAt,
-  }))
+  const stages: ProjectStage[] = engine.stages.map(s => {
+    const persisted = persistedByNumber.get(s.order)
+    const isApproved = persisted?.approved ?? s.status === 'approved'
+    return {
+      id: `${engine.slug}-stage-${String(s.order).padStart(2, '0')}-${s.id}`,
+      projectId: engine.id,
+      stageNumber: s.order,
+      stageKey: s.id,
+      stageTitle: s.id,
+      stageStatus: isApproved ? 'approved' : mapEngineStatusToV2(s.status),
+      approved: isApproved,
+      approvedAt: isApproved ? (persisted?.approvedAt ?? s.approval?.decidedAt ?? null) : null,
+      approvedBy: isApproved ? (persisted?.approvedBy ?? s.approval?.decidedBy ?? null) : null,
+      createdAt: engine.createdAt,
+      updatedAt: engine.updatedAt,
+    }
+  })
 
   return { project, stages }
 }
 
 // Convenience for the DAP-specific route — single import site.
-export function translateDapProjectForPipeline(): TranslatedProjectBundle {
-  return translateEngineProjectToV2(DAP_PROJECT)
+export function translateDapProjectForPipeline(
+  options: TranslateEngineProjectOptions = {},
+): TranslatedProjectBundle {
+  return translateEngineProjectToV2(DAP_PROJECT, options)
 }
 
 export const TRANSLATOR_DAP_PROJECT_ID = DAP_PROJECT_ID

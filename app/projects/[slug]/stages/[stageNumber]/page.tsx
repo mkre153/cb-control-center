@@ -5,8 +5,12 @@ import { buildGenericStageGate } from '@/lib/cb-control-center/cbccProjectStageA
 import { isEngineBackedSlug } from '@/lib/cb-control-center/cbccEngineRegistry'
 import { buildDapStageGateFromEngine } from '@/lib/cb-control-center/cbccStagePageModelTranslator'
 import { translateDapProjectForPipeline } from '@/lib/cb-control-center/cbccProjectPipelineTranslator'
+import { getDapStageApprovalStore } from '@/lib/cb-control-center/dapStageApprovalStore'
+import { resolveDapStageOverrides } from '@/lib/cb-control-center/dapStageStateResolver'
 import { StageDetailPage } from '@/components/cb-control-center/StageDetailPage'
 import { DeferredApprovalGate } from '@/components/cb-control-center/DeferredApprovalGate'
+import { DapStageOwnerApprovalForm } from '@/components/cb-control-center/DapStageOwnerApprovalForm'
+import { DAP_PROJECT } from '@/lib/cbcc/adapters/dap'
 
 const DAP_SLUG = 'dental-advantage-plan'
 
@@ -42,13 +46,19 @@ export default async function ProjectStageDetailRoute({ params }: { params: Para
   if (!n) notFound()
 
   // Engine-backed projects (currently DAP only) hydrate from the generic
-  // adapter via the page-model translator. All other slugs keep the existing
-  // Supabase-backed path.
+  // adapter via the page-model translator, with persisted owner approvals
+  // overlaid on top. All other slugs keep the existing Supabase-backed path.
   let project, stage
+  let persistedApprovalsForDap: Awaited<ReturnType<ReturnType<typeof getDapStageApprovalStore>['list']>> = []
   if (isEngineBackedSlug(slug)) {
-    const bundle = translateDapProjectForPipeline()
+    persistedApprovalsForDap = await getDapStageApprovalStore().list().catch(() => [])
+    const bundle = translateDapProjectForPipeline({ persistedApprovals: persistedApprovalsForDap })
     project = bundle.project
-    stage = buildDapStageGateFromEngine(n)
+    const overrides = resolveDapStageOverrides(DAP_PROJECT, persistedApprovalsForDap)
+    stage = buildDapStageGateFromEngine(n, {
+      stageStatusOverrides: overrides.stageStatusOverrides,
+      approvalOverrides: overrides.approvalOverrides,
+    })
   } else {
     project = await getProjectBySlug(slug)
     if (!project) notFound()
@@ -72,6 +82,12 @@ export default async function ProjectStageDetailRoute({ params }: { params: Para
   // already shown by StageApprovalChecklist for awaiting/approved states.
   const isDap = slug === DAP_SLUG
 
+  // Owner approval form for engine-backed DAP — rendered when the stage is
+  // unlocked (no blockers) and not yet approved. The form posts to
+  // approveDapStageAction; on success Next revalidates the affected paths.
+  const showDapApprovalForm =
+    isDap && stage.blockers.length === 0 && !stage.approvedByOwner
+
   return (
     <>
       <StageDetailPage
@@ -80,6 +96,11 @@ export default async function ProjectStageDetailRoute({ params }: { params: Para
         breadcrumbTrail={trail}
         nextStageHref={(next) => `${breadcrumbBase}/stages/${next.stageNumber}`}
       />
+      {showDapApprovalForm && (
+        <div className="max-w-4xl mx-auto px-6 -mt-6 pb-10">
+          <DapStageOwnerApprovalForm stageNumber={n} stageTitle={stage.title} />
+        </div>
+      )}
       {!isDap && (
         <div className="max-w-4xl mx-auto px-6 -mt-6 pb-10">
           <DeferredApprovalGate />
