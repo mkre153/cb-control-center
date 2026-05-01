@@ -363,12 +363,12 @@ describe('Group 5 — Source file integrity', () => {
     expect(src).toContain('DapBuildLedgerPanel')
   })
 
-  it('build page imports StageGatePanel (replaces SimulationShell as primary pipeline authority)', () => {
+  it('build page imports StagePipelineOverview (lightweight overview with per-stage detail links)', () => {
     const src = readFileSync(
       resolve(ROOT, 'app/businesses/dental-advantage-plan/build/page.tsx'),
       'utf8'
     )
-    expect(src).toContain('StageGatePanel')
+    expect(src).toContain('StagePipelineOverview')
   })
 })
 

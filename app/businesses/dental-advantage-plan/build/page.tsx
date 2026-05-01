@@ -1,4 +1,4 @@
-import { StageGatePanel } from '@/components/cb-control-center/StageGatePanel'
+import { StagePipelineOverview } from '@/components/cb-control-center/StagePipelineOverview'
 import { DapBuildLedgerPanel } from '@/components/cb-control-center/DapBuildLedgerPanel'
 
 export default function DapBuildPipelinePage() {
@@ -26,8 +26,8 @@ export default function DapBuildPipelinePage() {
           </span>
         </nav>
 
-        {/* Stage Gate System — forward-looking authoritative pipeline */}
-        <StageGatePanel />
+        {/* Stage Gate Pipeline — overview with links to full stage detail pages */}
+        <StagePipelineOverview />
 
         {/* Build Ledger — backward-looking completion record */}
         <div className="border-t border-gray-200 pt-8">

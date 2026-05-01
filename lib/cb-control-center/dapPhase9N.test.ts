@@ -431,7 +431,7 @@ describe('Phase 9M shadow sync — still valid, still shadow-only, still no paym
       }
       return results
     }
-    expect(findPages(join(ROOT, 'app')).length).toBe(52)
+    expect(findPages(join(ROOT, 'app')).length).toBe(53)
   })
 
   it('no ClientBuilder.Pro API route created in Phase 9N', () => {

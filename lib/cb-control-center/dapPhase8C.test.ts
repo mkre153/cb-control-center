@@ -197,9 +197,11 @@ describe('Current production route inventory', () => {
     'app/preview/cbseoaeo/page-generation-contract/page.tsx',
     // DAP page brief builder preview (Phase 18D)
     'app/preview/dap/page-briefs/page.tsx',
+    // DAP stage detail pages (Phase 19C)
+    'app/businesses/dental-advantage-plan/build/stages/[stageSlug]/page.tsx',
   ]
 
-  it('exactly 52 page.tsx files in app/ (Phase 18D added DAP page brief preview)', () => {
+  it('exactly 53 page.tsx files in app/ (Phase 19C added stage detail route)', () => {
     const found = findFiles(join(ROOT, 'app'), f => f.endsWith('page.tsx'))
     expect(found.length).toBe(KNOWN_ROUTES.length)
   })

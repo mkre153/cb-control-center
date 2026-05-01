@@ -18,10 +18,13 @@
 import { describe, it, expect } from 'vitest'
 import {
   DAP_STAGE_GATES,
+  DAP_STAGE_SLUGS,
   getActiveStageGate,
   getApprovedStageGates,
   getStageGateById,
   getStageGatesByStatus,
+  getDapStageGateBySlug,
+  getNextDapStageGate,
   type DapStageStatus,
 } from './dapStageGates'
 import { DAP_BUILD_LEDGER } from './dapBuildLedger'
@@ -439,9 +442,83 @@ describe('Group 8 — Blocker integrity', () => {
   })
 })
 
-// ─── Group 9: Artifact integrity ──────────────────────────────────────────────
+// ─── Group 9: Slug and routing ────────────────────────────────────────────────
 
-describe('Group 9 — Artifact integrity', () => {
+describe('Group 9 — Slug and routing', () => {
+  const EXPECTED_SLUGS = [
+    '1-business-definition',
+    '2-truth-schema',
+    '3-brandscript',
+    '4-page-generation',
+    '5-site-build',
+    '6-qa-acceptance',
+    '7-production-release',
+  ]
+
+  it('all 7 stages have a non-empty slug', () => {
+    for (const s of DAP_STAGE_GATES) {
+      expect(s.slug, `${s.stageId} missing slug`).toBeTruthy()
+    }
+  })
+
+  it('all stage slugs are unique', () => {
+    const slugs = DAP_STAGE_GATES.map(s => s.slug)
+    expect(new Set(slugs).size).toBe(slugs.length)
+  })
+
+  it('stage slugs match the expected values', () => {
+    const slugs = [...DAP_STAGE_GATES].sort((a, b) => a.stageNumber - b.stageNumber).map(s => s.slug)
+    expect(slugs).toEqual(EXPECTED_SLUGS)
+  })
+
+  it('DAP_STAGE_SLUGS exports all 7 slugs', () => {
+    expect(DAP_STAGE_SLUGS).toHaveLength(7)
+    for (const slug of EXPECTED_SLUGS) {
+      expect(DAP_STAGE_SLUGS).toContain(slug)
+    }
+  })
+
+  it('getDapStageGateBySlug returns the correct stage', () => {
+    const s1 = getDapStageGateBySlug('1-business-definition')
+    expect(s1).toBeDefined()
+    expect(s1?.stageNumber).toBe(1)
+    expect(s1?.stageId).toBe('stage-01-business-definition')
+  })
+
+  it('getDapStageGateBySlug returns undefined for invalid slug', () => {
+    expect(getDapStageGateBySlug('not-a-real-slug')).toBeUndefined()
+    expect(getDapStageGateBySlug('')).toBeUndefined()
+  })
+
+  it('getDapStageGateBySlug resolves all 7 expected slugs', () => {
+    for (const slug of EXPECTED_SLUGS) {
+      expect(getDapStageGateBySlug(slug), `slug '${slug}' should resolve`).toBeDefined()
+    }
+  })
+
+  it('getNextDapStageGate returns stage 2 when given stage 1', () => {
+    const s1 = getDapStageGateBySlug('1-business-definition')!
+    const next = getNextDapStageGate(s1)
+    expect(next?.stageNumber).toBe(2)
+  })
+
+  it('getNextDapStageGate returns undefined for the last stage', () => {
+    const s7 = getDapStageGateBySlug('7-production-release')!
+    expect(getNextDapStageGate(s7)).toBeUndefined()
+  })
+
+  it('stage detail routes can be derived: /build/stages/[slug]', () => {
+    for (const stage of DAP_STAGE_GATES) {
+      const route = `/businesses/dental-advantage-plan/build/stages/${stage.slug}`
+      expect(route).toContain(stage.slug)
+      expect(route).toContain('/build/stages/')
+    }
+  })
+})
+
+// ─── Group 10: Artifact integrity ─────────────────────────────────────────────
+
+describe('Group 10 — Artifact integrity', () => {
   it('every approved stage has an artifact', () => {
     for (const s of DAP_STAGE_GATES) {
       if (s.status === 'approved') {

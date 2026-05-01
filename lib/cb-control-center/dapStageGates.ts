@@ -45,6 +45,7 @@ export interface DapStageEvidence {
 export interface DapStageGate {
   readonly stageId: string
   readonly stageNumber: number          // 1–7, defines required ordering
+  readonly slug: string                 // URL slug for the stage detail page
   readonly title: string
   readonly description: string
   readonly whyItMatters: string
@@ -70,6 +71,7 @@ export const DAP_STAGE_GATES: readonly DapStageGate[] = [
   {
     stageId: 'stage-01-business-definition',
     stageNumber: 1,
+    slug: '1-business-definition',
     title: 'Business Definition',
     description:
       'Establish what DAP is, who the customer is, what the conversion goal is, and what claims are allowed or forbidden. Register the business in the CBCC portfolio.',
@@ -115,6 +117,7 @@ export const DAP_STAGE_GATES: readonly DapStageGate[] = [
   {
     stageId: 'stage-02-truth-schema',
     stageNumber: 2,
+    slug: '2-truth-schema',
     title: 'Truth Schema',
     description:
       'Lock what DAP is, what DAP is not, all 7 truth rules, forbidden claims, required disclaimers, and compliance boundaries. No downstream page may contradict this schema.',
@@ -178,6 +181,7 @@ Do not begin Stage 3 until this approval is recorded.`,
   {
     stageId: 'stage-03-brandscript-positioning',
     stageNumber: 3,
+    slug: '3-brandscript',
     title: 'BrandScript / Positioning',
     description:
       'Define the customer problem, guide positioning, the plan, CTA strategy, stakes, success outcome, and tone and voice for DAP. This governs every patient-facing message.',
@@ -235,6 +239,7 @@ Do not begin Stage 4 until owner approval is recorded.`,
   {
     stageId: 'stage-04-page-strategy',
     stageNumber: 4,
+    slug: '4-page-generation',
     title: 'Page Strategy',
     description:
       'Define the full page type strategy: homepage sections, SEO/AEO role, conversion role, FAQ strategy, comparison table strategy, and local/practice-page strategy for all 8 DAP page types.',
@@ -310,6 +315,7 @@ Do not begin Stage 5 implementation until this approval is recorded.`,
   {
     stageId: 'stage-05-homepage-build',
     stageNumber: 5,
+    slug: '5-site-build',
     title: 'Homepage Build',
     description:
       'Implement the DAP homepage foundation on rebuild/dap-site-v2. Replace the monolithic page.tsx with 7 modular server-component sections governed by the Phase 18C/D contracts. Enforce all 7 truth rules. Add safety tests.',
@@ -406,6 +412,7 @@ Stop condition: awaiting owner approval in CBCC before Stage 6 begins.`,
   {
     stageId: 'stage-06-qa-review',
     stageNumber: 6,
+    slug: '6-qa-acceptance',
     title: 'QA Review',
     description:
       'Verify truth rules, broken links, visual acceptance, mobile layout, SEO structure, CTA behavior, no forbidden claims, no stale mock data, no provider/pricing claims unless confirmed.',
@@ -476,6 +483,7 @@ Do not begin Stage 7 until owner approval is recorded.`,
   {
     stageId: 'stage-07-launch',
     stageNumber: 7,
+    slug: '7-production-release',
     title: 'Launch',
     description:
       'Merge rebuild/dap-site-v2 to main, confirm Vercel production deployment, run post-launch verification, and mark DAP as launched in CBCC.',
@@ -557,3 +565,15 @@ export function getActiveStageGate(): DapStageGate {
 export function getOpenBlockerCount(): number {
   return DAP_STAGE_GATES.reduce((acc, s) => acc + s.blockers.length, 0)
 }
+
+export function getDapStageGateBySlug(slug: string): DapStageGate | undefined {
+  return DAP_STAGE_GATES.find(s => s.slug === slug) as DapStageGate | undefined
+}
+
+export function getNextDapStageGate(current: DapStageGate): DapStageGate | undefined {
+  return DAP_STAGE_GATES.find(
+    s => s.stageNumber === current.stageNumber + 1
+  ) as DapStageGate | undefined
+}
+
+export const DAP_STAGE_SLUGS = DAP_STAGE_GATES.map(s => s.slug)
