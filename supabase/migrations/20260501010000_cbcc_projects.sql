@@ -1,5 +1,6 @@
 -- CBCC v2: generic project registry with Step 0 charter governance
 -- Two tables: cbcc_projects (project + Step 0 charter/approval) + cbcc_project_stages (7 rows per project)
+-- Stage seeding is performed in app code (cbccProjectRepository.createProject), not via DB trigger.
 
 CREATE TABLE IF NOT EXISTS cbcc_projects (
   id                    uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -75,24 +76,5 @@ CREATE TABLE IF NOT EXISTS cbcc_project_stages (
   UNIQUE (project_id, stage_number)
 );
 
--- Seed trigger: insert 7 locked stage rows when a project is created
-CREATE OR REPLACE FUNCTION cbcc_seed_project_stages()
-RETURNS trigger LANGUAGE plpgsql AS $$
-BEGIN
-  INSERT INTO cbcc_project_stages (project_id, stage_number, stage_key, stage_title)
-  VALUES
-    (NEW.id, 1, 'definition',    'Stage 1 — Definition'),
-    (NEW.id, 2, 'discovery',     'Stage 2 — Discovery'),
-    (NEW.id, 3, 'foundation',    'Stage 3 — Foundation'),
-    (NEW.id, 4, 'strategy',      'Stage 4 — Strategy'),
-    (NEW.id, 5, 'planning',      'Stage 5 — Planning'),
-    (NEW.id, 6, 'build',         'Stage 6 — Build'),
-    (NEW.id, 7, 'launch',        'Stage 7 — Launch');
-  RETURN NEW;
-END;
-$$;
-
-DROP TRIGGER IF EXISTS cbcc_projects_seed_stages ON cbcc_projects;
-CREATE TRIGGER cbcc_projects_seed_stages
-  AFTER INSERT ON cbcc_projects
-  FOR EACH ROW EXECUTE FUNCTION cbcc_seed_project_stages();
+CREATE INDEX IF NOT EXISTS idx_cbcc_project_stages_project_id
+  ON cbcc_project_stages (project_id, stage_number);

@@ -1,5 +1,6 @@
 import { createHash } from 'crypto'
 import { getSupabaseAdminClient } from './supabaseClient'
+import { CBCC_STAGE_DEFINITIONS } from './cbccStageDefinitions'
 import type { CbccProject, CbccProjectIntake, ProjectCharter, ProjectStage } from './cbccProjectTypes'
 
 function toProject(row: Record<string, unknown>): CbccProject {
@@ -67,7 +68,23 @@ export async function createProject(
     .single()
 
   if (error) throw new Error(`createProject: ${error.message}`)
-  return toProject(row as Record<string, unknown>)
+
+  const project = toProject(row as Record<string, unknown>)
+
+  // Seed 7 locked stage rows (was a DB trigger; moved to app code for simplicity)
+  const { error: seedError } = await db
+    .from('cbcc_project_stages')
+    .insert(
+      CBCC_STAGE_DEFINITIONS.map(s => ({
+        project_id: project.id,
+        stage_number: s.number,
+        stage_key: s.key,
+        stage_title: s.title,
+      }))
+    )
+
+  if (seedError) throw new Error(`createProject seed stages: ${seedError.message}`)
+  return project
 }
 
 export async function getProjectBySlug(slug: string): Promise<CbccProject | null> {
@@ -104,6 +121,7 @@ export async function saveCharter(projectId: string, charter: ProjectCharter): P
       charter_generated_at: new Date().toISOString(),
       charter_model: 'claude-opus-4-7',
       project_status: 'step_0_charter_ready',
+      updated_at: new Date().toISOString(),
     })
     .eq('id', projectId)
 
@@ -138,6 +156,7 @@ export async function approveCharter(projectId: string, approvedBy: string): Pro
       charter_version: ((row.charter_version as number) ?? 0) + 1,
       charter_hash: charterHash,
       project_status: 'step_0_approved',
+      updated_at: new Date().toISOString(),
     })
     .eq('id', projectId)
 
@@ -146,7 +165,7 @@ export async function approveCharter(projectId: string, approvedBy: string): Pro
   // Flip Stage 1 to 'available'
   const { error: stageError } = await db
     .from('cbcc_project_stages')
-    .update({ stage_status: 'available' })
+    .update({ stage_status: 'available', updated_at: new Date().toISOString() })
     .eq('project_id', projectId)
     .eq('stage_number', 1)
 

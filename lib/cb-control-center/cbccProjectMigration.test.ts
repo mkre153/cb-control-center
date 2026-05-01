@@ -44,14 +44,9 @@ describe('CBCC v2 migration — 20260501010000_cbcc_projects', () => {
     expect(sql).toContain('CONSTRAINT')
   })
 
-  it('seed trigger inserts 7 stage rows', () => {
+  it('does not rely on a DB seed trigger (stages are seeded in app code)', () => {
     if (!sql) sql = fs.readFileSync(MIGRATION_PATH, 'utf-8')
-    expect(sql).toContain('cbcc_seed_project_stages')
-    expect(sql).toContain('CREATE TRIGGER')
-    // Seven stage inserts — count the VALUES rows by stage numbers 1–7
-    for (let i = 1; i <= 7; i++) {
-      expect(sql).toContain(`NEW.id, ${i},`)
-    }
+    expect(sql).not.toContain('cbcc_seed_project_stages')
   })
 
   it('project_status CHECK includes all required values', () => {
