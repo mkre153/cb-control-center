@@ -142,6 +142,37 @@ workstream. Violating any one is grounds for reverting the phase.
 
 ---
 
+## Risk rules
+
+Used to order the cluster-relocation phases and decide what belongs in
+this workstream vs. a separate one.
+
+1. **Test-only moves are lowest risk.** No callers outside the moved
+   files; only path/import rewrites inside. Part 8C is the canonical
+   example.
+
+2. **Zero-import source clusters are next.** Files with 0 imports from
+   `app/` and `components/` can move without touching any caller.
+   Examples: `dapSource*`, `clientBuilder*`.
+
+3. **Bridge, stage-content, public, and route-layer changes are
+   high risk.** Bridge files (`cbccEngineRegistry`, translators,
+   Part 7 wiring) sit on the engine-↔-app seam. Stage content
+   (`dapStageGates.ts`, 17 imports) and public UX (`dapPublicUx*`,
+   34 imports) have the broadest caller surface. Route-layer changes
+   touch live URLs. None of these belong in early phases; they should
+   land last and be validated with live smoke tests.
+
+4. **AI-review duplicate resolution is runtime consolidation, not
+   structural cleanup.** Cutting `app/api/businesses/dental-advantage-plan/stages/review/route.ts`
+   from the legacy `dapStageReviewer.ts` over to the generic
+   `lib/cbcc/aiReview.ts` + DAP adapter changes runtime wiring —
+   not file location. It belongs in its own future part with its own
+   verification (curl the API, confirm advisory-only invariants, etc.),
+   and must not be mixed into a structural-move commit.
+
+---
+
 ## Phases completed
 
 | Phase | Description | Commit |
@@ -155,7 +186,7 @@ workstream. Violating any one is grounds for reverting the phase.
 
 ## Next proposed phase (NOT YET STARTED)
 
-**Phase 3 — Low-risk / zero-import source clusters.**
+**Phase 3 / Part 8D — Low-risk / zero-import source clusters.**
 
 Target candidates (in expected order of safety):
 
@@ -170,7 +201,7 @@ Target candidates (in expected order of safety):
 Each cluster moves on its own commit, validated against all four
 gates, before the next cluster begins.
 
-**Do not start Phase 3 until explicitly approved.**
+**Do not start Phase 3 / Part 8D until explicitly approved.**
 
 ---
 
