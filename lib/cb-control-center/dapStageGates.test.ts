@@ -25,6 +25,7 @@ import {
   type DapStageStatus,
 } from './dapStageGates'
 import { DAP_BUILD_LEDGER } from './dapBuildLedger'
+import { DAP_BUSINESS_DEFINITION } from './dapBusinessDefinition'
 
 const VALID_STATUSES: DapStageStatus[] = [
   'not_started', 'ready_for_directive', 'directive_issued', 'in_progress',
@@ -435,5 +436,133 @@ describe('Group 8 — Blocker integrity', () => {
         ).toBe(0)
       }
     }
+  })
+})
+
+// ─── Group 9: Artifact integrity ──────────────────────────────────────────────
+
+describe('Group 9 — Artifact integrity', () => {
+  it('every approved stage has an artifact', () => {
+    for (const s of DAP_STAGE_GATES) {
+      if (s.status === 'approved') {
+        expect(
+          s.artifact,
+          `${s.stageId} is approved but has no artifact`
+        ).toBeDefined()
+      }
+    }
+  })
+
+  it('every awaiting_owner_approval stage has a reviewable artifact', () => {
+    for (const s of DAP_STAGE_GATES) {
+      if (s.status === 'awaiting_owner_approval') {
+        expect(
+          s.artifact,
+          `${s.stageId} is awaiting_owner_approval but has no artifact`
+        ).toBeDefined()
+        if (s.artifact) {
+          expect(
+            ['reviewable', 'approved'],
+            `${s.stageId} artifact status is not reviewable`
+          ).toContain(s.artifact.status)
+        }
+      }
+    }
+  })
+
+  it('approved stage artifacts must include approvedAt and approvedBy', () => {
+    for (const s of DAP_STAGE_GATES) {
+      if (s.status === 'approved' && s.artifact) {
+        expect(
+          s.artifact.approvedAt,
+          `${s.stageId} artifact missing approvedAt`
+        ).toBeTruthy()
+        expect(
+          s.artifact.approvedBy,
+          `${s.stageId} artifact missing approvedBy`
+        ).toBeTruthy()
+      }
+    }
+  })
+
+  it('Stage 1 has artifact of type business_definition', () => {
+    const s1 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-01-business-definition')!
+    expect(s1.artifact).toBeDefined()
+    expect(s1.artifact?.type).toBe('business_definition')
+  })
+
+  it('Stage 1 artifact is the DAP_BUSINESS_DEFINITION export', () => {
+    const s1 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-01-business-definition')!
+    expect(s1.artifact).toBe(DAP_BUSINESS_DEFINITION)
+  })
+
+  it('Stage 1 artifact includes whatItIs with at least 3 items', () => {
+    const artifact = DAP_BUSINESS_DEFINITION
+    expect(artifact.whatItIs.length).toBeGreaterThanOrEqual(3)
+    expect(artifact.whatItIs.join(' ')).toContain('registry')
+  })
+
+  it('Stage 1 artifact includes whatItIsNot with at least 4 items', () => {
+    const artifact = DAP_BUSINESS_DEFINITION
+    expect(artifact.whatItIsNot.length).toBeGreaterThanOrEqual(4)
+    expect(artifact.whatItIsNot.join(' ')).toContain('not dental insurance')
+  })
+
+  it('Stage 1 artifact includes primaryCustomer', () => {
+    expect(DAP_BUSINESS_DEFINITION.primaryCustomer).toBeTruthy()
+    expect(DAP_BUSINESS_DEFINITION.primaryCustomer).toContain('without dental insurance')
+  })
+
+  it('Stage 1 artifact includes primaryConversionGoal', () => {
+    expect(DAP_BUSINESS_DEFINITION.primaryConversionGoal).toBeTruthy()
+    expect(DAP_BUSINESS_DEFINITION.primaryConversionGoal).toContain('search')
+  })
+
+  it('Stage 1 artifact includes allowedClaims with at least 3 items', () => {
+    expect(DAP_BUSINESS_DEFINITION.allowedClaims.length).toBeGreaterThanOrEqual(3)
+    expect(DAP_BUSINESS_DEFINITION.allowedClaims.join(' ')).toContain('participating dentists')
+  })
+
+  it('Stage 1 artifact includes forbiddenClaims with at least 5 items', () => {
+    expect(DAP_BUSINESS_DEFINITION.forbiddenClaims.length).toBeGreaterThanOrEqual(5)
+    expect(DAP_BUSINESS_DEFINITION.forbiddenClaims.join(' ')).toContain('DAP is dental insurance')
+  })
+
+  it('Stage 1 artifact forbidden claims do not include "insurance alternative"', () => {
+    // forbidden claims list items, not the assertions themselves, must not use forbidden copy
+    const allowedClaimsText = DAP_BUSINESS_DEFINITION.allowedClaims.join(' ')
+    expect(allowedClaimsText).not.toContain('insurance alternative')
+    expect(allowedClaimsText).not.toContain('dental coverage')
+    expect(allowedClaimsText).not.toContain('guaranteed savings')
+  })
+
+  it('Stage 1 artifact includes 7 truth rules', () => {
+    expect(DAP_BUSINESS_DEFINITION.truthRules.length).toBe(7)
+  })
+
+  it('Stage 1 artifact truth rules cover PHI prohibition', () => {
+    expect(DAP_BUSINESS_DEFINITION.truthRules.join(' ')).toContain('PHI')
+  })
+
+  it('Stage 1 artifact truth rules cover claims/payments prohibition', () => {
+    const rules = DAP_BUSINESS_DEFINITION.truthRules.join(' ')
+    expect(rules).toContain('claims')
+    expect(rules).toContain('pays providers')
+  })
+
+  it('Stage 1 artifact has status "approved"', () => {
+    expect(DAP_BUSINESS_DEFINITION.status).toBe('approved')
+  })
+
+  it('Stage 1 artifact approvedAt is 2026-04-30', () => {
+    expect(DAP_BUSINESS_DEFINITION.approvedAt).toBe('2026-04-30')
+  })
+
+  it('Stage 1 artifact approvedBy is Owner', () => {
+    expect(DAP_BUSINESS_DEFINITION.approvedBy).toBe('Owner')
+  })
+
+  it('Stage 1 artifact sourceFiles includes dapBusinessDefinition.ts', () => {
+    expect(DAP_BUSINESS_DEFINITION.sourceFiles.join(' ')).toContain('dapBusinessDefinition.ts')
   })
 })

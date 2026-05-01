@@ -5,6 +5,7 @@ import {
   type DapStageStatus,
   type DapStageEvidence,
 } from '@/lib/cb-control-center/dapStageGates'
+import { StageArtifactPanel } from './StageArtifactPanel'
 
 // ─── Status display ───────────────────────────────────────────────────────────
 
@@ -200,6 +201,9 @@ function StageGateCard({ stage, isActive }: { stage: DapStageGate; isActive: boo
           {stage.whyItMatters}
         </p>
       )}
+
+      {/* Artifact — rendered for all stages that have one */}
+      {stage.artifact && <StageArtifactPanel artifact={stage.artifact} />}
 
       {/* Evidence */}
       <EvidenceBlock ev={stage.implementationEvidence} stageId={stage.stageId} />

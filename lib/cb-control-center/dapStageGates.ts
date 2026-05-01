@@ -12,6 +12,12 @@
  * nextStageUnlocked in this file, then commit. Every approval is auditable in git.
  */
 
+import {
+  DAP_BUSINESS_DEFINITION,
+  type StageArtifact,
+} from './dapBusinessDefinition'
+import { DAP_TRUTH_SCHEMA_ARTIFACT } from './dapTruthSchemaArtifact'
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type DapStageStatus =
@@ -54,6 +60,7 @@ export interface DapStageGate {
   readonly requiredApprovals: readonly string[]
   readonly blockers: readonly string[]  // unresolved blockers preventing approval
   readonly ledgerPhaseId?: string       // cross-reference to dapBuildLedger entry
+  readonly artifact?: StageArtifact    // reviewable artifact — required for approved/awaiting stages
 }
 
 // ─── Registry ─────────────────────────────────────────────────────────────────
@@ -102,6 +109,7 @@ export const DAP_STAGE_GATES: readonly DapStageGate[] = [
     ],
     blockers: [],
     ledgerPhaseId: 'phase-18e-cbcc-workspace-shell',
+    artifact: DAP_BUSINESS_DEFINITION,
   },
 
   {
@@ -164,6 +172,7 @@ Do not begin Stage 3 until this approval is recorded.`,
     ],
     blockers: [],
     ledgerPhaseId: 'phase-18c-page-generation-contract',
+    artifact: DAP_TRUTH_SCHEMA_ARTIFACT,
   },
 
   {
@@ -284,6 +293,18 @@ Do not begin Stage 5 implementation until this approval is recorded.`,
     ],
     blockers: [],
     ledgerPhaseId: 'phase-18d-dap-page-brief-builder',
+    artifact: {
+      type: 'site_strategy',
+      title: 'DAP Page Strategy',
+      status: 'reviewable',
+      summary:
+        'Defines the full page type strategy for all 8 DAP page types: required sections, SEO/AEO role, conversion role, CTA rules, forbidden patterns, and brief builder output. Governs every patient-facing page.',
+      sourceFiles: [
+        'lib/cb-control-center/cbSeoAeoPageGeneration.ts',
+        'lib/cb-control-center/dapPageBriefBuilder.ts',
+        'app/preview/dap/page-briefs/page.tsx',
+      ],
+    } as StageArtifact,
   },
 
   {
@@ -362,6 +383,24 @@ Stop condition: awaiting owner approval in CBCC before Stage 6 begins.`,
     ],
     blockers: [],
     ledgerPhaseId: 'phase-19a-dap-homepage-foundation',
+    artifact: {
+      type: 'build_output',
+      title: 'DAP Homepage — Phase 19A',
+      status: 'reviewable',
+      summary:
+        'Rebuilt root homepage from a 1,132-line monolith to 7 modular server-component sections. All 7 DAP truth rules enforced. No forbidden claims present. ZIP/search tool above the fold. Visual acceptance check passed.',
+      sourceFiles: [
+        'src/app/page.tsx (rebuild/dap-site-v2)',
+        'src/components/homepage/HomepageHero.tsx',
+        'src/components/homepage/HomepageHowItWorks.tsx',
+        'src/components/homepage/HomepageWhatIsIncluded.tsx',
+        'src/components/homepage/HomepageComparison.tsx',
+        'src/components/homepage/HomepageWhoIsThisFor.tsx',
+        'src/components/homepage/HomepageFaqPreview.tsx',
+        'src/components/homepage/HomepageFinalCta.tsx',
+        'src/lib/homepage.test.ts',
+      ],
+    } as StageArtifact,
   },
 
   {
