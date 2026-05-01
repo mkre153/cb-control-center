@@ -156,10 +156,10 @@ export const DAP_BUILD_LEDGER: readonly DapBuildLedgerEntry[] = [
   {
     id: 'dap-rebuild-v2-branch-created',
     title: 'DAP Site Rebuild — rebuild/dap-site-v2 Created',
-    status: 'in_progress',
+    status: 'complete',
     summary:
-      'rebuild/dap-site-v2 branched from dap-storybrand-homepage at checkpoint commit 0951018. Working tree was clean before branching — no modified files, no untracked files, tsconfig.tsbuildinfo restored. Branch pushed to remote. Ready for homepage rebuild using Phase 18C/D contracts as governing blueprint.',
-    completedAt: null,
+      'rebuild/dap-site-v2 branched from dap-storybrand-homepage at checkpoint commit 0951018. Working tree was clean before branching — no modified files, no untracked files, tsconfig.tsbuildinfo restored. Branch pushed to remote. Homepage rebuild (Phase 19A) completed on this branch.',
+    completedAt: '2026-04-30',
     recordedAt: '2026-04-30',
     verification: 'recorded_from_operator_report',
     evidence: [
@@ -171,8 +171,29 @@ export const DAP_BUILD_LEDGER: readonly DapBuildLedgerEntry[] = [
         message: 'checkpoint: confirmed-provider filter + hero directives + competitive audit',
       },
     ],
+  },
+
+  {
+    id: 'phase-19a-dap-homepage-foundation',
+    title: 'Phase 19A — DAP Homepage Foundation',
+    status: 'complete',
+    summary:
+      'Rebuilt root homepage (src/app/page.tsx) from 1,132-line monolith into 7 modular server-component sections governed by Phase 18C/D CBCC contracts. All 7 DAP truth rules enforced in rendered output. 12 forbidden claims confirmed absent. vitest.config.ts added to resolve @/ alias. Safety test suite added (src/lib/homepage.test.ts, 40 tests). Visual acceptance check passed: patient-first framing, ZIP/search tool above fold, no v5 or admin language, CTAs point to #find-dentists and /the-plan only.',
+    completedAt: '2026-04-30',
+    recordedAt: '2026-04-30',
+    verification: 'verified_by_test',
+    evidence: [
+      { type: 'git_branch', name: 'rebuild/dap-site-v2' },
+      {
+        type: 'git_commit',
+        hash: 'a853380',
+        message: 'phase-19a: DAP homepage foundation — contract-governed, modular, test-protected',
+      },
+      { type: 'file', path: 'src/components/homepage/' },
+      { type: 'test_suite', name: 'homepage', passing: 49 },
+    ],
     nextAction:
-      'Begin DAP homepage rebuild on rebuild/dap-site-v2. Use Phase 18C page generation contracts and Phase 18D page brief builder as governing blueprint. Start with homepage (type: homepage in cbSeoAeoPageGeneration).',
+      'Build city pages using Phase 18C city_page contract. Start with /dental-advantage-plan/[city] route on rebuild/dap-site-v2.',
   },
 
 ] as const

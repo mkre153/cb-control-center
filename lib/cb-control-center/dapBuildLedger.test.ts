@@ -256,10 +256,27 @@ describe('Group 4 — Content accuracy', () => {
     expect(entry?.status).toBe('complete')
   })
 
-  it('DAP rebuild v2 branch entry exists and is in_progress', () => {
+  it('DAP rebuild v2 branch entry exists and is complete', () => {
     const entry = DAP_BUILD_LEDGER.find(e => e.id === 'dap-rebuild-v2-branch-created')
     expect(entry).toBeDefined()
-    expect(entry?.status).toBe('in_progress')
+    expect(entry?.status).toBe('complete')
+  })
+
+  it('Phase 19A entry exists and is complete', () => {
+    const entry = DAP_BUILD_LEDGER.find(e => e.id === 'phase-19a-dap-homepage-foundation')
+    expect(entry).toBeDefined()
+    expect(entry?.status).toBe('complete')
+  })
+
+  it('Phase 19A test suite passes 49', () => {
+    const entry = DAP_BUILD_LEDGER.find(e => e.id === 'phase-19a-dap-homepage-foundation')!
+    const suite = entry.evidence.find(ev => ev.type === 'test_suite') as { type: 'test_suite'; name: string; passing: number }
+    expect(suite.passing).toBe(49)
+  })
+
+  it('Phase 19A verification is verified_by_test', () => {
+    const entry = DAP_BUILD_LEDGER.find(e => e.id === 'phase-19a-dap-homepage-foundation')!
+    expect(entry.verification).toBe('verified_by_test')
   })
 
   it('archive entry verification is recorded_from_operator_report', () => {
@@ -374,10 +391,6 @@ describe('Group 6 — Display component renders correctly', () => {
     expect(render()).toContain('Complete')
   })
 
-  it('renders at least one in-progress entry', () => {
-    expect(render()).toContain('In Progress')
-  })
-
   it('renders all ledger entry ids as data attributes', () => {
     const html = render()
     for (const entry of DAP_BUILD_LEDGER) {
@@ -392,6 +405,7 @@ describe('Group 6 — Display component renders correctly', () => {
     expect(html).toContain('74 passing')
     expect(html).toContain('243 passing')
     expect(html).toContain('277 passing')
+    expect(html).toContain('49 passing')
   })
 
   it('does not claim to be auto-synced or real-time', () => {
