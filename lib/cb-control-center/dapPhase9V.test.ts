@@ -607,7 +607,7 @@ describe('Phase 9V — Practice preview page renders dispatch readiness language
 
 describe('Phase 9V — Full suite guard', () => {
   it('page count is still 23', () => {
-    expect(findPages(join(ROOT, 'app')).length).toBe(53)
+    expect(findPages(join(ROOT, 'app')).length).toBe(57)
   })
 
   it('Phase 9T preview helper still returns 8 previews', () => {

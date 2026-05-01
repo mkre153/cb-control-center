@@ -199,9 +199,14 @@ describe('Current production route inventory', () => {
     'app/preview/dap/page-briefs/page.tsx',
     // DAP stage detail pages (Phase 19C)
     'app/businesses/dental-advantage-plan/build/stages/[stageSlug]/page.tsx',
+    // CBCC v2 project registry routes (Step 0)
+    'app/projects/page.tsx',
+    'app/projects/new/page.tsx',
+    'app/projects/[slug]/page.tsx',
+    'app/projects/[slug]/charter/page.tsx',
   ]
 
-  it('exactly 53 page.tsx files in app/ (Phase 19C added stage detail route)', () => {
+  it('exactly 57 page.tsx files in app/ (CBCC v2 added project routes)', () => {
     const found = findFiles(join(ROOT, 'app'), f => f.endsWith('page.tsx'))
     expect(found.length).toBe(KNOWN_ROUTES.length)
   })

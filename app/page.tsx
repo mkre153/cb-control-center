@@ -1,5 +1,7 @@
-import { CbHomeDashboard } from '@/components/cb-control-center/CbHomeDashboard'
+import { CbccProjectRegistry } from '@/components/cb-control-center/v2/CbccProjectRegistry'
+import { listProjects } from '@/lib/cb-control-center/cbccProjectRepository'
 
-export default function CBControlCenterHomePage() {
-  return <CbHomeDashboard />
+export default async function CBControlCenterHomePage() {
+  const projects = await listProjects().catch(() => [])
+  return <CbccProjectRegistry projects={projects} />
 }

@@ -155,9 +155,9 @@ describe('Group 4 — Navigation architecture', () => {
     expect(src).not.toContain('SimulationShell')
   })
 
-  it('app/page.tsx imports CbHomeDashboard', () => {
+  it('app/page.tsx imports CbccProjectRegistry (v2 home)', () => {
     const src = readFileSync(resolve(ROOT, 'app/page.tsx'), 'utf8')
-    expect(src).toContain('CbHomeDashboard')
+    expect(src).toContain('CbccProjectRegistry')
   })
 
   it('DAP build pipeline page imports StagePipelineOverview (overview links to per-stage detail pages)', () => {

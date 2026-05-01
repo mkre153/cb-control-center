@@ -455,6 +455,7 @@ describe('Boundary preservation', () => {
       'supabase/migrations/20260430000001_dap_communication_approval_events.sql',
       'supabase/migrations/20260430000002_dap_communication_dry_run_events.sql',
       'supabase/migrations/20260430000003_dap_admin_decision_events.sql',
+      'supabase/migrations/20260501010000_cbcc_projects.sql',
     ]
     const unexpected = sqlFiles.filter(f => !KNOWN_MIGRATIONS.some(k => f.endsWith(k)))
     expect(unexpected).toHaveLength(0)

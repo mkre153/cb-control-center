@@ -381,7 +381,7 @@ describe('API route enforces safety invariants', () => {
 // ─── Group 6: Route boundary preserved ───────────────────────────────────────
 
 describe('Route boundary preserved — no new page routes added', () => {
-  const KNOWN_PAGE_COUNT = 53 // Phase 19C added stage detail route
+  const KNOWN_PAGE_COUNT = 57 // CBCC v2 added projects routes
 
   it('total page.tsx count is 34 (Phase 16 added admin-decision-audit preview)', () => {
     const found = findFiles(join(ROOT, 'app'), f => f.endsWith('page.tsx'))

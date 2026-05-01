@@ -693,18 +693,18 @@ describe('Phase 9Z — dry-run preview page renders all 16 templates', () => {
   })
 
   it('page count is now 25 (Phase 9Z added communication-dry-runs page)', () => {
-    expect(findPages(join(ROOT, 'app')).length).toBe(53)
+    expect(findPages(join(ROOT, 'app')).length).toBe(57)
   })
 })
 
 // ─── Group 13: Full suite guard ───────────────────────────────────────────────
 
 describe('Phase 9Z — full suite guard', () => {
-  it('migration inventory has 9 known migrations', () => {
+  it('migration inventory has 10 known migrations', () => {
     const { readdirSync } = require('fs')
     const dir   = resolve(ROOT, 'supabase/migrations')
     const files = readdirSync(dir).filter((f: string) => f.endsWith('.sql'))
-    expect(files).toHaveLength(9)
+    expect(files).toHaveLength(10)
   })
 
   it('dry-run migration exists', () => {

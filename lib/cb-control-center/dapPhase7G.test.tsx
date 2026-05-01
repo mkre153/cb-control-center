@@ -188,9 +188,14 @@ describe('Route file inventory', () => {
     'app/preview/dap/page-briefs/page.tsx',
     // DAP stage detail pages (Phase 19C)
     'app/businesses/dental-advantage-plan/build/stages/[stageSlug]/page.tsx',
+    // CBCC v2 project registry routes (Step 0)
+    'app/projects/page.tsx',
+    'app/projects/new/page.tsx',
+    'app/projects/[slug]/page.tsx',
+    'app/projects/[slug]/charter/page.tsx',
   ]
 
-  it('exactly 53 page.tsx files exist in app/ (Phase 18D added DAP page brief preview)', () => {
+  it('exactly 57 page.tsx files exist in app/ (CBCC v2 added project routes)', () => {
     const found = findFiles(join(ROOT, 'app'), f => f.endsWith('page.tsx'))
     expect(found.length).toBe(KNOWN_ROUTES.length)
   })
@@ -227,6 +232,7 @@ describe('Route file inventory', () => {
       '/guides/',
       '/treatments/',
       '/businesses/',
+      '/projects/',
     ]
     const found = findFiles(join(ROOT, 'app'), f => f.endsWith('page.tsx'))
     const unexpected = found.filter(f => {
