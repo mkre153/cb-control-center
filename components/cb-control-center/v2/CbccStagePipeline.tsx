@@ -37,10 +37,10 @@ export function CbccStagePipeline({ project, stages }: Props) {
             key={vis.stageNumber}
             data-stage-number={vis.stageNumber}
             data-stage-status={vis.status}
-            className={`flex items-center justify-between px-4 py-2.5 border rounded font-mono text-sm ${
+            className={`flex items-center justify-between px-4 py-2.5 border rounded-md text-sm ${
               isLocked
-                ? 'border-[#1e2d45] bg-[#0f1520]'
-                : 'border-[#1e3a5f] bg-[#0f1f35]'
+                ? 'border-gray-800 bg-gray-900'
+                : 'border-blue-900/50 bg-blue-950/30'
             }`}
           >
             <span className={isLocked ? 'text-gray-600' : 'text-gray-300'}>{title}</span>

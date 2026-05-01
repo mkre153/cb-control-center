@@ -28,34 +28,34 @@ export function CbccCharterPanel({ project }: Props) {
   const charter = project.charterJson
 
   return (
-    <div className="min-h-screen bg-[#0d1117] font-mono text-gray-300">
+    <div className="min-h-screen bg-gray-950 font-sans text-gray-300">
       {/* Nav */}
-      <nav className="border-b border-[#1e2d45] px-6 py-3 flex items-center justify-between">
+      <nav className="border-b border-gray-800 px-6 py-3 flex items-center justify-between bg-gray-900">
         <Link href="/" className="text-blue-400 font-semibold tracking-tight hover:text-blue-300">
           CB Control Center
         </Link>
         <Link
           href="/projects/new"
-          className="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded transition-colors"
+          className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors"
         >
           + New Project
         </Link>
       </nav>
 
-      <div className="max-w-3xl mx-auto px-6 py-10">
+      <div className="max-w-3xl mx-auto px-6 py-8">
         {/* Breadcrumb */}
         <div className="mb-6">
-          <Link href={`/projects/${project.slug}`} className="text-xs text-gray-600 hover:text-gray-400">
+          <Link href={`/projects/${project.slug}`} className="text-xs text-gray-500 hover:text-gray-400">
             ← {project.name}
           </Link>
         </div>
 
         {/* Header */}
         <div data-charter-panel className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-100">Step 0 — Project Charter</h2>
+          <h2 className="text-2xl font-bold text-white">Step 0 — Project Charter</h2>
           <p
             data-charter-status
-            className="mt-1 text-xs text-gray-500"
+            className="mt-1 text-sm text-gray-400"
           >
             {project.charterApproved
               ? 'Charter Approved'
@@ -67,7 +67,7 @@ export function CbccCharterPanel({ project }: Props) {
 
         {/* Blocked banner */}
         {!project.charterApproved && (
-          <div className="mb-6 px-4 py-3 bg-amber-900/20 border border-amber-700/40 rounded text-sm text-amber-400">
+          <div className="mb-6 px-4 py-3 rounded-md bg-amber-900/20 border border-amber-700/40 text-sm text-amber-400">
             <strong>Blocked:</strong> Step 0 Project Charter requires owner approval before Stage 1 can begin.
           </div>
         )}
@@ -83,7 +83,7 @@ export function CbccCharterPanel({ project }: Props) {
               type="submit"
               disabled={genPending}
               data-action="generate-charter"
-              className="px-5 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm rounded transition-colors"
+              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium rounded-md transition-colors"
             >
               {genPending ? 'Generating charter...' : 'Generate Charter'}
             </button>
@@ -105,7 +105,7 @@ export function CbccCharterPanel({ project }: Props) {
             <Section title="Approval Authority" content={charter.approvalAuthority} field="approvalAuthority" />
             <div
               data-charter-field="scopeNote"
-              className="px-4 py-3 bg-[#0f1520] border border-[#1e2d45] rounded text-xs text-gray-600"
+              className="px-4 py-3 rounded-md bg-gray-900 border border-gray-800 text-xs text-gray-500"
             >
               <strong className="text-gray-500">Scope Note:</strong> This charter approves project scope only. It does not approve claims, positioning, compliance language, SEO strategy, page content, or build decisions.
             </div>
@@ -124,7 +124,7 @@ export function CbccCharterPanel({ project }: Props) {
               type="submit"
               disabled={approvePending}
               data-action="approve-charter"
-              className="px-5 py-2 bg-green-700 hover:bg-green-600 disabled:opacity-50 text-white text-sm rounded transition-colors"
+              className="px-5 py-2 bg-green-700 hover:bg-green-600 disabled:opacity-50 text-white text-sm font-medium rounded-md transition-colors"
             >
               {approvePending ? 'Approving...' : 'Approve Charter'}
             </button>
@@ -135,7 +135,7 @@ export function CbccCharterPanel({ project }: Props) {
         )}
 
         {project.charterApproved && (
-          <div className="px-4 py-3 bg-green-900/20 border border-green-700/40 rounded text-sm text-green-400">
+          <div className="px-4 py-3 rounded-md bg-green-900/20 border border-green-700/40 text-sm text-green-400">
             Charter approved by {project.charterApprovedBy} on{' '}
             {project.charterApprovedAt
               ? new Date(project.charterApprovedAt).toLocaleDateString()
@@ -150,7 +150,7 @@ export function CbccCharterPanel({ project }: Props) {
 
 function Section({ title, content, field }: { title: string; content: string; field: string }) {
   return (
-    <div data-charter-field={field} className="border border-[#1e2d45] rounded px-4 py-3 bg-[#161b27]">
+    <div data-charter-field={field} className="border border-gray-800 rounded-md px-4 py-3 bg-gray-900">
       <p className="text-xs text-gray-600 uppercase tracking-widest mb-1">{title}</p>
       <p className="text-sm text-gray-300">{content}</p>
     </div>
@@ -159,7 +159,7 @@ function Section({ title, content, field }: { title: string; content: string; fi
 
 function ListSection({ title, items, field }: { title: string; items: string[]; field: string }) {
   return (
-    <div data-charter-field={field} className="border border-[#1e2d45] rounded px-4 py-3 bg-[#161b27]">
+    <div data-charter-field={field} className="border border-gray-800 rounded-md px-4 py-3 bg-gray-900">
       <p className="text-xs text-gray-600 uppercase tracking-widest mb-2">{title}</p>
       <ul className="space-y-1">
         {items.map((item, i) => (
