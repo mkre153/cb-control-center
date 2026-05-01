@@ -239,6 +239,15 @@ export type CbccStagePageAiReviewStatus =
 export interface CbccStagePageAiReviewPlaceholder {
   status: CbccStagePageAiReviewStatus
   summary?: string
+  // Display-only fields populated when an AI review result is supplied to
+  // the page-model builder. None of these affect deterministic approval —
+  // see ARCHITECTURE.md ("AI recommends. CBCC enforces. Owner approves.").
+  decision?: CbccAiReviewDecision
+  risks?: ReadonlyArray<CbccAiReviewRisk>
+  recommendation?: CbccAiReviewRecommendation
+  reviewedAt?: string
+  model?: string
+  promptVersion?: string
 }
 
 // ─── AI review (Part 4A — contract only) ──────────────────────────────────────

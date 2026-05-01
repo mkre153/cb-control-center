@@ -271,19 +271,8 @@ function normalizeRisks(raw: unknown, errors: string[]): ReadonlyArray<CbccAiRev
   return out
 }
 
-// ─── Re-export types for ergonomics ──────────────────────────────────────────
-
-export type {
-  CbccAiReviewDecision,
-  CbccAiReviewPromptPacket,
-  CbccAiReviewRecommendation,
-  CbccAiReviewRecommendationAction,
-  CbccAiReviewResult,
-  CbccAiReviewRisk,
-  CbccAiReviewRiskSeverity,
-} from './types'
-
 // Convenience: a sentinel for "not yet reviewed". Callers may use this when
 // constructing a stage page model that has no review yet, but the engine
-// itself never auto-creates results — only normalize does.
+// itself never auto-creates results — only normalize does. Types are
+// surfaced from the public barrel (lib/cbcc/index.ts).
 export const CBCC_AI_REVIEW_NOT_REQUESTED = Object.freeze({ status: 'not_requested' as const })

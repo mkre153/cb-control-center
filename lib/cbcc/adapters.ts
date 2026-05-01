@@ -7,9 +7,10 @@
 // Part 1 ships only the interface and a small registry helper. Concrete
 // adapters come later.
 
+// CbccProjectAdapter and related types live in ./types and are re-exported
+// from the public barrel (./index). This module supplies only the runtime
+// helpers (registry, type-guard, constructor).
 import type { CbccProjectAdapter } from './types'
-
-export type { CbccProjectAdapter } from './types'
 
 // ─── Adapter registry (in-memory, pure) ───────────────────────────────────────
 

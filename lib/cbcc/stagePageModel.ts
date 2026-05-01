@@ -16,6 +16,7 @@
 // neighboring stages exist.
 
 import type {
+  CbccAiReviewResult,
   CbccEvidenceLedger,
   CbccEvidenceRequirement,
   CbccProject,
@@ -24,6 +25,7 @@ import type {
   CbccStageDefinition,
   CbccStageId,
   CbccStagePageAction,
+  CbccStagePageAiReviewPlaceholder,
   CbccStagePageBlocker,
   CbccStagePageModel,
   CbccStagePageNavigation,
@@ -47,6 +49,33 @@ export interface BuildCbccStagePageModelInput {
   // Optional: the surrounding project's lifecycle status. Defaults to
   // 'active'. Affects locking (paused projects lock everything).
   projectStatus?: CbccProjectStatus
+  // Optional: a normalized AI review result to surface as display-only data
+  // on the page model. AI review NEVER affects approval/locking/blockers —
+  // see ARCHITECTURE.md. The result must match (projectId, currentStageId);
+  // mismatches throw a CbccStagePageModelMismatchError so callers detect
+  // the bug early instead of silently rendering stale data.
+  aiReviewResult?: CbccAiReviewResult
+}
+
+// Thrown when an AI review result is supplied with identity that does not
+// match the page being built. This is a programmer error, not a runtime
+// condition — it indicates the caller wired the wrong review to the wrong
+// page. We throw rather than ignore because deterministic safety > silent
+// drift.
+export class CbccStagePageModelMismatchError extends Error {
+  readonly expected: { projectId: string; stageId: CbccStageId }
+  readonly received: { projectId: string; stageId: CbccStageId | number }
+  constructor(
+    expected: { projectId: string; stageId: CbccStageId },
+    received: { projectId: string; stageId: CbccStageId | number },
+  ) {
+    super(
+      `aiReviewResult identity mismatch: expected (${expected.projectId}, ${expected.stageId}), got (${received.projectId}, ${received.stageId})`,
+    )
+    this.name = 'CbccStagePageModelMismatchError'
+    this.expected = expected
+    this.received = received
+  }
 }
 
 const DEFAULT_PROJECT_STATUS: CbccProjectStatus = 'active'
@@ -264,6 +293,42 @@ export function buildStagePageModel(
 
     availableActions,
 
-    aiReview: { status: 'not_requested' },
+    aiReview: buildAiReviewPlaceholder(input, def.id),
+  }
+}
+
+// ─── AI review surfacing ──────────────────────────────────────────────────────
+//
+// Pure projection from CbccAiReviewResult to the page-model's display-only
+// placeholder. Throws on identity mismatch; otherwise either returns the
+// 'not_requested' default or copies the relevant fields out.
+//
+// Critical: this function is the ONLY place AI review enters the page model.
+// It runs after approval/locking/blockers have been computed, so there is
+// no path by which AI review can affect deterministic state.
+
+function buildAiReviewPlaceholder(
+  input: BuildCbccStagePageModelInput,
+  currentStageId: CbccStageId,
+): CbccStagePageAiReviewPlaceholder {
+  const result = input.aiReviewResult
+  if (!result) return { status: 'not_requested' }
+
+  if (result.projectId !== input.projectId || result.stageId !== currentStageId) {
+    throw new CbccStagePageModelMismatchError(
+      { projectId: input.projectId, stageId: currentStageId },
+      { projectId: result.projectId, stageId: result.stageId },
+    )
+  }
+
+  return {
+    status: 'available',
+    summary: result.summary,
+    decision: result.decision,
+    risks: result.risks,
+    recommendation: result.recommendation,
+    reviewedAt: result.reviewedAt,
+    model: result.model,
+    promptVersion: result.promptVersion,
   }
 }

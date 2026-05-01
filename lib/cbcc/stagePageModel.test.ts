@@ -1,6 +1,11 @@
 import { describe, it, expect } from 'vitest'
-import { buildStagePageModel, type BuildCbccStagePageModelInput } from './stagePageModel'
+import {
+  buildStagePageModel,
+  CbccStagePageModelMismatchError,
+  type BuildCbccStagePageModelInput,
+} from './stagePageModel'
 import type {
+  CbccAiReviewResult,
   CbccEvidenceEntry,
   CbccEvidenceRequirement,
   CbccStageDefinition,
@@ -310,7 +315,7 @@ describe('evidence summary + validation present in model', () => {
 })
 
 describe('AI review placeholder', () => {
-  it('always returns status=not_requested in Part 3', () => {
+  it('returns status=not_requested when no aiReviewResult is supplied', () => {
     const m = buildStagePageModel(makeInput())
     expect(m.aiReview).toEqual({ status: 'not_requested' })
   })
@@ -321,6 +326,114 @@ describe('AI review placeholder', () => {
       stageStatuses: { 's-1': 'not_started', 's-2': 'not_started', 's-3': 'not_started' },
     }))
     expect(m.aiReview.status).toBe('not_requested')
+  })
+})
+
+// ─── AI review surfacing (Part 4C) ───────────────────────────────────────────
+
+function makeAiResult(over: Partial<CbccAiReviewResult> = {}): CbccAiReviewResult {
+  return {
+    projectId: PROJECT_ID,
+    stageId: 's-1',
+    decision: 'pass_with_concerns',
+    summary: 'AI says: looks good but two open risks.',
+    recommendation: { action: 'address_risks', rationale: 'risks open' },
+    risks: [{ id: 'risk-1', severity: 'medium', message: 'Coverage gap' }],
+    reviewedAt: NOW,
+    ...over,
+  }
+}
+
+describe('aiReviewResult surfacing', () => {
+  it('copies decision, summary, recommendation, risks, reviewedAt to the placeholder', () => {
+    const result = makeAiResult({ model: 'opus-4-7', promptVersion: 'v1' })
+    const m = buildStagePageModel(makeInput({ aiReviewResult: result }))
+    expect(m.aiReview.status).toBe('available')
+    expect(m.aiReview.summary).toBe(result.summary)
+    expect(m.aiReview.decision).toBe('pass_with_concerns')
+    expect(m.aiReview.recommendation).toEqual(result.recommendation)
+    expect(m.aiReview.risks).toEqual(result.risks)
+    expect(m.aiReview.reviewedAt).toBe(NOW)
+    expect(m.aiReview.model).toBe('opus-4-7')
+    expect(m.aiReview.promptVersion).toBe('v1')
+  })
+
+  it('throws CbccStagePageModelMismatchError when projectId mismatches', () => {
+    expect(() => buildStagePageModel(makeInput({
+      aiReviewResult: makeAiResult({ projectId: 'OTHER' }),
+    }))).toThrow(CbccStagePageModelMismatchError)
+  })
+
+  it('throws CbccStagePageModelMismatchError when stageId mismatches', () => {
+    expect(() => buildStagePageModel(makeInput({
+      currentStageId: 's-1',
+      aiReviewResult: makeAiResult({ stageId: 's-2' }),
+    }))).toThrow(CbccStagePageModelMismatchError)
+  })
+
+  // ── Critical invariant: AI review never alters deterministic state ─────
+
+  it('does NOT make missing required evidence approvable', () => {
+    const reqs: CbccEvidenceRequirement[] = [
+      { id: 'r-test', type: 'test', title: 'Tests passing', required: true },
+    ]
+    const result = makeAiResult({ decision: 'pass' })
+    const m = buildStagePageModel(makeInput({
+      currentStageId: 's-1',
+      stageStatuses: { 's-1': 'awaiting_owner_approval', 's-2': 'not_started', 's-3': 'not_started' },
+      evidenceLedger: [],
+      evidenceRequirements: reqs,
+      aiReviewResult: result,
+    }))
+    expect(m.approval.canApprove).toBe(false)
+    expect(m.approval.isReadyForApproval).toBe(false)
+    expect(m.availableActions).not.toContain('approve_stage')
+    // The blockers must still cite the missing evidence — AI cannot dissolve it.
+    expect(m.blockers.some(b => b.code.startsWith('missing_evidence:'))).toBe(true)
+  })
+
+  it('does NOT unlock a locked stage', () => {
+    const result = makeAiResult({ stageId: 's-2', decision: 'pass' })
+    const m = buildStagePageModel(makeInput({
+      currentStageId: 's-2',
+      stageStatuses: { 's-1': 'not_started', 's-2': 'not_started', 's-3': 'not_started' },
+      aiReviewResult: result,
+    }))
+    expect(m.lock.isLocked).toBe(true)
+    expect(m.approval.canApprove).toBe(false)
+    expect(m.availableActions).not.toContain('approve_stage')
+    // Lock blocker remains.
+    expect(m.blockers.some(b => b.code === 'stage_locked')).toBe(true)
+  })
+
+  it('does NOT make an already-approved stage approvable again', () => {
+    const result = makeAiResult({ decision: 'pass' })
+    const m = buildStagePageModel(makeInput({
+      currentStageId: 's-1',
+      stageStatuses: { 's-1': 'approved', 's-2': 'not_started', 's-3': 'not_started' },
+      aiReviewResult: result,
+    }))
+    expect(m.approval.canApprove).toBe(false)
+    expect(m.approval.reason).toMatch(/already approved/i)
+    expect(m.availableActions).not.toContain('approve_stage')
+  })
+
+  it('does NOT add AI risks to the deterministic blockers list', () => {
+    // AI risks live on m.aiReview.risks; m.blockers stays free of them so
+    // that approval gates never depend on AI output.
+    const result = makeAiResult({
+      risks: [
+        { id: 'r-critical', severity: 'critical', message: 'Catastrophe' },
+      ],
+    })
+    const m = buildStagePageModel(makeInput({ aiReviewResult: result }))
+    expect(m.aiReview.risks).toEqual(result.risks)
+    expect(m.blockers).toEqual([]) // no derived blockers
+  })
+
+  it('AI review is dropped from the model when the input is undefined', () => {
+    const m = buildStagePageModel(makeInput()) // no aiReviewResult
+    expect(m.aiReview).toEqual({ status: 'not_requested' })
   })
 })
 
