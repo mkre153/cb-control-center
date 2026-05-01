@@ -196,6 +196,25 @@ export const DAP_BUILD_LEDGER: readonly DapBuildLedgerEntry[] = [
       'Build city pages using Phase 18C city_page contract. Start with /dental-advantage-plan/[city] route on rebuild/dap-site-v2.',
   },
 
+  {
+    id: 'phase-19b-cbcc-stage-gate-v1',
+    title: 'Phase 19B — CBCC Stage Gate v1',
+    status: 'complete',
+    summary:
+      'Replaced static mock simulation (SimulationShell/mockData.ts) with a real, typed stage gate registry (dapStageGates.ts). StageGatePanel is now the primary DAP pipeline authority. Current DAP state encoded across 7 stages with full evidence, directive, and approval fields. Anti-bypass rule enforced: no implementation phase may begin without a CBCC-issued directive, and no next stage unlocks without owner approval. 43 integrity tests added.',
+    completedAt: '2026-04-30',
+    recordedAt: '2026-04-30',
+    verification: 'verified_by_test',
+    evidence: [
+      { type: 'git_commit', hash: '4603bba', message: 'feat(cbcc): DAP Stage Gate v1 — replace mock simulation with authoritative pipeline' },
+      { type: 'file', path: 'lib/cb-control-center/dapStageGates.ts' },
+      { type: 'file', path: 'components/cb-control-center/StageGatePanel.tsx' },
+      { type: 'test_suite', name: 'dapStageGates', passing: 43 },
+    ],
+    nextAction:
+      'Owner approval required for Stages 2, 4, and 5 in CBCC before next DAP implementation phase begins.',
+  },
+
 ] as const
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

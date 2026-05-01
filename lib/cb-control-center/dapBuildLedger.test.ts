@@ -279,6 +279,18 @@ describe('Group 4 — Content accuracy', () => {
     expect(entry.verification).toBe('verified_by_test')
   })
 
+  it('Phase 19B (Stage Gate v1) entry exists and is complete', () => {
+    const entry = DAP_BUILD_LEDGER.find(e => e.id === 'phase-19b-cbcc-stage-gate-v1')
+    expect(entry).toBeDefined()
+    expect(entry?.status).toBe('complete')
+  })
+
+  it('Phase 19B test suite passes 43', () => {
+    const entry = DAP_BUILD_LEDGER.find(e => e.id === 'phase-19b-cbcc-stage-gate-v1')!
+    const suite = entry.evidence.find(ev => ev.type === 'test_suite') as { type: 'test_suite'; name: string; passing: number }
+    expect(suite.passing).toBe(43)
+  })
+
   it('archive entry verification is recorded_from_operator_report', () => {
     const entry = DAP_BUILD_LEDGER.find(e => e.id === 'dap-archive-production-snapshot')!
     expect(entry.verification).toBe('recorded_from_operator_report')
