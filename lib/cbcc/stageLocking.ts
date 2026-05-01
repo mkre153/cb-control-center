@@ -136,3 +136,32 @@ export function canStartStage(
   }
   return { ok: true }
 }
+
+// ─── Directive-literal aliases ────────────────────────────────────────────────
+//
+// The Part 1 directive names two primitives explicitly (`canUnlockStage`,
+// `getNextStage`). They're semantic synonyms for the more specific functions
+// above, exported under the directive's literal names so the contract reads
+// the way the directive specifies. Internal callers should prefer the more
+// specific names.
+
+// canUnlockStage = "is this stage available to act on?" — pure inverse of
+// the locking computation, with the same `{ok, reason}` shape. Note that
+// unlock here means *not locked*; it does NOT imply the stage is in a status
+// that permits a transition (use canStartStage for that).
+export function canUnlockStage(
+  project: CbccProject,
+  stageId: CbccStageId,
+  options?: LockingOptions,
+): { ok: boolean; reason?: string } {
+  const lock = getStageLockReason(project, stageId, options)
+  return lock.locked ? { ok: false, reason: lock.reason } : { ok: true }
+}
+
+// getNextStage = the next actionable stage (alias for getNextUnlockedStage).
+export function getNextStage(
+  project: CbccProject,
+  options?: LockingOptions,
+): CbccStage | null {
+  return getNextUnlockedStage(project, options)
+}

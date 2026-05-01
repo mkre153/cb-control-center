@@ -4,7 +4,9 @@ import {
   getStageLockReason,
   getUnlockedStages,
   getNextUnlockedStage,
+  getNextStage,
   canStartStage,
+  canUnlockStage,
 } from './stageLocking'
 import type { CbccProject, CbccStage, CbccStageStatus } from './types'
 
@@ -172,5 +174,50 @@ describe('canStartStage', () => {
     const r = canStartStage(p, 'missing')
     expect(r.ok).toBe(false)
     expect(r.reason).toMatch(/not found/)
+  })
+})
+
+describe('canUnlockStage (directive-literal alias)', () => {
+  it('reports ok for an unlocked stage', () => {
+    const p = makeProject([makeStage(1)])
+    expect(canUnlockStage(p, 's-1')).toEqual({ ok: true })
+  })
+
+  it('reports ok=false with the locking reason', () => {
+    const p = makeProject([makeStage(1), makeStage(2)])
+    const r = canUnlockStage(p, 's-2')
+    expect(r.ok).toBe(false)
+    expect(r.reason).toMatch(/predecessor/)
+  })
+
+  it('reports unknown-stage as ok=false', () => {
+    const p = makeProject([makeStage(1)])
+    const r = canUnlockStage(p, 'missing')
+    expect(r.ok).toBe(false)
+    expect(r.reason).toMatch(/not found/)
+  })
+
+  it('reports ok=true for an approved stage (it is not locked)', () => {
+    // canUnlockStage answers "is this stage gated?" — it does NOT check
+    // whether the stage can be transitioned. canStartStage covers that.
+    const p = makeProject([makeStage(1, 'approved')])
+    expect(canUnlockStage(p, 's-1')).toEqual({ ok: true })
+  })
+})
+
+describe('getNextStage (directive-literal alias)', () => {
+  it('matches getNextUnlockedStage on the same input', () => {
+    const p = makeProject([makeStage(1, 'approved'), makeStage(2), makeStage(3)])
+    expect(getNextStage(p)).toEqual(getNextUnlockedStage(p))
+  })
+
+  it('returns the first non-approved unlocked stage', () => {
+    const p = makeProject([makeStage(1, 'approved'), makeStage(2), makeStage(3)])
+    expect(getNextStage(p)?.id).toBe('s-2')
+  })
+
+  it('returns null when no actionable stage exists', () => {
+    const p = makeProject([makeStage(1, 'approved'), makeStage(2, 'rejected'), makeStage(3)])
+    expect(getNextStage(p)).toBeNull()
   })
 })
