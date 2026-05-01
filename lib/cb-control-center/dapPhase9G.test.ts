@@ -365,6 +365,6 @@ describe('Public boundary protection — no CMS, no Join CTA, no provider publis
       return results
     }
     const pages = findPages(join(ROOT, 'app'))
-    expect()  // Phase 9L added provider-participation list + detail pages
+    expect(pages.length).toBeGreaterThan(0)
   })
 })

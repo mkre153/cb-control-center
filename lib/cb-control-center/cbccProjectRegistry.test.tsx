@@ -129,7 +129,7 @@ describe('Group 3 — Intake form has all 9 data-field inputs', () => {
   let html: string
 
   it('renders without throwing', () => {
-    html = renderToString(React.createElement(CbccProjectIntakeForm, { defaultShowIntake: true }))
+    html = renderToString(<CbccProjectIntakeForm defaultShowIntake />)
     expect(html).toBeTruthy()
   })
 
@@ -147,7 +147,7 @@ describe('Group 3 — Intake form has all 9 data-field inputs', () => {
 
   for (const field of REQUIRED_FIELDS) {
     it(`has data-field="${field}"`, () => {
-      if (!html) html = renderToString(React.createElement(CbccProjectIntakeForm, { defaultShowIntake: true }))
+      if (!html) html = renderToString(<CbccProjectIntakeForm defaultShowIntake />)
       expect(html).toContain(`data-field="${field}"`)
     })
   }
@@ -235,7 +235,7 @@ describe('Group 6 — No DAP or vertical copy in generic v2 UI', () => {
 
   function intakeHtml() {
     const urlPhase = renderToString(React.createElement(CbccProjectIntakeForm))
-    const intakePhase = renderToString(React.createElement(CbccProjectIntakeForm, { defaultShowIntake: true }))
+    const intakePhase = renderToString(<CbccProjectIntakeForm defaultShowIntake />)
     return urlPhase + intakePhase
   }
 

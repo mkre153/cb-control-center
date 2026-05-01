@@ -482,7 +482,7 @@ describe('UI pages — exist, disclaimer, links, no public claims', () => {
       return results
     }
     const pages = findPages(join(ROOT, 'app'))
-    expect()
+    expect(pages.length).toBeGreaterThan(0)
   })
 })
 

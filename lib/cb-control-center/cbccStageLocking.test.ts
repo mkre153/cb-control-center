@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { computeStageVisibilities } from './cbccStageLocking'
-import type { ProjectStage, CbccProject } from './cbccProjectTypes'
+import type { ProjectStage, CbccProject, CbccStageStatus } from './cbccProjectTypes'
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -76,13 +76,15 @@ describe('Stage locking — Group 3: sequential unlocking', () => {
     it(`approving stages 1..${k} unlocks stage ${k + 1}`, () => {
       const project = makeProject(true)
       // Stages 1..k are approved; stage k+1 is locked in DB but should unlock
-      const stages = makeStages(
-        Array.from({ length: k }, (_, i) => ({
+      const overrides: Partial<Pick<ProjectStage, 'stageNumber' | 'approved' | 'stageStatus'>>[] = [
+        ...Array.from({ length: k }, (_, i) => ({
           stageNumber: i + 1,
           approved: true,
-          stageStatus: 'approved' as const,
-        })).concat([{ stageNumber: k + 1, approved: false, stageStatus: 'available' as const }])
-      )
+          stageStatus: 'approved' as CbccStageStatus,
+        })),
+        { stageNumber: k + 1, approved: false, stageStatus: 'available' as CbccStageStatus },
+      ]
+      const stages = makeStages(overrides)
       const result = computeStageVisibilities(project, stages)
       const unlocked = result.find(v => v.stageNumber === k + 1)!
       expect(unlocked.status).toBe('available')

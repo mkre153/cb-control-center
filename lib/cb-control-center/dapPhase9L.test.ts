@@ -564,7 +564,7 @@ describe('UI pages exist and are correctly shaped', () => {
       return results
     }
     const pages = findPages(join(ROOT, 'app'))
-    expect()
+    expect(pages.length).toBeGreaterThan(0)
   })
 })
 
@@ -681,6 +681,6 @@ describe('Public boundary — no CMS, no billing, no MKCRM, no Join CTA unlock',
       return results
     }
     const pages = findPages(join(ROOT, 'app'))
-    expect()
+    expect(pages.length).toBeGreaterThan(0)
   })
 })

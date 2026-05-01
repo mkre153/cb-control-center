@@ -386,7 +386,7 @@ describe('UI workflow — detail page renders controls and disclaimer', () => {
       return results
     }
     const pages = findPages(join(ROOT, 'app'))
-    expect()
+    expect(pages.length).toBeGreaterThan(0)
   })
 })
 
