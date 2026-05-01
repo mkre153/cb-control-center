@@ -241,6 +241,81 @@ export interface CbccStagePageAiReviewPlaceholder {
   summary?: string
 }
 
+// ─── AI review (Part 4A — contract only) ──────────────────────────────────────
+//
+// The engine represents an AI recommendation as advisory data. The AI
+// **cannot mutate state**: it produces a CbccAiReviewResult, which the page
+// model surfaces; only the owner can approve/reject. Part 4B will wire an
+// actual provider — for now this is the contract layer.
+
+export type CbccAiReviewDecision =
+  | 'pass'
+  | 'pass_with_concerns'
+  | 'fail'
+  | 'inconclusive'
+
+export type CbccAiReviewRiskSeverity = 'low' | 'medium' | 'high' | 'critical'
+
+export interface CbccAiReviewRisk {
+  id: string
+  severity: CbccAiReviewRiskSeverity
+  category?: string
+  message: string
+  // Free-form references (evidence ids, file paths, urls, commit hashes…).
+  // The engine does not interpret them — they are display strings.
+  citations?: ReadonlyArray<string>
+}
+
+export type CbccAiReviewRecommendationAction =
+  | 'request_more_evidence'
+  | 'revise_artifact'
+  | 'rerun_tests'
+  | 'address_risks'
+  | 'proceed_to_owner_review'
+  | 'no_action'
+
+export interface CbccAiReviewRecommendation {
+  action: CbccAiReviewRecommendationAction
+  rationale: string
+  nextSteps?: ReadonlyArray<string>
+}
+
+export interface CbccAiReviewResult {
+  projectId: string
+  stageId: CbccStageId
+  // Provider metadata — informational only. The engine does not branch on these.
+  model?: string
+  promptVersion?: string
+  decision: CbccAiReviewDecision
+  // Plain-text summary suitable for display.
+  summary: string
+  recommendation: CbccAiReviewRecommendation
+  risks: ReadonlyArray<CbccAiReviewRisk>
+  reviewedAt: string
+}
+
+// The structured packet handed to a future provider. Producing this packet
+// is pure (no IO). A provider takes the packet and returns raw output, which
+// `normalizeCbccAiReviewResult` validates.
+
+export interface CbccAiReviewPromptPacket {
+  projectId: string
+  stageId: CbccStageId
+  stageTitle: string
+  stageDescription?: string
+  stagePurpose?: string
+  evidence: ReadonlyArray<CbccEvidenceEntry>
+  evidenceRequirements: ReadonlyArray<CbccEvidenceRequirement>
+  // Optional prior review result so providers can do follow-ups.
+  priorReview?: CbccAiReviewResult
+  // System-level rules the AI must respect (e.g. "do not approve, only
+  // recommend"). Callers inject these — the engine does not opine.
+  guardrails: ReadonlyArray<string>
+  // Stable identifier for the prompt template the caller intends to use.
+  // Surfaces back into `CbccAiReviewResult.promptVersion` for auditability.
+  promptVersion?: string
+}
+
 export interface CbccStagePageModel {
   projectId: string
   stageId: CbccStageId
