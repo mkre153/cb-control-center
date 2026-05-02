@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import type { DapOfferTermsDraftFields } from '@/lib/cb-control-center/dapOfferTermsTypes'
+import type { DapOfferTermsDraftFields } from '@/lib/dap/registry/dapOfferTermsTypes'
 import {
   createOfferTermsDraftFromOnboarding,
   updateOfferTermsDraft,

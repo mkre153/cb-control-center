@@ -1,4 +1,4 @@
-import type { DapOfferTermsDraftStatus } from './dapOfferTermsTypes'
+import type { DapOfferTermsDraftStatus } from '../dap/registry/dapOfferTermsTypes'
 import type { DapPracticeOnboardingStatus } from '../dap/registry/dapPracticeOnboardingTypes'
 
 // Only interested and terms_needed intakes may begin offer terms collection.

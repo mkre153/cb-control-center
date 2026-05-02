@@ -8,7 +8,7 @@ import type {
   CreateDapOfferTermsDraftInput,
   UpdateDapOfferTermsDraftInput,
   DapOfferTermsActionInput,
-} from './dapOfferTermsTypes'
+} from '../dap/registry/dapOfferTermsTypes'
 import {
   isOnboardingEligibleForOfferTermsCollection,
   assertValidDapOfferTermsTransition,

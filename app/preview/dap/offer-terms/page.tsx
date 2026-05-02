@@ -1,5 +1,5 @@
 import { listOfferTermsDrafts } from '@/lib/cb-control-center/dapOfferTerms'
-import type { DapOfferTermsDraft } from '@/lib/cb-control-center/dapOfferTermsTypes'
+import type { DapOfferTermsDraft } from '@/lib/dap/registry/dapOfferTermsTypes'
 import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'

@@ -13,7 +13,7 @@ import { canTransitionDapOfferTermsStatus } from '@/lib/cb-control-center/dapOff
 import type {
   DapOfferTermsDraftStatus,
   DapOfferTermsEvent,
-} from '@/lib/cb-control-center/dapOfferTermsTypes'
+} from '@/lib/dap/registry/dapOfferTermsTypes'
 import type {
   DapOfferTermsReview,
   DapOfferTermsReviewEvent,

@@ -1,4 +1,4 @@
-import type { DapOfferTermsDraftStatus } from './dapOfferTermsTypes'
+import type { DapOfferTermsDraftStatus } from '../dap/registry/dapOfferTermsTypes'
 import type {
   DapOfferTermsReviewCriteria,
   DapOfferTermsReviewStatus,
