@@ -96,10 +96,12 @@ describe('Part 18 — A. Responsibility map (inspection asserted against source)
     const src = readFileSync(REVIEWER_PATH, 'utf-8')
     expect(src).toContain('getAnthropicClient')
     expect(src).toMatch(/messages\.create\s*\(/)
-    // Part 19: rubric is imported from the adapter zone now, not the
-    // legacy folder. The reviewer is one of the few cross-boundary
-    // importers we explicitly allow (legacy → adapter is one-way safe).
-    expect(src).toContain("from '@/lib/cbcc/adapters/dap/dapStageRubrics'")
+    // Part 19 → 20: reviewer reaches into the adapter zone via a
+    // path-aliased import. Pre-Part-20 it pulled the rubric directly;
+    // Part 20 replaced that with the prompt builder, which in turn
+    // imports the rubric inside the adapter. Either way, the legacy →
+    // adapter direction must remain present.
+    expect(src).toMatch(/from ['"]@\/lib\/cbcc\/adapters\/dap\/[^'"]+['"]/)
   })
 
   it('legacy reviewer continues to own the legacy types StageAiReview / StageAiChecklistResult', () => {
@@ -281,11 +283,22 @@ describe('Part 18 — E. Engine purity preserved', () => {
 })
 
 // ─── F. Adapter purity preserved ───────────────────────────────────────────
+//
+// Part 20 update: scan the source with comments stripped (mirrors Part 13
+// Group 2's pattern). Adapter modules are allowed to reference banned
+// tokens in their documentation block when explaining the architectural
+// rule — `dapStageReviewPrompt.ts`, for instance, documents the
+// "no Anthropic SDK / no cb-control-center import" boundary in a comment.
+// The architectural invariant is about runtime behavior, not prose.
+
+function stripComments(src: string): string {
+  return src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '')
+}
 
 describe('Part 18 — F. Adapter purity preserved', () => {
   for (const name of readdirSync(ADAPTER_DIR)) {
     if (!name.endsWith('.ts') || name.endsWith('.test.ts')) continue
-    const src = readFileSync(resolve(ADAPTER_DIR, name), 'utf-8')
+    const src = stripComments(readFileSync(resolve(ADAPTER_DIR, name), 'utf-8'))
 
     it(`adapters/dap/${name} does not reference the new mapper module`, () => {
       expect(src).not.toMatch(/dapStageAiReviewLegacy/)
@@ -296,7 +309,9 @@ describe('Part 18 — F. Adapter purity preserved', () => {
     })
 
     it(`adapters/dap/${name} does not import lib/cb-control-center`, () => {
-      expect(src).not.toMatch(/cb-control-center/)
+      // Path-based ban: only flag actual imports, not prose mentions in
+      // module docs that explain the boundary rule.
+      expect(src).not.toMatch(/from ['"][^'"]*cb-control-center[^'"]*['"]/)
     })
 
     it(`adapters/dap/${name} has no SDK / IO / runtime markers`, () => {

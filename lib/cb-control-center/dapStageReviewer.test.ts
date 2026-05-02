@@ -1,12 +1,20 @@
 /**
- * DAP Stage Reviewer — Structural Tests
+ * DAP Stage Reviewer — Structural Tests (runtime-only after Part 20).
  *
  * PURPOSE: Verify the reviewer module exports the correct shape and
  * does not expose mutation functions. No real API calls are made.
  *
+ * Part 20: prompt-content assertions (truth rules, advisory disclaimer,
+ * owner-approval-is-separate, rubric threading, advisoryNotice / rubric
+ * fields) moved to
+ * `lib/cbcc/adapters/dap/dapStageReviewPrompt.test.ts` because the prompt
+ * is built there. Runtime concerns (SDK model name, function export, no
+ * mutation surface, anthropicClient lazy singleton) stay here.
+ *
  * COVERAGE:
- *   Group 1 — Module exports
+ *   Group 1 — Module exports + runtime wiring
  *   Group 2 — No mutation surface
+ *   Group 3 — Adapter-zone prompt boundary (Part 20 wiring check)
  */
 
 import { describe, it, expect } from 'vitest'
@@ -17,7 +25,7 @@ const ROOT = resolve(__dirname, '../..')
 const REVIEWER_PATH = resolve(ROOT, 'lib/cb-control-center/dapStageReviewer.ts')
 const CLIENT_PATH   = resolve(ROOT, 'lib/cb-control-center/anthropicClient.ts')
 
-// ─── Group 1: Module exports ──────────────────────────────────────────────────
+// ─── Group 1: Module exports + runtime wiring ───────────────────────────────
 
 describe('Group 1 — dapStageReviewer module exports', () => {
   it('dapStageReviewer.ts exists', () => {
@@ -64,37 +72,6 @@ describe('Group 1 — dapStageReviewer module exports', () => {
     const src = readFileSync(REVIEWER_PATH, 'utf8')
     expect(src).toContain('claude-opus-4-7')
   })
-
-  it('includes all 7 DAP truth rules in the prompt', () => {
-    const src = readFileSync(REVIEWER_PATH, 'utf8')
-    expect(src).toContain('DAP is not dental insurance')
-    expect(src).toContain('DAP does not process claims')
-    expect(src).toContain('DAP does not collect PHI')
-    expect(src).toContain('DAP does not pay dental providers')
-  })
-
-  it('includes advisory disclaimer in system prompt', () => {
-    const src = readFileSync(REVIEWER_PATH, 'utf8')
-    expect(src).toContain('advisory only')
-  })
-
-  it('includes the explicit "owner approval is separate" note', () => {
-    const src = readFileSync(REVIEWER_PATH, 'utf8')
-    expect(src.toLowerCase()).toContain('owner approval')
-    expect(src.toLowerCase()).toContain('separate')
-  })
-
-  it('threads the per-stage rubric into the prompt', () => {
-    const src = readFileSync(REVIEWER_PATH, 'utf8')
-    expect(src).toContain('getDapStageRubric')
-    expect(src).toContain('formatDapStageRubricForPrompt')
-  })
-
-  it('user payload includes rubric and advisoryNotice fields', () => {
-    const src = readFileSync(REVIEWER_PATH, 'utf8')
-    expect(src).toContain('rubric:')
-    expect(src).toContain('advisoryNotice:')
-  })
 })
 
 // ─── Group 2: No mutation surface ────────────────────────────────────────────
@@ -125,5 +102,33 @@ describe('Group 2 — Reviewer is read-only', () => {
     const src = readFileSync(CLIENT_PATH, 'utf8')
     // Key must be read inside the function, not at module level
     expect(src).not.toMatch(/^const.*ANTHROPIC_API_KEY/m)
+  })
+})
+
+// ─── Group 3: Adapter-zone prompt boundary (Part 20) ────────────────────────
+
+describe('Group 3 — Reviewer delegates prompt assembly to the adapter (Part 20)', () => {
+  const src = readFileSync(REVIEWER_PATH, 'utf8')
+
+  it('imports the prompt builder from the adapter prompt module', () => {
+    expect(src).toContain("from '@/lib/cbcc/adapters/dap/dapStageReviewPrompt'")
+    expect(src).toContain('buildDapStageReviewPromptPacket')
+  })
+
+  it('does not redeclare DAP_TRUTH_RULES locally', () => {
+    expect(src).not.toMatch(/^(?:export\s+)?const\s+DAP_TRUTH_RULES\b/m)
+  })
+
+  it('does not assemble the system prompt string locally', () => {
+    // The pre-Part-20 file embedded the system prompt as a template
+    // literal inline. After the split, no auditor / advisory text should
+    // remain in the runtime layer — those strings live in the adapter.
+    expect(src).not.toMatch(/You are a DAP build process auditor/)
+    expect(src).not.toMatch(/ANTI-BYPASS RULE/)
+  })
+
+  it('does not assemble the user payload locally', () => {
+    expect(src).not.toMatch(/advisoryNotice:/)
+    expect(src).not.toMatch(/getDapStageRubric|formatDapStageRubricForPrompt/)
   })
 })

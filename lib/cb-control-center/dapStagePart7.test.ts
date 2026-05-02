@@ -551,12 +551,16 @@ describe('Part 7 acceptance — 12. DAP adapter is one-way dependent on generic 
   })
 
   it('no adapter file imports lib/cb-control-center (the DAP-specific app layer)', () => {
+    // Part 20 update: ban actual imports rather than the bare word, so
+    // adapter modules can document the boundary rule in their own
+    // comments without tripping the check. Matches the pattern the
+    // Part 19 acceptance suite uses.
     const files = readdirSync(ADAPTER_ROOT)
       .filter(n => n.endsWith('.ts') && !n.endsWith('.test.ts'))
     for (const name of files) {
       const src = readFileSync(resolve(ADAPTER_ROOT, name), 'utf-8')
       expect(src, `${name} must not import lib/cb-control-center`).not.toMatch(
-        /cb-control-center/,
+        /from ['"][^'"]*cb-control-center[^'"]*['"]/,
       )
     }
   })

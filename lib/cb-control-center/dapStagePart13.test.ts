@@ -123,9 +123,15 @@ describe('Part 13 — Group 1: reviewer stays in legacy folder; rubric moved to 
     expect(src).toContain("from './dapStageGates'")
   })
 
-  it('legacy reviewer now imports the rubric from the adapter zone (Part 19)', () => {
+  it('legacy reviewer reaches for adapter-zone resources via path-aliased imports (Part 19/20)', () => {
+    // Part 19 introduced the direct rubric import; Part 20 replaced that
+    // with an import of the prompt builder, which itself imports the
+    // rubric inside the adapter zone. Both states satisfy the
+    // architectural intent of "legacy → adapter is the one-way safe
+    // direction." Assert the spirit of that rule by requiring at least
+    // one path-aliased adapter import on the reviewer.
     const src = readFileSync(LEGACY_REVIEWER, 'utf-8')
-    expect(src).toContain("from '@/lib/cbcc/adapters/dap/dapStageRubrics'")
+    expect(src).toMatch(/from ['"]@\/lib\/cbcc\/adapters\/dap\/[^'"]+['"]/)
     expect(src).not.toContain("from './dapStageRubrics'")
   })
 

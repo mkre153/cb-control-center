@@ -1,8 +1,17 @@
 /**
- * DAP Stage Reviewer — Opus 4.7 AI-assisted stage review
+ * DAP Stage Reviewer — Opus 4.7 AI-assisted stage review (runtime layer).
  *
- * Calls claude-opus-4-7 to review a stage artifact against the stage requirements,
- * DAP truth rules, and the anti-bypass rule. Returns a structured recommendation.
+ * Calls claude-opus-4-7 to review a stage artifact against the prompt packet
+ * built by the adapter zone, parses the JSON response, and returns the
+ * legacy `StageAiReview` shape the UI panel renders.
+ *
+ * Part 20 split:
+ *   - Pure prompt assembly (truth rules, system + user prompt, rubric
+ *     threading, gate-shaped input contract) lives in
+ *     `lib/cbcc/adapters/dap/dapStageReviewPrompt.ts`.
+ *   - This file owns only the Anthropic transport: SDK call, response
+ *     text extraction, JSON parse, error fallback, and the legacy
+ *     `StageAiReview` UI-compat type.
  *
  * CRITICAL: This is advisory only. The AI does NOT approve stages.
  * Owner approval requires editing dapStageGates.ts and committing.
@@ -10,9 +19,15 @@
 
 import { getAnthropicClient } from './anthropicClient'
 import type { DapStageGate } from './dapStageGates'
-import { getDapStageRubric, formatDapStageRubricForPrompt } from '@/lib/cbcc/adapters/dap/dapStageRubrics'
+import { buildDapStageReviewPromptPacket } from '@/lib/cbcc/adapters/dap/dapStageReviewPrompt'
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// ─── Legacy UI shape ──────────────────────────────────────────────────────────
+//
+// The shape `StageAiReviewPanel.tsx` and the runtime provider's
+// `consumeLastLegacy()` harvester both depend on. Kept here (rather than in
+// the adapter) because it's the legacy compatibility contract — the engine
+// port already produces a richer `CbccAiReviewResult`; this is the
+// pre-engine-port shape.
 
 export interface StageAiChecklistResult {
   criterion: string
@@ -27,51 +42,16 @@ export interface StageAiReview {
   checklistResults: StageAiChecklistResult[]
 }
 
-// ─── DAP truth rules (immutable) ─────────────────────────────────────────────
-
-const DAP_TRUTH_RULES = [
-  'DAP is not dental insurance',
-  'DAP does not process claims',
-  'DAP does not collect PHI',
-  'DAP does not set practice pricing',
-  'DAP does not guarantee savings',
-  'DAP does not guarantee universal availability',
-  'DAP does not pay dental providers',
-]
-
-// ─── Review ───────────────────────────────────────────────────────────────────
+// ─── Review (Anthropic transport) ─────────────────────────────────────────────
 
 export async function reviewStage(stage: DapStageGate): Promise<StageAiReview> {
   const client = getAnthropicClient()
 
-  const rubric = getDapStageRubric(stage.stageNumber)
-  const rubricBlock = rubric
-    ? `\n\n${formatDapStageRubricForPrompt(rubric)}`
-    : '\n\n(No stage-specific rubric registered for this stage number — review against requirements and truth rules only.)'
-
-  const systemPrompt = `You are a DAP build process auditor for CB Control Center. Your role is to review stage artifacts and evidence, then recommend whether the owner should approve or not.
-
-ANTI-BYPASS RULE: No DAP implementation phase may begin without a CBCC-issued directive for that stage. Each phase stops at evidence submission. Owner must approve before the next directive is issued.
-
-DAP TRUTH RULES (immutable — no artifact may contradict these):
-${DAP_TRUTH_RULES.map((r, i) => `${i + 1}. ${r}`).join('\n')}
-${rubricBlock}
-
-CRITICAL: You are advisory only. Your recommendation does not approve anything. Owner approval is a separate, deliberate action — only the owner approves by editing dapStageGates.ts and committing.
-
-Respond with ONLY valid JSON matching this exact shape:
-{
-  "recommendation": "approve" | "disapprove" | "request_revision",
-  "confidence": "high" | "medium" | "low",
-  "reasoning": "markdown string explaining your recommendation",
-  "checklistResults": [
-    { "criterion": "string", "passed": true | false, "note": "optional string" }
-  ]
-}`
-
-  const userPrompt = JSON.stringify({
-    advisoryNotice: 'AI output is advisory only. Owner approval is separate and required before any stage unlocks.',
-    projectSlug: 'dental-advantage-plan',
+  // The gate type lives in this folder; the adapter prompt module declares a
+  // structural input shape that the gate satisfies via TypeScript's
+  // structural typing. This call site is the one-way safe data flow:
+  // legacy → adapter, never the reverse.
+  const { systemPrompt, userPrompt } = buildDapStageReviewPromptPacket({
     stageId: stage.stageId,
     stageNumber: stage.stageNumber,
     title: stage.title,
@@ -80,10 +60,8 @@ Respond with ONLY valid JSON matching this exact shape:
     requiredApprovals: stage.requiredApprovals,
     blockers: stage.blockers,
     implementationEvidence: stage.implementationEvidence,
-    artifact: stage.artifact ?? null,
-    truthRules: DAP_TRUTH_RULES,
-    rubric: rubric ?? null,
-  }, null, 2)
+    artifact: stage.artifact,
+  })
 
   try {
     const message = await client.messages.create({

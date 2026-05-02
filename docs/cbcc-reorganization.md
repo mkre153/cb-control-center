@@ -2438,6 +2438,153 @@ across Parts 13–19:
 - `lib/cb-control-center/` — Next/UI/app-adjacent legacy + the
   Anthropic transport boundary + legacy review compatibility
 
+## Part 20 Addendum — Split DAP Stage Reviewer Into Pure Prompt Assembly vs Runtime Execution (2026-05-02)
+
+**Goal.** Take the final cleanup step sketched across Parts
+13–19: separate `dapStageReviewer.ts` into the pure prompt
+assembly that belongs in the adapter zone and the Anthropic
+transport that must remain outside it. Inspection-first; minimal
+extraction; preserve runtime behavior exactly.
+
+### What was extracted
+
+New file:
+`lib/cbcc/adapters/dap/dapStageReviewPrompt.ts`
+
+owns:
+- `DAP_TRUTH_RULES` — the 7 immutable "DAP does not …"
+  assertions.
+- `DapStageReviewPromptInput` — a structural input type
+  declaring only the gate fields the prompt reads. Lets the
+  legacy reviewer pass a `DapStageGate` without forcing the
+  adapter to import that type from the legacy folder
+  (TypeScript's structural typing handles the rest).
+- `DapStageReviewPromptPacket` — the `(systemPrompt, userPrompt)`
+  pair the reviewer hands to the SDK.
+- `buildDapStageReviewPromptPacket(input)` — the pure builder.
+  Threads the per-stage rubric in via the adapter-zone rubric
+  module (Part 19), embeds the ANTI-BYPASS RULE, the truth
+  rules, the advisory disclaimer, the "owner approval is
+  separate" note, and the JSON response-shape contract.
+
+Co-located test:
+`lib/cbcc/adapters/dap/dapStageReviewPrompt.test.ts` — 18 tests
+covering truth-rule integrity, system prompt content, user
+payload structure, rubric integration (with-rubric and
+no-rubric branches), and pure-function determinism.
+
+### What intentionally stayed in `lib/cb-control-center/`
+
+`dapStageReviewer.ts` is now ~85 lines and owns only:
+- `StageAiChecklistResult` and `StageAiReview` types — the
+  legacy UI shape `StageAiReviewPanel` renders. These are the
+  pre-engine-port compatibility contract; moving them would
+  ripple through the panel and the runtime provider's
+  `consumeLastLegacy()` harvester.
+- `getAnthropicClient()` call + `client.messages.create({…})`
+  — the Anthropic transport.
+- Response text extraction (filter content blocks, join text).
+- `JSON.parse` of the response.
+- Error fallback returning a `request_revision` review with
+  `low` confidence.
+
+Its only adapter-zone import is the prompt builder; the rubric
+module is reached transitively through that builder.
+
+### Updated responsibility map
+
+| File | Owns | Boundary |
+|------|------|----------|
+| `lib/cbcc/adapters/dap/dapStageRubrics.ts` (Part 19) | Per-stage rubric data + format helper | Pure adapter |
+| `lib/cbcc/adapters/dap/dapStageReviewPrompt.ts` (Part 20) | Truth rules constant, structural input type, prompt builder | Pure adapter |
+| `lib/cb-control-center/dapStageReviewer.ts` (Part 20 slimmed) | `StageAiReview` types, Anthropic transport, response parse, error fallback | Legacy runtime |
+| `lib/cb-control-center/cbccAnthropicAiReviewProvider.ts` (Part 17/18) | `CbccAiReviewProvider` impl, single-shot factory, legacy harvest via `consumeLastLegacy()` | Legacy runtime |
+| `lib/cb-control-center/dapStageAiReviewLegacy.ts` (Part 18) | Pure legacy ↔ engine-raw mapper | Legacy adjacent |
+| `app/api/businesses/dental-advantage-plan/stages/review/route.ts` (Part 17) | HTTP handler · stage resolution · packet build · `runCbccAiReview` · legacy harvest | App layer |
+| `lib/cbcc/aiReview.ts` + `lib/cbcc/aiReviewProvider.ts` | Generic engine contract + port | Pure engine |
+
+### Boundary rules preserved
+
+The adapter zone's purity is unchanged in spirit:
+- No Anthropic SDK / no `getAnthropicClient`.
+- No Supabase / no Next/React / no server/client directives.
+- No imports from `lib/cb-control-center/`.
+- No `fetch(`, no filesystem IO.
+
+Three pre-existing tests had to be tightened to scan source
+*with comments stripped* or *via path-based regex* rather than
+bare-word match — the new prompt module's documentation block
+deliberately mentions the forbidden tokens to explain the
+boundary rule, and prose is not a runtime risk:
+- `lib/cb-control-center/dapStagePart7.test.ts` — line 553's
+  bare `/cb-control-center/` regex tightened to
+  `/from ['"][^'"]*cb-control-center[^'"]*['"]/`.
+- `lib/cb-control-center/dapStagePart18.test.ts` — Section F
+  now strips comments and uses path-based regex (mirrors Part
+  13 Group 2's approach).
+
+This is the same form of rephrase Part 19 introduced — the rule
+the suite actually wants to protect ("no actual imports from the
+legacy folder") is stated more precisely. Earlier tests
+(`dapStagePart13.test.ts` Group 1, `dapStagePart18.test.ts`
+Section A, `dapStagePart19.test.ts` Section E) had assertions
+like "reviewer imports the rubric from `@/lib/cbcc/adapters/dap/
+dapStageRubrics`" — those were updated to "reviewer reaches into
+the adapter zone via a path-aliased import" so both
+pre-Part-20 (direct rubric import) and post-Part-20 (prompt
+builder import → rubric transitively) satisfy the architectural
+spirit. The directive permits "import-path updates" to existing
+tests; these are exactly that.
+
+`dapStageReviewer.test.ts` had its prompt-content assertions
+(truth rules, advisory text, owner-approval-is-separate, rubric
+threading, advisoryNotice / rubric payload fields) moved next to
+the prompt module they describe. Runtime concerns (model name,
+function export, types, no-mutation, anthropicClient lazy
+singleton) stay in the reviewer test.
+
+### Validation results
+
+- Page-policy guard: pass (`pnpm check:page-policy`, 17 files
+  scanned under 3 rule prefixes).
+- Typecheck: clean (`pnpm typecheck`).
+- Vitest: **6260 tests pass**, 1 skipped, 105 files
+  (`pnpm test`).
+- Lint: 0 errors, 50 warnings — all pre-existing
+  (`pnpm lint`).
+- Production build: succeeds (`pnpm build`).
+
+### Recommendation for Part 21
+
+Per the directive's framing: do a scheduled / periodic
+"adapter-zone accumulation audit" now that Parts 13–20 have
+landed. Concretely:
+
+1. Walk `lib/cb-control-center/` for any file that, like the
+   pre-Part-20 truth rules + prompt assembly, mixes pure DAP
+   data/logic with runtime concerns. The new path-based
+   boundary rules now make these moves mechanical.
+2. Verify the engine root has no leakage from any of the new
+   adapter modules (the engine barrel still does not export
+   `./adapters/dap`; the adapter's local `index.ts` still does
+   not re-export the rubric or the prompt — Part 20 Section F
+   asserts this).
+3. Confirm the route + `StageAiReviewPanel` legacy shape is
+   still the only UI-facing review contract; if a Part 21
+   discovers a second consumer of `StageAiReview`, that becomes
+   a candidate for engine-port migration.
+
+The shape sketched at the end of Part 19 is now reached:
+
+- `lib/cbcc/` — generic engine, pure
+- `lib/cbcc/adapters/dap/` — DAP project + stages + rubric +
+  truth rules + prompt builder
+- `lib/cb-control-center/` — Next/UI/app-adjacent legacy +
+  Anthropic transport boundary + legacy review compatibility +
+  legacy ↔ engine raw mapper
+
+
+
 
 
 

@@ -184,18 +184,25 @@ describe('Part 19 — D. Engine purity preserved', () => {
 
 // ─── E. Reviewer wiring updated ────────────────────────────────────────────
 
-describe('Part 19 — E. Reviewer imports the rubric from the adapter zone', () => {
+describe('Part 19 — E. Reviewer reaches into the adapter zone (Part 20 update)', () => {
   const src = readFileSync(REVIEWER_PATH, 'utf-8')
 
-  it('reviewer imports rubric helpers from the adapter path', () => {
-    expect(src).toContain("from '@/lib/cbcc/adapters/dap/dapStageRubrics'")
+  it('reviewer reaches the adapter zone via a path-aliased import', () => {
+    // Pre-Part-20 the reviewer imported the rubric directly. Part 20
+    // moved the rubric consumption into the prompt builder, which
+    // the reviewer now imports instead. Either form satisfies the
+    // architectural rule "legacy → adapter is the safe direction."
+    expect(src).toMatch(/from ['"]@\/lib\/cbcc\/adapters\/dap\/[^'"]+['"]/)
   })
 
   it('reviewer no longer references the old relative rubric path', () => {
     expect(src).not.toContain("from './dapStageRubrics'")
   })
 
-  it('reviewer is the only legacy-folder file that imports the rubric (no stragglers)', () => {
+  it('no legacy-folder file imports the rubric directly any more (Part 20)', () => {
+    // Part 20 routed all rubric consumption through the adapter-zone
+    // prompt builder, so no file in lib/cb-control-center/ should have
+    // a direct dapStageRubrics import.
     const legacyDir = resolve(ROOT, 'lib/cb-control-center')
     const consumers: string[] = []
     for (const name of readdirSync(legacyDir)) {
@@ -203,12 +210,7 @@ describe('Part 19 — E. Reviewer imports the rubric from the adapter zone', () 
       const fileSrc = readFileSync(resolve(legacyDir, name), 'utf-8')
       if (/from ['"][^'"]*dapStageRubrics[^'"]*['"]/.test(fileSrc)) consumers.push(name)
     }
-    expect(consumers).toEqual(['dapStageReviewer.ts'])
-  })
-
-  it('rubric helper symbol names are still part of the reviewer source (carry-forward)', () => {
-    expect(src).toContain('getDapStageRubric')
-    expect(src).toContain('formatDapStageRubricForPrompt')
+    expect(consumers).toEqual([])
   })
 })
 
