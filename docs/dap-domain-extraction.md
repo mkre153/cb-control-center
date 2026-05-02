@@ -73,9 +73,11 @@ Wave 1 complete. Two files deferred:
 - mkcrm/dapClientBuilderBillingTypes — lives under mkcrm/ subdirectory; assess separately
 
 ### Wave 2 — Pure rules/logic (no Supabase)
-- mkcrm/dapClientBuilderBillingRules
 - dapDisplayRules
 - dapPublicUxRules
+
+### Wave 2G — Inspected, not moved
+- `lib/cb-control-center/mkcrm/dapClientBuilderBillingRules.ts` — file is pure (no Supabase/Next.js/React/server deps, only static rule functions), but its sole import is from `./dapClientBuilderBillingTypes` which remains in `lib/cb-control-center/mkcrm/`. Moving the rules file would create a `lib/dap/registry → lib/cb-control-center` back-dependency, which violates the extraction boundary rule. Prerequisite: move `mkcrm/dapClientBuilderBillingTypes` first (currently deferred in Wave 1 remaining). Revisit as Wave 2G-2 once types file is extracted.
 
 ### Wave 3 — Read models and content
 - dapMemberStatusReadModel
