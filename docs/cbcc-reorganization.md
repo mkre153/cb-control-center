@@ -2079,4 +2079,117 @@ exposes its directives as adapter data.
 adopts a hook framework; add a CI workflow running `pnpm check`
 on push and PR.
 
+## Part 17 Addendum — AI Review Provider-Port Migration (2026-05-01)
+
+**Goal.** Wire the existing generic engine port
+(`lib/cbcc/aiReview.ts` + `lib/cbcc/aiReviewProvider.ts`) into the
+DAP AI review flow without breaking any prior boundary, weakening
+any prior test, or changing the UI shape. After Part 17 the route
+goes through `runCbccAiReview(...)`; Anthropic SDK use stays in the
+legacy app-layer folder behind a single new boundary file that
+implements the engine's `CbccAiReviewProvider` interface.
+
+**What changed.**
+
+1. New runtime provider:
+   `lib/cb-control-center/cbccAnthropicAiReviewProvider.ts` —
+   implements `CbccAiReviewProvider`, single-shot per request,
+   delegates to the existing `reviewStage(gate)`, and translates
+   the legacy `StageAiReview` into the engine's raw shape via a
+   pure `legacyReviewToEngineRaw(...)` mapper. The provider also
+   stores the original legacy result so the route can hand it to
+   the UI without changing the response shape.
+
+2. Route refactor:
+   `app/api/businesses/dental-advantage-plan/stages/review/route.ts`
+   no longer calls `reviewStage(...)` directly. It now:
+   - resolves the DAP gate (unchanged),
+   - maps `stageNumber` → engine `stageId` via
+     `DAP_STAGE_DEFINITIONS` (the adapter is the single source of
+     truth for that mapping),
+   - builds a packet via `buildCbccAiReviewPromptPacket(...)`,
+   - constructs a one-shot provider via
+     `createDapAnthropicAiReviewProvider(gate)`,
+   - awaits `runCbccAiReview({ packet, provider })` so the
+     engine's normalize step runs against the provider's output,
+   - returns `provider.consumeLastLegacy()` to the UI so the
+     existing `StageAiReviewPanel` renders unchanged.
+
+3. New acceptance suite:
+   `lib/cb-control-center/dapStagePart17.test.ts` (32 tests in 6
+   sections) asserts the provider module shape, the legacy →
+   engine mapping for each recommendation/confidence/checklist
+   case, an end-to-end round-trip through `runCbccAiReview`, the
+   route's import surface, the engine's continued purity, and the
+   route's continued advisory-only posture (no approval/unlock/
+   persistence).
+
+**Mapping decisions baked into the provider.**
+
+| Legacy `recommendation` | Engine `decision`     | Engine `recommendation.action`  |
+| ----------------------- | --------------------- | ------------------------------- |
+| `approve`               | `pass`                | `proceed_to_owner_review`       |
+| `request_revision`      | `pass_with_concerns`  | `address_risks`                 |
+| `disapprove`            | `fail`                | `revise_artifact`               |
+
+`confidence` ∈ {`high`, `medium`, `low`} maps 1:1 to the severity
+of every derived risk. Failed checklist items become engine risks
+(one per item; passed items are dropped). Empty `reasoning`
+falls back to a synthetic non-empty string so engine normalize
+never trips on the summary/rationale required-field rules.
+
+**Boundaries preserved.** Each prior invariant is re-asserted in
+Part 17:
+- engine contract (`lib/cbcc/aiReview.ts`) and engine port
+  (`lib/cbcc/aiReviewProvider.ts`) remain free of Anthropic SDK,
+  Supabase, Next/React, server/client markers, and any reference
+  to the runtime provider;
+- `lib/cbcc/adapters/dap/` stays pure (no SDK, no IO, no
+  cross-imports from `lib/cb-control-center/`, no review-symbol
+  surface, no reference to the runtime provider);
+- the engine barrel still does not export DAP review symbols or
+  the runtime provider;
+- the runtime provider does not touch the approval store, the
+  Supabase client, or any persistence path;
+- the route exposes only `POST` and never reaches an approval
+  action.
+
+The Part 13 Group 4 assertion that the route file contains
+`from '@/lib/cb-control-center/dapStageReviewer'` continues to
+pass via a `import type { StageAiReview }` line — the route still
+needs the legacy shape's name for typing the harvest variable, so
+the importer chain back to the reviewer is preserved (now with one
+extra hop through the provider).
+
+**Why dapStageRubrics / dapStageReviewer did NOT move.** The
+Part 13 Group 2 boundary test forbids any
+`adapters/dap/*.ts` file from referencing `dapStageReviewer`,
+`dapStageRubrics`, `StageAiReview`, `DapStageRubric`, or
+`reviewStage`. Both files structurally violate that surface — the
+reviewer because it calls the SDK, the rubric because Group 2
+explicitly bans the symbol name. Moving either would have required
+weakening a pre-existing test, which the Part 17 directive
+forbids. The next part can safely move `dapStageRubrics` after
+either renaming the boundary regex or accepting that the rubric
+data lives one level deeper than the symbol-name guard. That is
+mechanical and out of scope here.
+
+**Validation.**
+- Page-policy guard: pass (`pnpm check:page-policy`).
+- Typecheck: clean (`pnpm typecheck`).
+- Vitest: **6088 tests pass**, 1 skipped, 101 files
+  (`pnpm test`).
+- Lint: 0 errors, 50 warnings — all warnings pre-existing
+  (`pnpm lint`).
+- Production build: succeeds, route surface unchanged
+  (`pnpm build`).
+
+**Next architectural milestone.** Move `dapStageRubrics.ts` into
+`lib/cbcc/adapters/dap/` once the Part 13 Group 2 symbol-name
+guard is rephrased to target imports rather than identifiers.
+Once that is done, `dapStageReviewer.ts` becomes the only legacy
+review file outside the adapter zone, and a follow-up part can
+shrink it to a thin Anthropic transport behind the same provider
+boundary established here.
+
 
