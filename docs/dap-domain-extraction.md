@@ -72,14 +72,17 @@ Wave 1 complete. Two files deferred:
 - source/dapSourceTypes — has inbound deps from source pipeline; assess separately
 - mkcrm/dapClientBuilderBillingTypes — lives under mkcrm/ subdirectory; assess separately
 
-### Wave 2 — Pure rules/logic (no Supabase)
-- dapPublicUxRules
-
 ### Wave 2G — Inspected, not moved
 - `lib/cb-control-center/mkcrm/dapClientBuilderBillingRules.ts` — file is pure (no Supabase/Next.js/React/server deps, only static rule functions), but its sole import is from `./dapClientBuilderBillingTypes` which remains in `lib/cb-control-center/mkcrm/`. Moving the rules file would create a `lib/dap/registry → lib/cb-control-center` back-dependency, which violates the extraction boundary rule. Prerequisite: move `mkcrm/dapClientBuilderBillingTypes` first (currently deferred in Wave 1 remaining). Revisit as Wave 2G-2 once types file is extracted.
 
 ### Wave 2H — Inspected, not moved
 - `lib/cb-control-center/dapDisplayRules.ts` — file is pure (no Supabase/Next.js/React/server deps, only display rules, route constants, copy constants, and pure helper functions). However, line 1 imports `ProviderStatus` from `'./types'` which is `lib/cb-control-center/types.ts`. Moving to `lib/dap/registry/` would create a `lib/dap/registry → lib/cb-control-center` back-dependency. Prerequisite: extract `ProviderStatus` (and `PublicClaimLevel`) from `lib/cb-control-center/types.ts` into the `lib/dap/` namespace first. This was noted as deferred future work in Wave 1H (dapCmsTypes has the same blocker). ~30 inbound importers across components/, app/, and lib/. Revisit once ProviderStatus is extracted.
+
+### Wave 2I — Inspected, not moved
+- `lib/cb-control-center/dapPublicUxRules.ts` — file is pure (no Supabase/Next.js/React/server deps, only public UX model builder functions). Same blocker as Wave 2H: line 1 imports `ProviderStatus` from `'./types'` (`lib/cb-control-center/types.ts`). Moving to `lib/dap/registry/` would create the same `lib/dap/registry → lib/cb-control-center` back-dependency. Note: second import block is from `'../dap/site/dapPublicUxTypes'` which is already in `lib/dap/` — so the only blocker is `ProviderStatus`. 13 inbound importers (4 app/, 8 test files including dapPhase8B which has a path assertion at line 355). Revisit once ProviderStatus is extracted alongside dapDisplayRules and dapCmsTypes.
+
+### Wave 2 — Summary
+Wave 2 extracted 6 files. 3 files deferred pending ProviderStatus extraction (dapDisplayRules, dapPublicUxRules, dapCmsTypes). 1 file deferred pending types co-extraction (dapClientBuilderBillingRules). All deferred files are pure — no runtime blockers, only import-graph blockers.
 
 ### Wave 3 — Read models and content
 - dapMemberStatusReadModel
