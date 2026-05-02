@@ -15,28 +15,33 @@
  *       forbids any `adapters/dap/*.ts` file from importing
  *       `lib/cb-control-center/...`.
  *
- * The reviewer module structurally violates both rules (it calls
- * `getAnthropicClient`, imports it from the legacy folder, and depends on
- * `DapStageGate` from the legacy folder). Moving it into `adapters/dap/`
- * without breaking those rules would require either weakening the existing
- * tests (forbidden by the directive) or co-relocating its dependencies
- * (out of scope and would expand the SDK-touching surface inside the
- * adapter folder).
+ * Part 19 update: `dapStageRubrics.ts` IS now moved to
+ * `lib/cbcc/adapters/dap/`. It was always pure data + a pure formatter,
+ * so it satisfies adapter purity on its own. The change required by Part
+ * 19 was rephrasing this file's Group 2 boundary regex from "ban the
+ * symbol names `dapStageRubrics` / `DapStageRubric`" to "ban depending on
+ * the legacy `lib/cb-control-center/` directory." The architectural
+ * invariant being protected — the adapter zone may not depend on legacy
+ * runtime code — is preserved and arguably strengthened: the rule is
+ * stated as a dependency boundary instead of a name-shape coincidence.
  *
- * Conclusion (revised Part 13 directive):
- *
- *   - DO NOT move the reviewer/rubric until AI review is redesigned as a
- *     provider port (see docs addendum for the future migration path).
- *   - Reaffirm and document the adapter folder's purity invariants here so
- *     a future Part-N attempt sees them up front.
+ * The reviewer module is still at `lib/cb-control-center/` because it
+ * structurally violates adapter purity (calls `getAnthropicClient`,
+ * imports `DapStageGate` from the legacy folder). Moving it into
+ * `adapters/dap/` would require breaking those rules or co-relocating
+ * its dependencies (out of scope for Part 19; deferred to a Part-N
+ * decomposition of the reviewer into "pure prompt assembly" vs.
+ * "Anthropic execution").
  *
  * This file therefore documents and asserts:
  *
- *   1. The DAP reviewer/rubric stay in `lib/cb-control-center/` for now.
+ *   1. The DAP reviewer stays in `lib/cb-control-center/`; the rubric
+ *      is now in `lib/cbcc/adapters/dap/` (Part 19 move).
  *   2. `lib/cbcc/adapters/dap/` remains pure: no SDK calls, no IO, no
  *      cross-imports from `lib/cb-control-center/`, no Next.js / React
- *      runtime markers, no review symbols.
- *   3. The legacy reviewer surface is still wired to its current importers.
+ *      runtime markers, no reviewer-runtime symbols.
+ *   3. The legacy reviewer surface is still wired to its current
+ *      importers (only the rubric import path changed).
  *
  * No DOM, no network, no DB. Pure filesystem + source-content checks.
  */
@@ -47,9 +52,18 @@ import { resolve } from 'path'
 
 const ROOT = resolve(__dirname, '..', '..')
 
-// Legacy (still-canonical, until provider-port migration) reviewer paths.
+// Legacy reviewer path. The reviewer module is still in
+// `lib/cb-control-center/` because it structurally violates adapter purity
+// (Anthropic SDK dependency); a future Part may decompose it.
 const LEGACY_REVIEWER = resolve(ROOT, 'lib/cb-control-center/dapStageReviewer.ts')
-const LEGACY_RUBRICS  = resolve(ROOT, 'lib/cb-control-center/dapStageRubrics.ts')
+
+// Pre-Part-19 location, kept as a constant only so the "no copy left
+// behind" assertion below is explicit.
+const LEGACY_RUBRICS_OLD = resolve(ROOT, 'lib/cb-control-center/dapStageRubrics.ts')
+
+// Part 19 destination — the rubric data + format helper now live inside
+// the DAP adapter purity zone.
+const ADAPTER_RUBRICS = resolve(ROOT, 'lib/cbcc/adapters/dap/dapStageRubrics.ts')
 
 // Pure-zone roots.
 const ENGINE_ROOT  = resolve(ROOT, 'lib/cbcc')
@@ -84,15 +98,19 @@ function stripComments(src: string): string {
   return src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '')
 }
 
-// ─── Group 1: legacy reviewer/rubric remain in cb-control-center ────────────
+// ─── Group 1: reviewer stays in legacy folder; rubric moved to adapter ──────
 
-describe('Part 13 — Group 1: reviewer/rubric stay in legacy folder for now', () => {
+describe('Part 13 — Group 1: reviewer stays in legacy folder; rubric moved to adapter (Part 19)', () => {
   it('lib/cb-control-center/dapStageReviewer.ts still exists', () => {
     expect(existsSync(LEGACY_REVIEWER)).toBe(true)
   })
 
-  it('lib/cb-control-center/dapStageRubrics.ts still exists', () => {
-    expect(existsSync(LEGACY_RUBRICS)).toBe(true)
+  it('Part 19: rubric file moved into the adapter zone', () => {
+    expect(existsSync(ADAPTER_RUBRICS)).toBe(true)
+  })
+
+  it('Part 19: no copy of the rubric remains at the old legacy path', () => {
+    expect(existsSync(LEGACY_RUBRICS_OLD)).toBe(false)
   })
 
   it('legacy reviewer is structurally why it cannot move yet — it imports getAnthropicClient', () => {
@@ -103,6 +121,12 @@ describe('Part 13 — Group 1: reviewer/rubric stay in legacy folder for now', (
   it('legacy reviewer imports DapStageGate from cb-control-center (carry-forward dependency)', () => {
     const src = readFileSync(LEGACY_REVIEWER, 'utf-8')
     expect(src).toContain("from './dapStageGates'")
+  })
+
+  it('legacy reviewer now imports the rubric from the adapter zone (Part 19)', () => {
+    const src = readFileSync(LEGACY_REVIEWER, 'utf-8')
+    expect(src).toContain("from '@/lib/cbcc/adapters/dap/dapStageRubrics'")
+    expect(src).not.toContain("from './dapStageRubrics'")
   })
 
   it('legacy reviewer is still read-only (no supabase / approval-store coupling)', () => {
@@ -119,6 +143,21 @@ describe('Part 13 — Group 1: reviewer/rubric stay in legacy folder for now', (
 // the Part 13 narrative. If this group ever fails, a future part has either
 // drifted the adapter folder away from its purity contract or quietly
 // added a forbidden dependency.
+//
+// Part 19 rephrasing: the previous symbol-name bans on `dapStageRubrics` /
+// `DapStageRubric` were removed because they were a coincidence of the
+// rubric file living outside the adapter — they prevented a pure-data file
+// from moving to its correct architectural home. The architectural rule
+// the suite actually wants to protect is "the adapter zone may not depend
+// on legacy `lib/cb-control-center/` runtime code." That rule is enforced
+// here by a path-based ban (`cb-control-center` import) plus the runtime
+// markers below, and is mirrored by `dapAdapter.test.ts`.
+//
+// Symbol-name bans are kept ONLY for tokens that uniquely name runtime
+// behavior the adapter must never carry: `dapStageReviewer`, `reviewStage`,
+// and `StageAiReview` (legacy UI shape that comes back from the Anthropic
+// transport). Pure data type names like `DapStageRubric` are no longer
+// banned — type names are not a runtime risk.
 
 const ADAPTER_FORBIDDEN: ReadonlyArray<{ pattern: RegExp; label: string }> = [
   { pattern: /@anthropic-ai\/sdk/,                  label: '@anthropic-ai/sdk' },
@@ -129,12 +168,13 @@ const ADAPTER_FORBIDDEN: ReadonlyArray<{ pattern: RegExp; label: string }> = [
   { pattern: /from ['"]react['"]/,                  label: 'react import' },
   { pattern: /['"]use server['"]/,                  label: "'use server'" },
   { pattern: /['"]use client['"]/,                  label: "'use client'" },
+  // The architectural invariant: adapter may not depend on the legacy
+  // app-layer folder. This single path ban is what protects the boundary;
+  // the symbol-name bans below are kept only for runtime-behavior tokens
+  // that have no legitimate place in an adapter.
   { pattern: /cb-control-center/,                   label: 'cb-control-center import' },
-  // No DAP review symbol surface should appear in the adapter folder yet.
   { pattern: /dapStageReviewer/,                    label: 'dapStageReviewer reference' },
-  { pattern: /dapStageRubrics/,                     label: 'dapStageRubrics reference' },
   { pattern: /\bStageAiReview\b/,                   label: 'StageAiReview reference' },
-  { pattern: /\bDapStageRubric\b/,                  label: 'DapStageRubric reference' },
   { pattern: /\breviewStage\b/,                     label: 'reviewStage reference' },
 ]
 

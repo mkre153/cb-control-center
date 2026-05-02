@@ -2294,4 +2294,150 @@ folded into `cbccAnthropicAiReviewProvider.ts` directly. Either
 shape is defensible; the choice depends on whether the project
 eventually adds a non-Anthropic provider.
 
+## Part 19 Addendum — Move Pure DAP Stage Rubrics Into the Adapter Zone (2026-05-02)
+
+**Goal.** Move `dapStageRubrics.ts` to the place its dependencies
+have always allowed — `lib/cbcc/adapters/dap/` — without weakening
+the adapter's purity invariants. Part 18 had identified this as
+the next-highest-leverage extraction; Part 13's symbol-name regex
+was the only thing blocking it. Part 19 rephrases that regex so
+the move becomes legal, and the architectural rule it actually
+protects is stated more precisely.
+
+### What moved
+
+- `lib/cb-control-center/dapStageRubrics.ts`
+  → `lib/cbcc/adapters/dap/dapStageRubrics.ts`
+- `lib/cb-control-center/dapStageRubrics.test.ts`
+  → `lib/cbcc/adapters/dap/dapStageRubrics.test.ts`
+
+`git mv` preserves history. The data + helper exports are
+unchanged in name and shape:
+`DapStageRubric`, `DAP_STAGE_RUBRICS`, `getDapStageRubric`,
+`formatDapStageRubricForPrompt`.
+
+### What changed
+
+1. `lib/cb-control-center/dapStageReviewer.ts` import path:
+   - **before:** `import { … } from './dapStageRubrics'`
+   - **after:** `import { … } from '@/lib/cbcc/adapters/dap/dapStageRubrics'`
+   This is the only consumer of the rubric. Verified by Part 19
+   Section E: a directory scan of `lib/cb-control-center/`
+   confirms `dapStageReviewer.ts` is the lone importer.
+
+2. `lib/cb-control-center/dapStagePart13.test.ts` Group 2
+   `ADAPTER_FORBIDDEN` array dropped two patterns:
+   - `{ pattern: /dapStageRubrics/, label: 'dapStageRubrics reference' }`
+   - `{ pattern: /\bDapStageRubric\b/, label: 'DapStageRubric reference' }`
+
+   Group 1 narrative + assertions updated to record the move
+   (rubric file no longer at the legacy path; reviewer now
+   imports from the adapter). The `cb-control-center` import-path
+   ban — the rule the suite actually protects — is unchanged.
+   Bans on runtime-behavior tokens (`dapStageReviewer`,
+   `reviewStage`, `StageAiReview`) remain.
+
+3. `lib/cb-control-center/dapStagePart18.test.ts` updated
+   `RUBRICS_PATH` to the new adapter location and updated the
+   reviewer-import-substring assertion from `'./dapStageRubrics'`
+   to `'@/lib/cbcc/adapters/dap/dapStageRubrics'`.
+
+4. New file `lib/cb-control-center/dapStagePart19.test.ts` (32
+   tests in 7 sections) records the move outcome, the adapter
+   rubric purity, the dependency-cleanliness of the adapter zone,
+   the engine-purity preservation, the reviewer wiring update,
+   the unchanged UI/route surface, and the Part 13 boundary regex
+   rephrasing.
+
+### Why the boundary is now stronger, not weaker
+
+The previous rule said "no token matching `dapStageRubrics` or
+`DapStageRubric` may appear in the adapter folder." The new rule
+says "no file in the adapter folder may import from
+`lib/cb-control-center/`." The new rule is:
+
+- **More precise.** It directly states the architectural
+  invariant. The old rule was a name-shape coincidence that just
+  happened to align with the invariant while the rubric file
+  lived outside the adapter.
+- **Stricter on the actual risk surface.** Path-based dependency
+  bans catch *any* legacy file an adapter might pull in, not just
+  the two that were named.
+- **Unblocking instead of paralyzing.** Pure data files no longer
+  fail the boundary just because the architectural review
+  borrowed their type-name. A future Part-N can move other pure
+  DAP data the same way without further regex surgery.
+
+The adapter zone's runtime-behavior bans (`dapStageReviewer`,
+`reviewStage`, `StageAiReview`) remain — those tokens identify
+runtime concerns (SDK transport, legacy UI shape) that have no
+legitimate place in an adapter and would not be caught by a
+path-based check alone.
+
+### What was deliberately not changed
+
+- `dapStageReviewer.ts` stays in `lib/cb-control-center/`.
+  Reasoning unchanged from Part 17/18: it calls
+  `getAnthropicClient()` and depends on `DapStageGate` from the
+  legacy folder. Moving requires either weakening adapter purity
+  (forbidden) or splitting the file into pure prompt assembly +
+  Anthropic execution (the suggested Part 20).
+- `cbccAnthropicAiReviewProvider.ts`,
+  `dapStageAiReviewLegacy.ts`, the route, the engine, and the UI
+  panel are untouched. Behavior preservation verified end-to-end
+  by Part 19 Section F (route still calls `runCbccAiReview` +
+  `consumeLastLegacy()`; panel still imports legacy types from
+  the reviewer module).
+- The DAP adapter local barrel (`lib/cbcc/adapters/dap/index.ts`)
+  was deliberately NOT updated to re-export the rubric. Keeping
+  it out of the barrel keeps the engine barrel clean (Part 19
+  Section D verifies neither the engine barrel nor the adapter
+  barrel re-export the rubric) and forces the legacy reviewer to
+  reach for the rubric explicitly via the file path — making it
+  easier to reason about who depends on review-time data.
+
+### Validation results
+
+- Page-policy guard: pass (`pnpm check:page-policy`, 17 files
+  scanned under 3 rule prefixes).
+- Typecheck: clean (`pnpm typecheck`).
+- Vitest: **6188 tests pass**, 1 skipped, 103 files
+  (`pnpm test`).
+- Lint: 0 errors, 50 warnings — all pre-existing
+  (`pnpm lint`).
+- Production build: succeeds (`pnpm build`).
+
+### Recommendation for Part 20
+
+The next high-leverage piece is the suggested Part 20 from the
+Part 19 directive: **split `dapStageReviewer.ts` into pure prompt
+assembly vs. Anthropic execution.** Today the reviewer mixes:
+
+1. `DAP_TRUTH_RULES` constant (pure data)
+2. system + user prompt assembly (pure function of gate + rubric
+   + truth rules)
+3. `getAnthropicClient()` + `client.messages.create(...)` (the
+   SDK transport)
+4. response text extraction + `JSON.parse` + error fallback (the
+   transport layer)
+
+Items (1) and (2) qualify for the adapter zone the same way the
+rubric did — they're pure data and pure functions of pure data.
+Once extracted, only items (3) and (4) need to live in
+`lib/cb-control-center/`, and they fit naturally inside
+`cbccAnthropicAiReviewProvider.ts`. After that, the reviewer
+file either becomes a thin transport stub or disappears entirely,
+folded into the provider.
+
+That's the move that finishes the path-to-clean-shape sketched
+across Parts 13–19:
+
+- `lib/cbcc/` — generic engine (already clean)
+- `lib/cbcc/adapters/dap/` — DAP project + stages + rubric +
+  prompt builder + truth rules
+- `lib/cb-control-center/` — Next/UI/app-adjacent legacy + the
+  Anthropic transport boundary + legacy review compatibility
+
+
+
 

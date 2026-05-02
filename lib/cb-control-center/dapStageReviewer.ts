@@ -10,7 +10,7 @@
 
 import { getAnthropicClient } from './anthropicClient'
 import type { DapStageGate } from './dapStageGates'
-import { getDapStageRubric, formatDapStageRubricForPrompt } from './dapStageRubrics'
+import { getDapStageRubric, formatDapStageRubricForPrompt } from '@/lib/cbcc/adapters/dap/dapStageRubrics'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

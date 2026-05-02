@@ -48,7 +48,8 @@ const ROOT = resolve(__dirname, '..', '..')
 const LEGACY_MAPPER_PATH    = resolve(ROOT, 'lib/cb-control-center/dapStageAiReviewLegacy.ts')
 const PROVIDER_PATH         = resolve(ROOT, 'lib/cb-control-center/cbccAnthropicAiReviewProvider.ts')
 const REVIEWER_PATH         = resolve(ROOT, 'lib/cb-control-center/dapStageReviewer.ts')
-const RUBRICS_PATH          = resolve(ROOT, 'lib/cb-control-center/dapStageRubrics.ts')
+// Part 19: rubric file moved into the adapter zone.
+const RUBRICS_PATH          = resolve(ROOT, 'lib/cbcc/adapters/dap/dapStageRubrics.ts')
 const ROUTE_PATH            = resolve(ROOT, 'app/api/businesses/dental-advantage-plan/stages/review/route.ts')
 const REVIEW_PANEL_PATH     = resolve(ROOT, 'components/cb-control-center/StageAiReviewPanel.tsx')
 const ENGINE_AI_PATH        = resolve(ROOT, 'lib/cbcc/aiReview.ts')
@@ -95,7 +96,10 @@ describe('Part 18 — A. Responsibility map (inspection asserted against source)
     const src = readFileSync(REVIEWER_PATH, 'utf-8')
     expect(src).toContain('getAnthropicClient')
     expect(src).toMatch(/messages\.create\s*\(/)
-    expect(src).toContain("from './dapStageRubrics'")
+    // Part 19: rubric is imported from the adapter zone now, not the
+    // legacy folder. The reviewer is one of the few cross-boundary
+    // importers we explicitly allow (legacy → adapter is one-way safe).
+    expect(src).toContain("from '@/lib/cbcc/adapters/dap/dapStageRubrics'")
   })
 
   it('legacy reviewer continues to own the legacy types StageAiReview / StageAiChecklistResult', () => {
