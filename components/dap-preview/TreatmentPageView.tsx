@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { REQUEST_FLOW_ROUTE, DIRECTORY_ROUTE } from '@/lib/cb-control-center/dapDisplayRules'
-import type { DapTreatmentPageCmsRecord } from '@/lib/cb-control-center/dapCmsTypes'
+import type { DapTreatmentPageCmsRecord } from '@/lib/dap/site/dapCmsTypes'
 
 interface TreatmentPageViewProps {
   record: DapTreatmentPageCmsRecord

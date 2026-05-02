@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { getStatusColors } from '@/lib/cb-control-center/dapDisplayRules'
 import { ProviderStatusBadge } from './ProviderStatusBadge'
-import type { DapPracticeCmsRecord } from '@/lib/cb-control-center/dapCmsTypes'
+import type { DapPracticeCmsRecord } from '@/lib/dap/site/dapCmsTypes'
 
 interface ProviderResultCardProps {
   record: DapPracticeCmsRecord

@@ -2,7 +2,7 @@ import { validateDapCmsSourceBundle } from './source/dapSourceValidation'
 import { buildDapCmsSnapshotFromSource } from './source/dapSourceAdapter'
 import { runClaimQA } from './dapClaimQA'
 import type { DapCmsSourceBundle } from './source/dapSourceTypes'
-import type { DapCmsSnapshot } from './dapCmsTypes'
+import type { DapCmsSnapshot } from '../dap/site/dapCmsTypes'
 import type { DapSourceValidationResult } from './source/dapSourceValidation'
 import type { QASummary } from './dapClaimQA'
 

@@ -36,6 +36,7 @@ Routes stay stable. App files become thin import shells.
 | dapOfferTermsTypes.ts | `lib/cb-control-center/dapOfferTermsTypes.ts` | `lib/dap/registry/dapOfferTermsTypes.ts` | feat(dap): Wave 1E extract offer terms types | 2026-05-02 |
 | dapOfferTermsReviewTypes.ts | `lib/cb-control-center/dapOfferTermsReviewTypes.ts` | `lib/dap/registry/dapOfferTermsReviewTypes.ts` | feat(dap): Wave 1F extract offer terms review types | 2026-05-02 |
 | dapMemberStatusTypes.ts | `lib/cb-control-center/dapMemberStatusTypes.ts` | `lib/dap/membership/dapMemberStatusTypes.ts` | feat(dap): Wave 1G extract member status types | 2026-05-02 |
+| dapCmsTypes.ts | `lib/cb-control-center/dapCmsTypes.ts` | `lib/dap/site/dapCmsTypes.ts` | feat(dap): Wave 1H extract CMS types | 2026-05-02 |
 
 Import sites updated (dapRequestTypes): 13 files (app/, components/, lib/cb-control-center/, dap-phase-tests/)
 Note: dapPhase9A.test.ts and dapPhase9F.test.ts had hardcoded path constants — both updated to new path, assertions unchanged.
@@ -55,12 +56,15 @@ Note: dapPhase9K.test.ts had REVIEW_TYPES_PATH constant — updated to new path,
 Import sites updated (dapMemberStatusTypes): 15 files (3 app alias, 9 lib relative, 3 test direct imports + 1 path constant).
 Notes: dapPhase9Q had both a direct type import and TYPES_PATH constant. dapPhase9R and dapPhase9S had direct type imports only. dapPhase10 regex /dapMemberStatusTypes/ unchanged — still matches updated import path.
 
+Import sites updated (dapCmsTypes): 10 files (5 alias, 3 relative from lib/, 1 relative from lib/source/, 1 test direct import).
+Note: internal import updated from './types' to '@/lib/cb-control-center/types' (cross-layer dep, allowed per criteria). ProviderStatus/PublicClaimLevel extraction is deferred future work.
+
 ## Planned waves
 
 ### Wave 1 remaining (pure types)
-- dapCmsTypes
-- source/dapSourceTypes
-- mkcrm/dapClientBuilderBillingTypes
+Wave 1 complete. Two files deferred:
+- source/dapSourceTypes — has inbound deps from source pipeline; assess separately
+- mkcrm/dapClientBuilderBillingTypes — lives under mkcrm/ subdirectory; assess separately
 
 ### Wave 2 — Pure rules/logic (no Supabase)
 - dapRequestRules

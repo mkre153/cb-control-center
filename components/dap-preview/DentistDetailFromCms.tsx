@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { DIRECTORY_ROUTE, REQUEST_FLOW_ROUTE } from '@/lib/cb-control-center/dapDisplayRules'
 import { ProviderStatusBadge } from './ProviderStatusBadge'
-import type { DapDentistPageCmsRecord } from '@/lib/cb-control-center/dapCmsTypes'
+import type { DapDentistPageCmsRecord } from '@/lib/dap/site/dapCmsTypes'
 
 interface DentistDetailFromCmsProps {
   record: DapDentistPageCmsRecord

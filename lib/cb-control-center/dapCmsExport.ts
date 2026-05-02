@@ -29,7 +29,7 @@ import type {
   DapTreatmentPageCmsRecord,
   DapCmsSnapshot,
   DentistPublicState,
-} from './dapCmsTypes'
+} from '../dap/site/dapCmsTypes'
 import { buildDapCmsSnapshotFromSource } from './source/dapSourceAdapter'
 import type { DapCmsSourceBundle } from './source/dapSourceTypes'
 

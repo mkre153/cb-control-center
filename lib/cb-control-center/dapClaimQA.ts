@@ -6,7 +6,7 @@ import type {
   DapDentistPageCmsRecord,
   DapDecisionPageCmsRecord,
   DapTreatmentPageCmsRecord,
-} from './dapCmsTypes'
+} from '../dap/site/dapCmsTypes'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

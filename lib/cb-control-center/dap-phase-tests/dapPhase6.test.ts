@@ -9,7 +9,7 @@ import type {
   DapDentistPageCmsRecord,
   DapDecisionPageCmsRecord,
   DapCmsSnapshot,
-} from '../dapCmsTypes'
+} from '../../dap/site/dapCmsTypes'
 
 // ─── Mock factories ───────────────────────────────────────────────────────────
 

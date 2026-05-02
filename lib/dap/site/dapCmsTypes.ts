@@ -1,4 +1,4 @@
-import type { ProviderStatus, PublicClaimLevel } from './types'
+import type { ProviderStatus, PublicClaimLevel } from '@/lib/cb-control-center/types'
 
 export interface DapPracticeCmsRecord {
   id: string

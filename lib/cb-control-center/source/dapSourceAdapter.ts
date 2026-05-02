@@ -19,7 +19,7 @@ import type {
   DapTreatmentPageCmsRecord,
   DapCmsSnapshot,
   DentistPublicState,
-} from '../dapCmsTypes'
+} from '../../dap/site/dapCmsTypes'
 import type { ProviderStatus, PublicClaimLevel } from '../types'
 import type {
   DapPracticeSourceRecord,

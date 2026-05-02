@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { REQUEST_FLOW_ROUTE, DIRECTORY_ROUTE } from '@/lib/cb-control-center/dapDisplayRules'
-import type { DapDecisionPageCmsRecord } from '@/lib/cb-control-center/dapCmsTypes'
+import type { DapDecisionPageCmsRecord } from '@/lib/dap/site/dapCmsTypes'
 
 interface DecisionPageViewProps {
   record: DapDecisionPageCmsRecord

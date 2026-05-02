@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { exportDapCmsSnapshot } from '@/lib/cb-control-center/dapCmsExport'
 import { runClaimQA } from '@/lib/cb-control-center/dapClaimQA'
 import type { QAWarning, QASummary } from '@/lib/cb-control-center/dapClaimQA'
-import type { DapCmsSnapshot, DapTreatmentPageCmsRecord } from '@/lib/cb-control-center/dapCmsTypes'
+import type { DapCmsSnapshot, DapTreatmentPageCmsRecord } from '@/lib/dap/site/dapCmsTypes'
 
 export default function CmsSnapshotPage() {
   const snapshot = exportDapCmsSnapshot()
