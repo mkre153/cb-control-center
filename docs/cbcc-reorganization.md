@@ -2192,4 +2192,106 @@ review file outside the adapter zone, and a follow-up part can
 shrink it to a thin Anthropic transport behind the same provider
 boundary established here.
 
+## Part 18 Addendum — Decompose Legacy DAP Reviewer Boundary (2026-05-01)
+
+**Goal.** Take the Part 17 provider apart along its real
+responsibilities — Anthropic transport vs. legacy↔engine shape
+conversion — so future provider/mapper changes can move
+independently. Inspection-first; extraction only where obvious;
+no boundary weakening.
+
+### Responsibility map (inspection result)
+
+| File | Owns today | Should keep | Could extract | Decision |
+|------|------------|-------------|---------------|----------|
+| `lib/cb-control-center/dapStageReviewer.ts` | `StageAiReview` / `StageAiChecklistResult` types · `DAP_TRUTH_RULES` · prompt assembly · Anthropic SDK call · response parse · error fallback | The SDK call site (this is why it lives here) | Prompt assembly into a pure helper | **Defer.** Not obvious enough; intertwined with rubric/truth-rules and only ~113 lines total. |
+| `lib/cb-control-center/dapStageRubrics.ts` | Per-stage rubric data · prompt format helper | All of the above (already pure) | Could move to `lib/cbcc/adapters/dap/` | **Defer.** Part 13 Group 2 symbol guard explicitly bans the names `dapStageRubrics`/`DapStageRubric` from adapter files. Moving requires loosening that regex (separate Part). |
+| `lib/cb-control-center/cbccAnthropicAiReviewProvider.ts` (Part 17) | legacy↔engine raw mapper · `DapAnthropicAiReviewProvider` interface · single-shot factory · `consumeLastLegacy()` | Provider interface + factory + harvest | The mapper has no SDK dependency and is conceptually shape-conversion, not transport | **Extract.** Pulled into a sibling `dapStageAiReviewLegacy.ts`. |
+| `lib/cbcc/aiReview.ts` + `lib/cbcc/aiReviewProvider.ts` | Pure engine contract + port | All of the above | Nothing | **Untouched.** |
+| `app/api/businesses/dental-advantage-plan/stages/review/route.ts` (Part 17) | HTTP handler · stage resolution · packet build · provider call · legacy harvest | All of the above | Nothing | **Untouched.** |
+| `components/cb-control-center/StageAiReviewPanel.tsx` | Renders the legacy `StageAiReview` shape | All of the above | Nothing | **Untouched.** |
+
+### What changed
+
+1. New file: `lib/cb-control-center/dapStageAiReviewLegacy.ts`
+   owns `legacyReviewToEngineRaw()` and
+   `LegacyToEngineMappingOptions`. Pure, no SDK/IO/Next/React, no
+   imports from `lib/cbcc/`.
+2. `cbccAnthropicAiReviewProvider.ts` no longer defines the
+   mapper or its options — it imports them from the new file.
+   The provider file is now Anthropic-boundary + harvest only.
+3. Part 17 test imports updated to read
+   `legacyReviewToEngineRaw` from the new module. The "module
+   exports the factory and the mapping function" assertion was
+   split into two single-module assertions (no weakening — the
+   same two facts are still asserted).
+4. New file: `lib/cb-control-center/dapStagePart18.test.ts` (52
+   tests in 8 sections) records the responsibility map as
+   executable invariants and asserts every boundary Part 18
+   promised not to weaken.
+
+### What was deliberately not changed
+
+- `dapStageReviewer.ts` was **not** thinned further. The directive
+  said "extract only if obvious" — prompt assembly, truth rules,
+  rubric integration, and SDK call are tightly intertwined inside
+  ~113 lines, and pulling any one out risks churn for marginal
+  benefit.
+- `dapStageRubrics.ts` was **not** moved into the adapter zone.
+  Part 13 Group 2 explicitly bans the symbol names; moving
+  requires rephrasing the boundary regex, which is a separate
+  Part.
+- The route, the engine, the adapter, and the UI panel were
+  **not** touched. Behavior preservation is verified end-to-end
+  by Part 18 Section D.
+
+### Boundary status
+
+- Engine (`lib/cbcc/`) — pure. No SDK, no DAP review symbol
+  leakage, no reference to the new mapper or to the provider.
+- Adapter (`lib/cbcc/adapters/dap/`) — pure. No reference to the
+  mapper, no reference to the provider, no `cb-control-center`
+  imports.
+- Runtime provider (`cbccAnthropicAiReviewProvider.ts`) — owns
+  transport + harvest. Imports the engine port and the legacy
+  reviewer; imports the new mapper for shape conversion.
+- New mapper (`dapStageAiReviewLegacy.ts`) — pure shape
+  conversion. Imports only the legacy `StageAiReview` type.
+- Route — unchanged from Part 17. Still flows through
+  `runCbccAiReview` and returns the legacy harvest.
+- UI panel — unchanged. Still imports legacy types from
+  `dapStageReviewer.ts`.
+
+### Validation results
+
+- Page-policy guard: pass (`pnpm check:page-policy`, 17 files
+  scanned under 3 rule prefixes).
+- Typecheck: clean (`pnpm typecheck`).
+- Vitest: **6141 tests pass**, 1 skipped, 102 files
+  (`pnpm test`).
+- Lint: 0 errors, 50 warnings — all pre-existing
+  (`pnpm lint`).
+- Production build: succeeds (`pnpm build`).
+
+### Recommendation for Part 19
+
+The next high-value boundary improvement is rephrasing the Part
+13 Group 2 adapter purity regex from "ban symbol name" to "ban
+import path." Today the guard reads
+`{ pattern: /dapStageRubrics/, label: 'dapStageRubrics reference' }`
+and matches any token, including a comment that mentions the
+file by name. Once this is rephrased to match
+`from ['"][^'"]*dapStageRubrics[^'"]*['"]` the rubric data — which
+is already pure — qualifies for the adapter zone, and a follow-up
+Part can move it without weakening the test.
+
+After that move, the next candidate is `dapStageReviewer.ts`.
+With the rubric module relocated and the prompt assembly
+extracted (also a Part 19+ candidate), the reviewer shrinks to a
+thin Anthropic transport that can either remain in
+`lib/cb-control-center/` as a deliberate runtime boundary or be
+folded into `cbccAnthropicAiReviewProvider.ts` directly. Either
+shape is defensible; the choice depends on whether the project
+eventually adds a non-Anthropic provider.
+
 

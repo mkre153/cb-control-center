@@ -1,5 +1,5 @@
 // CBCC runtime provider — Anthropic-backed AI review for DAP stages
-// (Part 17 — provider-port migration).
+// (Part 17 — provider-port migration; Part 18 — mapper extracted).
 //
 // This file is the boundary between the generic CBCC AI review port
 // (`lib/cbcc/aiReviewProvider.ts`) and the legacy DAP-specific reviewer
@@ -16,9 +16,13 @@
 // the factory below, which produces a single-shot `CbccAiReviewProvider`
 // for one (gate, packet) pair.
 //
-// Architecture invariants (asserted by Part 17 boundary tests):
+// Part 18 split: pure shape conversion now lives in
+// `dapStageAiReviewLegacy.ts`. This file owns transport + harvest only.
 //
-//   - This module is allowed to import `dapStageReviewer.ts`.
+// Architecture invariants (asserted by Part 17 / Part 18 boundary tests):
+//
+//   - This module is allowed to import `dapStageReviewer.ts` and
+//     `dapStageAiReviewLegacy.ts`.
 //   - This module is allowed to import the engine port from `@/lib/cbcc/...`.
 //   - This module is NOT allowed to be imported by `lib/cbcc/...` or by
 //     `lib/cbcc/adapters/dap/...`.
@@ -28,87 +32,7 @@ import type { CbccAiReviewProvider } from '@/lib/cbcc/aiReviewProvider'
 import type { CbccAiReviewPromptPacket } from '@/lib/cbcc/types'
 import type { DapStageGate } from './dapStageGates'
 import { reviewStage, type StageAiReview } from './dapStageReviewer'
-
-// ─── Legacy ↔ engine raw mapping ──────────────────────────────────────────────
-//
-// Pure mapping function. Translates the legacy reviewer's output shape into
-// a raw object the generic engine's `normalizeCbccAiReviewResult` can accept.
-// Unknown fields are ignored by normalize; we use that to passthrough the
-// legacy review object via `_legacy` for callers that need UI-shape compat.
-//
-// The mapping is deliberately conservative:
-//   - 'approve'           → decision 'pass',                action 'proceed_to_owner_review'
-//   - 'request_revision'  → decision 'pass_with_concerns',  action 'address_risks'
-//   - 'disapprove'        → decision 'fail',                action 'revise_artifact'
-//   - confidence          → severity used for derived risks (high/medium/low)
-//   - failed checklist    → engine risks (one per failed item)
-//
-// Edge cases:
-//   - empty `reasoning` falls back to a synthetic non-empty summary so the
-//     normalize step doesn't trip.
-
-export interface LegacyToEngineMappingOptions {
-  // Optional model identifier passed through to normalize. Defaults to the
-  // legacy reviewer's model. Callers may override for testing.
-  model?: string
-  // Optional promptVersion for auditability — purely informational.
-  promptVersion?: string
-}
-
-export function legacyReviewToEngineRaw(
-  legacy: StageAiReview,
-  options: LegacyToEngineMappingOptions = {},
-): Record<string, unknown> {
-  const decision = (() => {
-    switch (legacy.recommendation) {
-      case 'approve':           return 'pass'
-      case 'disapprove':        return 'fail'
-      case 'request_revision':  return 'pass_with_concerns'
-      default:                  return 'pass_with_concerns'
-    }
-  })()
-
-  const action = (() => {
-    switch (legacy.recommendation) {
-      case 'approve':           return 'proceed_to_owner_review'
-      case 'disapprove':        return 'revise_artifact'
-      case 'request_revision':  return 'address_risks'
-      default:                  return 'address_risks'
-    }
-  })()
-
-  const severity = (() => {
-    switch (legacy.confidence) {
-      case 'high':    return 'high'
-      case 'medium':  return 'medium'
-      case 'low':     return 'low'
-      default:        return 'low'
-    }
-  })()
-
-  const summary = (legacy.reasoning ?? '').trim()
-    || `Advisory ${legacy.recommendation} with ${legacy.confidence} confidence.`
-
-  const rationale = (legacy.reasoning ?? '').trim()
-    || `Advisory ${legacy.recommendation} (mapped from legacy DAP reviewer).`
-
-  const risks = legacy.checklistResults
-    .filter(c => !c.passed)
-    .map((c, i) => ({
-      id: `checklist-${i + 1}`,
-      severity,
-      message: c.note ? `${c.criterion} — ${c.note}` : c.criterion,
-    }))
-
-  return {
-    decision,
-    summary,
-    recommendation: { action, rationale },
-    risks,
-    model: options.model ?? 'claude-opus-4-7',
-    promptVersion: options.promptVersion,
-  }
-}
+import { legacyReviewToEngineRaw } from './dapStageAiReviewLegacy'
 
 // ─── Provider implementation ──────────────────────────────────────────────────
 //

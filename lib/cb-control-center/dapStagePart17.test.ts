@@ -22,10 +22,10 @@ import { readFileSync, readdirSync, existsSync } from 'fs'
 import { resolve } from 'path'
 
 import {
-  legacyReviewToEngineRaw,
   createDapAnthropicAiReviewProvider,
   type DapAnthropicAiReviewProvider,
 } from './cbccAnthropicAiReviewProvider'
+import { legacyReviewToEngineRaw } from './dapStageAiReviewLegacy'
 import type { StageAiReview } from './dapStageReviewer'
 import type { DapStageGate } from './dapStageGates'
 import { runCbccAiReview } from '@/lib/cbcc/aiReviewProvider'
@@ -79,9 +79,12 @@ describe('Part 17 — A. Runtime provider module shape', () => {
     expect(existsSync(PROVIDER_PATH)).toBe(true)
   })
 
-  it('module exports the factory and the mapping function', () => {
-    expect(typeof legacyReviewToEngineRaw).toBe('function')
+  it('provider module exports the factory', () => {
     expect(typeof createDapAnthropicAiReviewProvider).toBe('function')
+  })
+
+  it('legacy mapper module exports the mapping function', () => {
+    expect(typeof legacyReviewToEngineRaw).toBe('function')
   })
 
   it('module imports the engine port (CbccAiReviewProvider) — not the legacy reviewer alone', () => {
