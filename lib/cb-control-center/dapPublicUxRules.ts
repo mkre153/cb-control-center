@@ -18,7 +18,7 @@ import type {
   DapTreatmentPageCtaModel,
   DapSearchResultsInput,
   DapSearchResultsModel,
-} from './dapPublicUxTypes'
+} from '../dap/site/dapPublicUxTypes'
 
 // ─── Availability State Mapping ───────────────────────────────────────────────
 

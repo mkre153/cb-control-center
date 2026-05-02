@@ -1,4 +1,4 @@
-import type { DapProviderCardModel, DapAvailabilityState } from '@/lib/cb-control-center/dapPublicUxTypes'
+import type { DapProviderCardModel, DapAvailabilityState } from '@/lib/dap/site/dapPublicUxTypes'
 import { DapPublicCta } from './DapPublicCta'
 import { DapStatusBadge } from './DapStatusBadge'
 

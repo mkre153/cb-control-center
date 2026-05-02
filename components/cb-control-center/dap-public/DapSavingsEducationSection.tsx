@@ -1,4 +1,4 @@
-import type { DapSavingsEducationModel } from '@/lib/cb-control-center/dapPublicUxTypes'
+import type { DapSavingsEducationModel } from '@/lib/dap/site/dapPublicUxTypes'
 
 interface DapSavingsEducationSectionProps {
   model: DapSavingsEducationModel

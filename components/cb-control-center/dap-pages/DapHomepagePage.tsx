@@ -3,7 +3,7 @@ import type {
   DapHowItWorksSectionModel,
   DapComparisonSectionModel,
   DapFaqSectionModel,
-} from '@/lib/cb-control-center/dapPublicUxTypes'
+} from '@/lib/dap/site/dapPublicUxTypes'
 import { DapHomepageHeroPreview } from '@/components/cb-control-center/dap-public/DapHomepageHeroPreview'
 import { DapHowItWorksSection } from '@/components/cb-control-center/dap-public/DapHowItWorksSection'
 import { DapComparisonSection } from '@/components/cb-control-center/dap-public/DapComparisonSection'

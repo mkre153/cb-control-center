@@ -1,4 +1,4 @@
-import type { DapHowItWorksSectionModel } from '@/lib/cb-control-center/dapPublicUxTypes'
+import type { DapHowItWorksSectionModel } from '@/lib/dap/site/dapPublicUxTypes'
 
 interface DapHowItWorksSectionProps {
   model: DapHowItWorksSectionModel

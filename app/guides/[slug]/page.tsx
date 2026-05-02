@@ -11,7 +11,7 @@ import { DapPublicCta } from '@/components/cb-control-center/dap-public/DapPubli
 import { DapSavingsEducationSection } from '@/components/cb-control-center/dap-public/DapSavingsEducationSection'
 import { DapComparisonSection } from '@/components/cb-control-center/dap-public/DapComparisonSection'
 import { DapFaqSection } from '@/components/cb-control-center/dap-public/DapFaqSection'
-import type { DapCtaModel, DapPublicCtaType } from '@/lib/cb-control-center/dapPublicUxTypes'
+import type { DapCtaModel, DapPublicCtaType } from '@/lib/dap/site/dapPublicUxTypes'
 
 type Params = Promise<{ slug: string }>
 

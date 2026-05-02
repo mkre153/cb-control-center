@@ -36,7 +36,7 @@ import type {
   DapProviderCardModel,
   DapGateState,
   DapAvailabilityState,
-} from '../dapPublicUxTypes'
+} from '../../dap/site/dapPublicUxTypes'
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 

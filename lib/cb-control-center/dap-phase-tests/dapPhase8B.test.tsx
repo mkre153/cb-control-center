@@ -50,7 +50,7 @@ import {
   getDefaultSavingsEducationModel,
 } from '../dapPublicSectionModels'
 
-import type { DapAvailabilityState, DapGateState, DapProviderCardModel } from '../dapPublicUxTypes'
+import type { DapAvailabilityState, DapGateState, DapProviderCardModel } from '../../dap/site/dapPublicUxTypes'
 
 // ─── Project root ─────────────────────────────────────────────────────────────
 

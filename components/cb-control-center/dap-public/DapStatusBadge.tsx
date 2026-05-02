@@ -1,4 +1,4 @@
-import type { DapStatusBadgeModel, DapStatusBadgeVariant } from '@/lib/cb-control-center/dapPublicUxTypes'
+import type { DapStatusBadgeModel, DapStatusBadgeVariant } from '@/lib/dap/site/dapPublicUxTypes'
 
 const BADGE_STYLES: Record<DapStatusBadgeVariant, string> = {
   confirmed:     'bg-green-100 text-green-700 border-green-200',

@@ -5,7 +5,7 @@ import type {
   DapFaqSectionModel,
   DapCtaModel,
   DapPublicCtaType,
-} from '@/lib/cb-control-center/dapPublicUxTypes'
+} from '@/lib/dap/site/dapPublicUxTypes'
 import { DapPublicCta } from '@/components/cb-control-center/dap-public/DapPublicCta'
 import { DapComparisonSection } from '@/components/cb-control-center/dap-public/DapComparisonSection'
 import { DapSavingsEducationSection } from '@/components/cb-control-center/dap-public/DapSavingsEducationSection'

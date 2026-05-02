@@ -1,4 +1,4 @@
-import type { DapProviderCardModel, DapSearchResultsModel, DapCtaModel } from '@/lib/cb-control-center/dapPublicUxTypes'
+import type { DapProviderCardModel, DapSearchResultsModel, DapCtaModel } from '@/lib/dap/site/dapPublicUxTypes'
 import { DapProviderCard } from './DapProviderCard'
 import { DapNoResultsPanel } from './DapNoResultsPanel'
 import { DapPublicCta } from './DapPublicCta'

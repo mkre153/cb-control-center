@@ -1,4 +1,4 @@
-import type { DapCtaModel, DapPublicCtaType } from '@/lib/cb-control-center/dapPublicUxTypes'
+import type { DapCtaModel, DapPublicCtaType } from '@/lib/dap/site/dapPublicUxTypes'
 
 const CTA_BASE = 'inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-semibold transition-colors'
 

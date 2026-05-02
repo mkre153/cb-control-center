@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import type { DapRequestFlowModel } from '@/lib/cb-control-center/dapPublicUxTypes'
+import type { DapRequestFlowModel } from '@/lib/dap/site/dapPublicUxTypes'
 import type {
   DapRequestConfirmationModel,
   DapRequestValidationIssue,

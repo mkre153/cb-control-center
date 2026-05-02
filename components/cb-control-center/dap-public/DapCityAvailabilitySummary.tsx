@@ -1,4 +1,4 @@
-import type { DapCityAvailabilitySummary, DapCtaModel } from '@/lib/cb-control-center/dapPublicUxTypes'
+import type { DapCityAvailabilitySummary, DapCtaModel } from '@/lib/dap/site/dapPublicUxTypes'
 import { DapPublicCta } from './DapPublicCta'
 
 const CITY_CTA_LABELS: Record<string, { label: string; href: string }> = {

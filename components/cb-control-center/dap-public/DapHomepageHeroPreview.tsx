@@ -1,4 +1,4 @@
-import type { DapHomepageHeroModel } from '@/lib/cb-control-center/dapPublicUxTypes'
+import type { DapHomepageHeroModel } from '@/lib/dap/site/dapPublicUxTypes'
 import { DapPublicCta } from './DapPublicCta'
 
 interface DapHomepageHeroPreviewProps {

@@ -5,7 +5,7 @@ import type {
   DapNoResultsModel,
   DapHowItWorksSectionModel,
   DapFaqSectionModel,
-} from '@/lib/cb-control-center/dapPublicUxTypes'
+} from '@/lib/dap/site/dapPublicUxTypes'
 import { DapCityAvailabilitySummaryView } from '@/components/cb-control-center/dap-public/DapCityAvailabilitySummary'
 import { DapProviderCard } from '@/components/cb-control-center/dap-public/DapProviderCard'
 import { DapNoResultsPanel } from '@/components/cb-control-center/dap-public/DapNoResultsPanel'

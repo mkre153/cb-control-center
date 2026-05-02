@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { exportDapCmsSnapshot } from '@/lib/cb-control-center/dapCmsExport'
 import { DapPublicCta } from '@/components/cb-control-center/dap-public/DapPublicCta'
-import type { DapCtaModel } from '@/lib/cb-control-center/dapPublicUxTypes'
+import type { DapCtaModel } from '@/lib/dap/site/dapPublicUxTypes'
 
 type Params = Promise<{ city: string }>
 

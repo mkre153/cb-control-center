@@ -1,4 +1,4 @@
-import type { DapFaqSectionModel } from '@/lib/cb-control-center/dapPublicUxTypes'
+import type { DapFaqSectionModel } from '@/lib/dap/site/dapPublicUxTypes'
 
 interface DapFaqSectionProps {
   model: DapFaqSectionModel

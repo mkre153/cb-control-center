@@ -17,7 +17,7 @@ import {
   getRequestFlowModel,
   getCityPageModel,
 } from '../dapPublicUxRules'
-import type { DapGateState } from '../dapPublicUxTypes'
+import type { DapGateState } from '../../dap/site/dapPublicUxTypes'
 
 // ─── Gate state helpers ───────────────────────────────────────────────────────
 

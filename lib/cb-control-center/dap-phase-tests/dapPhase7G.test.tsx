@@ -51,7 +51,7 @@ import {
   getAllowedPublicClaimsForPractice,
 } from '../dapPublicUxRules'
 import { exportDapCmsSnapshot } from '../dapCmsExport'
-import type { DapProviderCardModel, DapGateState } from '../dapPublicUxTypes'
+import type { DapProviderCardModel, DapGateState } from '../../dap/site/dapPublicUxTypes'
 
 // ─── Project root ─────────────────────────────────────────────────────────────
 

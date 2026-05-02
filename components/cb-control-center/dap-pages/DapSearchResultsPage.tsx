@@ -2,7 +2,7 @@ import type {
   DapSearchResultsModel,
   DapProviderCardModel,
   DapHowItWorksSectionModel,
-} from '@/lib/cb-control-center/dapPublicUxTypes'
+} from '@/lib/dap/site/dapPublicUxTypes'
 import { DapSearchResultsPreview } from '@/components/cb-control-center/dap-public/DapSearchResultsPreview'
 import { DapHowItWorksSection } from '@/components/cb-control-center/dap-public/DapHowItWorksSection'
 

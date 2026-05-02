@@ -1,4 +1,4 @@
-import type { DapAvailabilityState, DapGateState, DapProviderCardModel } from '@/lib/cb-control-center/dapPublicUxTypes'
+import type { DapAvailabilityState, DapGateState, DapProviderCardModel } from '@/lib/dap/site/dapPublicUxTypes'
 import {
   getHomepageHeroModel,
   getRequestFlowModel,

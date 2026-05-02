@@ -3,7 +3,7 @@ import type {
   DapProviderCardModel,
   DapSavingsEducationModel,
   DapFaqSectionModel,
-} from '@/lib/cb-control-center/dapPublicUxTypes'
+} from '@/lib/dap/site/dapPublicUxTypes'
 import { DapProviderCard } from '@/components/cb-control-center/dap-public/DapProviderCard'
 import { DapSavingsEducationSection } from '@/components/cb-control-center/dap-public/DapSavingsEducationSection'
 import { DapFaqSection } from '@/components/cb-control-center/dap-public/DapFaqSection'

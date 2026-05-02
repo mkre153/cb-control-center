@@ -1,4 +1,4 @@
-import type { DapComparisonSectionModel } from '@/lib/cb-control-center/dapPublicUxTypes'
+import type { DapComparisonSectionModel } from '@/lib/dap/site/dapPublicUxTypes'
 
 interface DapComparisonSectionProps {
   model: DapComparisonSectionModel

@@ -1,4 +1,4 @@
-import type { DapNoResultsModel } from '@/lib/cb-control-center/dapPublicUxTypes'
+import type { DapNoResultsModel } from '@/lib/dap/site/dapPublicUxTypes'
 import { DapPublicCta } from './DapPublicCta'
 
 interface DapNoResultsPanelProps {

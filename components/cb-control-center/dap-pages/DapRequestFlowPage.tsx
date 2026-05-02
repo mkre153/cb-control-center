@@ -1,4 +1,4 @@
-import type { DapRequestFlowModel } from '@/lib/cb-control-center/dapPublicUxTypes'
+import type { DapRequestFlowModel } from '@/lib/dap/site/dapPublicUxTypes'
 import { DapRequestFlowPreview } from '@/components/cb-control-center/dap-public/DapRequestFlowPreview'
 
 interface DapRequestFlowPageProps {
