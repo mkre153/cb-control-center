@@ -33,7 +33,7 @@ const ROOT = resolve(__dirname, '../../..')
 
 // ─── Key paths ────────────────────────────────────────────────────────────────
 
-const REVIEW_TYPES_PATH   = resolve(ROOT, 'lib/cb-control-center/dapOfferTermsReviewTypes.ts')
+const REVIEW_TYPES_PATH   = resolve(ROOT, 'lib/dap/registry/dapOfferTermsReviewTypes.ts')
 const REVIEW_RULES_PATH   = resolve(ROOT, 'lib/cb-control-center/dapOfferTermsReviewRules.ts')
 const REVIEW_MODULE_PATH  = resolve(ROOT, 'lib/cb-control-center/dapOfferTermsReview.ts')
 const REVIEW_ACTIONS_PATH = resolve(ROOT, 'app/preview/dap/offer-terms/reviewActions.ts')

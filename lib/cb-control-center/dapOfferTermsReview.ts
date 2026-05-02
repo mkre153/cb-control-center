@@ -6,7 +6,7 @@ import type {
   DapOfferTermsReviewResult,
   CreateDapOfferTermsReviewInput,
   DapOfferTermsReviewActionInput,
-} from './dapOfferTermsReviewTypes'
+} from '../dap/registry/dapOfferTermsReviewTypes'
 import {
   isOfferTermsDraftEligibleForReview,
   evaluateOfferTermsReviewCriteria,

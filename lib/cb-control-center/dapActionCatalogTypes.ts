@@ -5,7 +5,7 @@
 import type { DapRequestStatus }                  from '../dap/registry/dapRequestTypes'
 import type { DapMemberStanding }                  from './dapMemberStatusTypes'
 import type { DapAdminDecisionReadinessStatus }    from './dapAdminDecisionReadiness'
-import type { DapOfferTermsReviewStatus }          from './dapOfferTermsReviewTypes'
+import type { DapOfferTermsReviewStatus }          from '../dap/registry/dapOfferTermsReviewTypes'
 import type { DapProviderParticipationStatus }     from '../dap/registry/dapProviderParticipationTypes'
 import type { DapCommunicationApprovalStatus }     from './dapCommunicationApprovalTypes'
 import type { DapCommunicationDryRunStatus }       from './dapCommunicationDryRunTypes'

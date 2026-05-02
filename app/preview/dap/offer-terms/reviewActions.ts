@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import type { DapOfferTermsReviewCriteria } from '@/lib/cb-control-center/dapOfferTermsReviewTypes'
+import type { DapOfferTermsReviewCriteria } from '@/lib/dap/registry/dapOfferTermsReviewTypes'
 import {
   startOfferTermsReview,
   passOfferTermsReview,

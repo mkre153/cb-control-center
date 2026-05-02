@@ -2,7 +2,7 @@ import type { DapOfferTermsDraftStatus } from '../dap/registry/dapOfferTermsType
 import type {
   DapOfferTermsReviewCriteria,
   DapOfferTermsReviewStatus,
-} from './dapOfferTermsReviewTypes'
+} from '../dap/registry/dapOfferTermsReviewTypes'
 
 // Only submitted_for_review drafts may enter the review gate.
 export function isOfferTermsDraftEligibleForReview(

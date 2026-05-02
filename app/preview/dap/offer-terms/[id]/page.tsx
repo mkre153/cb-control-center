@@ -17,7 +17,7 @@ import type {
 import type {
   DapOfferTermsReview,
   DapOfferTermsReviewEvent,
-} from '@/lib/cb-control-center/dapOfferTermsReviewTypes'
+} from '@/lib/dap/registry/dapOfferTermsReviewTypes'
 import type { DapProviderParticipationConfirmation } from '@/lib/dap/registry/dapProviderParticipationTypes'
 import {
   updateOfferTermsDraftAction,
