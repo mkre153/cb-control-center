@@ -34,7 +34,7 @@ import {
   mapBillingEventToMemberStanding,
   isTerminalDapMemberStanding,
   assertDapStatusEventsAreSafe,
-} from '../dapMemberStatusRules'
+} from '../../dap/registry/dapMemberStatusRules'
 import {
   getPublicCommercialSystemForVertical,
   getInternalCrmSystemForVertical,
@@ -50,7 +50,7 @@ import type { DapMemberBillingEventForStatus } from '../../dap/membership/dapMem
 
 const ROOT       = resolve(__dirname, '../../..')
 const TYPES_PATH = resolve(ROOT, 'lib/dap/membership/dapMemberStatusTypes.ts')
-const RULES_PATH = resolve(ROOT, 'lib/cb-control-center/dapMemberStatusRules.ts')
+const RULES_PATH = resolve(ROOT, 'lib/dap/registry/dapMemberStatusRules.ts')
 
 // ─── Timestamps ───────────────────────────────────────────────────────────────
 

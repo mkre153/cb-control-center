@@ -2,7 +2,7 @@ import Link from 'next/link'
 import {
   getDapMemberStatusPreview,
 } from '@/lib/cb-control-center/dapMemberStatusPreview'
-import { isTerminalDapMemberStanding } from '@/lib/cb-control-center/dapMemberStatusRules'
+import { isTerminalDapMemberStanding } from '@/lib/dap/registry/dapMemberStatusRules'
 import type { DapMemberStanding } from '@/lib/dap/membership/dapMemberStatusTypes'
 import type { DapMemberBillingEventForStatus } from '@/lib/dap/membership/dapMemberStatusTypes'
 

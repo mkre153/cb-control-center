@@ -9,7 +9,7 @@ import type {
   DapMemberPublicStatus,
   DapMemberStatusPublicReadModel,
 } from './dapMemberStatusPublicTypes'
-import { deriveDapMemberStatusReadModel } from './dapMemberStatusRules'
+import { deriveDapMemberStatusReadModel } from '../dap/registry/dapMemberStatusRules'
 
 // ─── Forbidden field names (public read model must never contain these) ────────
 

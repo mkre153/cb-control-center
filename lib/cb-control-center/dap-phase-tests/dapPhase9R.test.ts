@@ -34,7 +34,7 @@ import {
   formatDapMemberStandingLabel,
   formatDapMemberStandingDescription,
 } from '../dapMemberStatusPreview'
-import { deriveDapMemberStatusReadModel } from '../dapMemberStatusRules'
+import { deriveDapMemberStatusReadModel } from '../../dap/registry/dapMemberStatusRules'
 import type { DapMemberStanding, DapMemberStatusReadModel } from '../../dap/membership/dapMemberStatusTypes'
 
 // ─── Project root ─────────────────────────────────────────────────────────────

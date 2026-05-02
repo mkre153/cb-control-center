@@ -43,7 +43,7 @@ import {
 
 import { getAllDapMemberStatusEmailPreviews } from '../dapMemberStatusEmailPreview'
 import { getDapMemberStatusEmailCopy }        from '../dapMemberStatusEmailCopy'
-import { deriveDapMemberStatusReadModel }     from '../dapMemberStatusRules'
+import { deriveDapMemberStatusReadModel }     from '../../dap/registry/dapMemberStatusRules'
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 

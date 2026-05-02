@@ -2,7 +2,7 @@ import type {
   DapMemberStanding,
   DapMemberBillingEventForStatus,
   DapMemberStatusReadModel,
-} from '../dap/membership/dapMemberStatusTypes'
+} from '../membership/dapMemberStatusTypes'
 
 // DAP member standing is a read model derived from append-only billing events.
 // Client Builder Pro originates billing events.
