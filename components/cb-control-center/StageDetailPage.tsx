@@ -1,10 +1,12 @@
 import type { DapStageGate, DapStageStatus } from '@/lib/cb-control-center/dapStageGates'
 import { getNextDapStageGate } from '@/lib/cb-control-center/dapStageGates'
+import type { CbccEvidenceRequirement } from '@/lib/cbcc/types'
 import { StageArtifactPanel } from './StageArtifactPanel'
 import { StageEvidencePanel } from './StageEvidencePanel'
 import { StageApprovalChecklist } from './StageApprovalChecklist'
 import { StageDirectivePanel } from './StageDirectivePanel'
 import { StageAiReviewPanel } from './StageAiReviewPanel'
+import { StageMissingEvidencePanel } from './StageMissingEvidencePanel'
 import { StageSection } from './StageSection'
 import { AntiBypassBanner } from './AntiBypassBanner'
 
@@ -44,6 +46,7 @@ export function StageDetailPage({
   breadcrumbTrail,
   nextStageHref,
   projectSlug,
+  missingEvidence,
 }: {
   stage: DapStageGate
   breadcrumbBase?: string
@@ -52,6 +55,10 @@ export function StageDetailPage({
   // Project slug for the AI review API. When omitted (legacy v1 caller),
   // the panel posts without a projectSlug and the route treats it as DAP.
   projectSlug?: string
+  // Required evidence items the engine reports as missing for this stage.
+  // Supplied by engine-backed callers (v2 route); legacy v1 caller omits.
+  // The panel only renders when the array is non-empty.
+  missingEvidence?: ReadonlyArray<CbccEvidenceRequirement>
 }) {
   const isApproved = stage.status === 'approved'
   const isAwaiting = stage.status === 'awaiting_owner_approval'
@@ -125,6 +132,14 @@ export function StageDetailPage({
 
           <AntiBypassBanner />
         </div>
+
+        {/* Missing required evidence — rendered above the owner approval
+            surface so the operator sees what blocks approval before any
+            approval CTA. Only present when the engine reports items missing
+            (i.e. the stage is unlocked but requirements are unmet). */}
+        {missingEvidence && missingEvidence.length > 0 && (
+          <StageMissingEvidencePanel items={missingEvidence} />
+        )}
 
         {/* Awaiting approval — show checklist prominently */}
         {isAwaiting && (

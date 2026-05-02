@@ -1042,3 +1042,144 @@ The file has 7 describe blocks:
 state; approval requires logic; AI advises, owner approves; locked stages
 are visible but not approvable. The Part 11 acceptance suite is the
 single guarantee against future regressions of any of these properties.
+
+---
+
+## Part 12 Addendum — Wire next-allowed-action into operator UI (2026-05-01)
+
+Part 11 made the engine safer (evidence-gated approval, predecessor lock,
+mutation boundary, next-allowed-action engine). Part 12 makes the engine's
+decisions **visible**: the operator can now see, on the project page and on
+each stage page, what the engine has already decided about the next legal
+move and why approval is unavailable.
+
+This part is a **UI wiring pass only**. No engine behavior was added or
+changed. No DB migrations. No route moves. No AI calls.
+
+### What Part 12 changed
+
+Three operator-facing surfaces, all consuming existing engine output:
+
+1. **`<NextAllowedActionCard>`** on `/projects/[slug]` — read-only render of
+   `getNextAllowedAction(...)` output. The card identifies the next allowed
+   stage/action, surfaces the blocker reason for `work_blocked`, and
+   surfaces the missing-evidence id for `generate_required_artifact`. For
+   non-engine-backed projects it is omitted entirely (no fallback action).
+
+2. **Missing-evidence panel** on `/projects/[slug]/stages/[stageNumber]`
+   (engine-backed projects). Renders a pre-approval list of required
+   evidence items the engine reports as missing. Suppressed when the stage
+   is locked (the locked-directive UX already covers that case) or when
+   the stage has no missing items. Threaded into `<StageDetailPage>` as a
+   new optional `missingEvidence` prop so the v1 caller's behavior is
+   unchanged.
+
+3. **Approval form result rendering** in `<DapStageOwnerApprovalForm>`. The
+   four discriminated `ApproveDapStageResult` failure codes now have
+   distinct, operator-readable surfaces with stable test anchors:
+   - `missing_required_evidence` — renders every id in the
+     `result.missingEvidence` list.
+   - `stage_locked` — renders a predecessor-not-approved message.
+   - `already_approved` — renders an idempotency-friendly message.
+   - generic — falls back to `result.message` with the code anchor still
+     present so tests can target the exact code.
+
+### What engine behavior was reused (and not changed)
+
+| Engine surface | Reused by Part 12 |
+|---|---|
+| `getNextAllowedAction({ project, stageDefinitions, evidenceRequirementsByStage, evidenceLedger })` | Computed on the project page; output passed to the card unmodified. |
+| `canApproveStageWithEvidence({ project, projectId, stageId, evidence, requirements })` | Computed on the stage detail page; `gate.missingEvidence` passed to the panel unmodified. |
+| `buildDapEffectiveProject` + `buildDapApprovalEvidenceLedger` + `getDapStageEvidenceRequirements` | DAP adapter helpers used to feed both engines; no new logic added. |
+| `ApproveDapStageResult` discriminated union | Form rendering switches on `result.code`; the action layer is untouched. |
+
+The engine never sees the UI surfaces; the UI never makes a decision.
+
+### Stable test anchors added
+
+| Surface | Anchor |
+|---|---|
+| Project page card | `data-next-allowed-action-card` |
+| Project page card | `data-next-allowed-action="<kind>"` |
+| Project page card | `data-next-allowed-stage="<n>"` |
+| Project page card | `data-next-allowed-reason="<text>"` (work_blocked only) |
+| Project page card | `data-next-allowed-missing-evidence="<id>"` (generate_required_artifact only) |
+| Stage page panel | `data-missing-evidence-panel` |
+| Stage page panel | `data-missing-evidence-item` |
+| Stage page panel | `data-missing-evidence-id="<id>"` |
+| Approval form | `data-approval-error` (alongside legacy `data-form-error`) |
+| Approval form | `data-approval-error-code="<code>"` |
+| Approval form | `data-approval-missing-evidence` |
+| Approval form | `data-approval-missing-evidence-item` |
+| Approval form | `data-approval-missing-evidence-id="<id>"` |
+
+### What was intentionally not changed
+
+- No engine modules edited. `lib/cbcc/nextAllowedAction.ts`,
+  `stageApproval.ts`, `evidenceLedger.ts`, `pageCreationPolicy.ts` are
+  byte-for-byte unchanged.
+- No DB migrations.
+- No route file added or moved. Static page count stays at 199.
+- No AI module wired into any new place. The reviewer surface is
+  unchanged.
+- The two unrelated working-tree files
+  (`app/preview/dap/practice-decision-emails/page.tsx` and
+  `components/cb-control-center/tabs/SiteArchitectureTab.tsx`) are
+  intentionally NOT included in the Part 12 commit, per directive scope.
+- The `<DapStageOwnerApprovalForm>` retains its original `data-form-error`
+  anchor for backward compat with existing Part 11 tests.
+
+### Files changed
+
+| File | Type | What |
+|---|---|---|
+| `components/cb-control-center/NextAllowedActionCard.tsx` | NEW | Read-only card for the engine's next-allowed-action output. |
+| `components/cb-control-center/StageMissingEvidencePanel.tsx` | NEW | Read-only list of missing required evidence items. |
+| `components/cb-control-center/StageDetailPage.tsx` | UPDATED | New optional `missingEvidence` prop; renders panel above approval surfaces when non-empty. |
+| `components/cb-control-center/DapStageOwnerApprovalForm.tsx` | UPDATED | Result-aware error rendering; new `ApprovalErrorView` exported for tests. |
+| `app/projects/[slug]/page.tsx` | UPDATED | Computes next-allowed-action for engine-backed projects and mounts the card. |
+| `app/projects/[slug]/stages/[stageNumber]/page.tsx` | UPDATED | Computes missing evidence for engine-backed projects and threads it into `<StageDetailPage>`. |
+| `lib/cb-control-center/dapStagePart12.test.tsx` | NEW | 26-test acceptance suite covering all four surfaces and regression boundaries. |
+| `docs/cbcc-reorganization.md` | UPDATED | This addendum. |
+
+### Test coverage added
+
+| File | Tests | New / Updated |
+|---|---:|---|
+| `lib/cb-control-center/dapStagePart12.test.tsx` | 26 | NEW |
+
+Test count: 5899 (post-Part-11) → 5925 (post-Part-12), +26 — all from
+the new Part 12 acceptance file.
+
+The file has 6 describe blocks:
+- A. Project page next-allowed-action card (4 tests)
+- B. NextAllowedActionCard renders each engine action kind (5 tests)
+- C. StageDetailPage missing-evidence panel (5 tests)
+- D. DapStageOwnerApprovalForm result rendering (5 tests)
+- E. Regression boundaries (6 tests — AI/persistence isolation, route invariants)
+- Engine root stays generic (1 cheap re-assertion)
+
+### Validation results
+
+| Gate | Result |
+|---|---|
+| `pnpm typecheck` | Pass (0 errors) |
+| `pnpm test` | Pass (5925 / 1 skipped — was 5899, +26) |
+| `pnpm lint` | Pass (0 errors; 49 pre-existing warnings, **0 new warnings introduced by Part 12**) |
+| `pnpm build` | Pass (Compiled successfully in 1767ms; 199 static pages generated, unchanged) |
+
+### Remaining recommendations
+
+| Item | Class | When |
+|---|---|---|
+| `lib/cb-control-center/dapStageReviewer.ts` + `dapStageRubrics.ts` still live in the legacy folder rather than `lib/cbcc/adapters/dap/` | Cosmetic — relocation | Part 13 candidate (folder cleanup). |
+| Page-creation policy guard remains test-only, not pre-commit / CI | Coverage gap by design | Part 14 candidate (CI / pre-commit guard). |
+| Two unrelated working-tree files (`practice-decision-emails/page.tsx`, `SiteArchitectureTab.tsx`) still uncommitted | Operational | Part 15 candidate (separate inspect-and-decide pass). |
+| AI review still routed through legacy `dapStageReviewer.ts`; engine-shaped `lib/cbcc/aiReview.ts` remains unwired | Architectural — Risk rule #4 | Same posture as Parts 8X / 10 / 11. Carry forward to a controlled future part. |
+| Non-DAP / generic v2 projects: no `NextAllowedActionCard` rendered | Adoption gap | When a second engine-backed project lands, generalize the project-page wiring (the card already takes a vertical-neutral `CbccNextAllowedAction`). |
+
+**Part 12 closes the visibility gap.** The engine has had the answer to
+"what is the next legal move?" since Part 10. Part 12 makes that answer
+something the operator can actually see — on the project page, on each
+stage page, and inside the approval form when an attempt fails.
+

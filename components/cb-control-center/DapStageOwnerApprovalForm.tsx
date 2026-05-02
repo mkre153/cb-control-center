@@ -81,9 +81,7 @@ export function DapStageOwnerApprovalForm({ stageNumber, stageTitle, defaultOwne
           </button>
 
           {result && !result.ok && (
-            <p data-form-error className="text-xs text-red-700 font-semibold">
-              {result.message}
-            </p>
+            <ApprovalErrorView result={result} stageNumber={stageNumber} />
           )}
           {result && result.ok && (
             <p data-form-success className="text-xs text-green-700 font-semibold">
@@ -93,5 +91,91 @@ export function DapStageOwnerApprovalForm({ stageNumber, stageTitle, defaultOwne
         </form>
       </div>
     </section>
+  )
+}
+
+// Renders the four discriminated approval failure states with stable test
+// anchors. The form keeps the original `data-form-error` anchor for backward
+// compatibility with Part 11 tests, and adds the Part 12 anchors below.
+// Exported so unit tests can render it directly against a `result` literal
+// instead of having to drive the form through user interactions.
+export function ApprovalErrorView({
+  result,
+  stageNumber,
+}: {
+  result: Extract<ApproveDapStageResult, { ok: false }>
+  stageNumber: number
+}) {
+  const code = result.code
+
+  if (code === 'missing_required_evidence') {
+    const ids = result.missingEvidence ?? []
+    return (
+      <div
+        data-form-error
+        data-approval-error
+        data-approval-error-code={code}
+        className="space-y-2"
+      >
+        <p className="text-xs text-red-700 font-semibold">
+          Stage {stageNumber} cannot be approved — missing required evidence.
+        </p>
+        {ids.length > 0 && (
+          <ul data-approval-missing-evidence className="space-y-1 pl-3">
+            {ids.map(id => (
+              <li
+                key={id}
+                data-approval-missing-evidence-item
+                data-approval-missing-evidence-id={id}
+                className="text-xs text-red-700 font-mono"
+              >
+                {id}
+              </li>
+            ))}
+          </ul>
+        )}
+        <p className="text-[11px] text-red-600 leading-relaxed">
+          Add and validate the listed evidence items before retrying approval. The approval
+          gate will not advance until every required item is present.
+        </p>
+      </div>
+    )
+  }
+
+  if (code === 'stage_locked') {
+    return (
+      <p
+        data-form-error
+        data-approval-error
+        data-approval-error-code={code}
+        className="text-xs text-red-700 font-semibold"
+      >
+        Stage {stageNumber} is locked — its predecessor must be owner-approved first.
+      </p>
+    )
+  }
+
+  if (code === 'already_approved') {
+    return (
+      <p
+        data-form-error
+        data-approval-error
+        data-approval-error-code={code}
+        className="text-xs text-amber-700 font-semibold"
+      >
+        Stage {stageNumber} is already approved. {result.message}
+      </p>
+    )
+  }
+
+  return (
+    <p
+      data-form-error
+      data-approval-error
+      data-approval-error-code={code}
+      className="text-xs text-red-700 font-semibold"
+    >
+      {result.message}
+    </p>
   )
 }

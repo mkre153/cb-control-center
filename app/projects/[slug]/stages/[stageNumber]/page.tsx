@@ -6,11 +6,19 @@ import { isEngineBackedSlug } from '@/lib/cb-control-center/cbccEngineRegistry'
 import { buildDapStageGateFromEngine } from '@/lib/cb-control-center/cbccStagePageModelTranslator'
 import { translateDapProjectForPipeline } from '@/lib/cb-control-center/cbccProjectPipelineTranslator'
 import { getDapStageApprovalStore } from '@/lib/cb-control-center/dapStageApprovalStore'
-import { resolveDapStageOverrides } from '@/lib/cb-control-center/dapStageStateResolver'
+import { resolveDapStageOverrides, buildDapEffectiveProject } from '@/lib/cb-control-center/dapStageStateResolver'
 import { StageDetailPage } from '@/components/cb-control-center/StageDetailPage'
 import { DeferredApprovalGate } from '@/components/cb-control-center/DeferredApprovalGate'
 import { DapStageOwnerApprovalForm } from '@/components/cb-control-center/DapStageOwnerApprovalForm'
-import { DAP_PROJECT } from '@/lib/cbcc/adapters/dap'
+import {
+  DAP_PROJECT,
+  DAP_PROJECT_ID,
+  DAP_STAGE_DEFINITIONS,
+  buildDapApprovalEvidenceLedger,
+  getDapStageEvidenceRequirements,
+} from '@/lib/cbcc/adapters/dap'
+import { canApproveStageWithEvidence } from '@/lib/cbcc/index'
+import type { CbccEvidenceRequirement } from '@/lib/cbcc/types'
 
 const DAP_SLUG = 'dental-advantage-plan'
 
@@ -50,6 +58,7 @@ export default async function ProjectStageDetailRoute({ params }: { params: Para
   // overlaid on top. All other slugs keep the existing Supabase-backed path.
   let project, stage
   let persistedApprovalsForDap: Awaited<ReturnType<ReturnType<typeof getDapStageApprovalStore>['list']>> = []
+  let missingEvidence: ReadonlyArray<CbccEvidenceRequirement> = []
   if (isEngineBackedSlug(slug)) {
     persistedApprovalsForDap = await getDapStageApprovalStore().list().catch(() => [])
     const bundle = translateDapProjectForPipeline({ persistedApprovals: persistedApprovalsForDap })
@@ -59,6 +68,25 @@ export default async function ProjectStageDetailRoute({ params }: { params: Para
       stageStatusOverrides: overrides.stageStatusOverrides,
       approvalOverrides: overrides.approvalOverrides,
     })
+    // Engine evidence gate — when the stage is unlocked but required
+    // evidence is missing, surface the items so the operator sees what
+    // blocks approval. The engine returns no missing items for locked
+    // stages or already-approved stages, so the panel naturally hides
+    // in those cases.
+    const def = DAP_STAGE_DEFINITIONS.find(d => d.order === n)
+    if (def) {
+      const effectiveProject = buildDapEffectiveProject(DAP_PROJECT, persistedApprovalsForDap)
+      const gate = canApproveStageWithEvidence({
+        project: effectiveProject,
+        projectId: DAP_PROJECT_ID,
+        stageId: def.id,
+        evidence: buildDapApprovalEvidenceLedger({ projectId: DAP_PROJECT_ID }),
+        requirements: getDapStageEvidenceRequirements(n),
+      })
+      if (!gate.ok && gate.reason === 'missing_required_evidence') {
+        missingEvidence = gate.missingEvidence
+      }
+    }
   } else {
     project = await getProjectBySlug(slug)
     if (!project) notFound()
@@ -96,6 +124,7 @@ export default async function ProjectStageDetailRoute({ params }: { params: Para
         breadcrumbTrail={trail}
         nextStageHref={(next) => `${breadcrumbBase}/stages/${next.stageNumber}`}
         projectSlug={slug}
+        missingEvidence={missingEvidence}
       />
       {showDapApprovalForm && (
         <div className="max-w-4xl mx-auto px-6 -mt-6 pb-10">
