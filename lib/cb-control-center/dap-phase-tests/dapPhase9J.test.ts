@@ -23,7 +23,7 @@ import {
   isOnboardingEligibleForOfferTermsCollection,
   canTransitionDapOfferTermsStatus,
   assertValidDapOfferTermsTransition,
-} from '../dapOfferTermsRules'
+} from '../../dap/registry/dapOfferTermsRules'
 
 // ─── Project root ─────────────────────────────────────────────────────────────
 
@@ -32,7 +32,7 @@ const ROOT = resolve(__dirname, '../../..')
 // ─── Key paths ────────────────────────────────────────────────────────────────
 
 const TYPES_PATH          = resolve(ROOT, 'lib/dap/registry/dapOfferTermsTypes.ts')
-const RULES_PATH          = resolve(ROOT, 'lib/cb-control-center/dapOfferTermsRules.ts')
+const RULES_PATH          = resolve(ROOT, 'lib/dap/registry/dapOfferTermsRules.ts')
 const MODULE_PATH         = resolve(ROOT, 'lib/cb-control-center/dapOfferTerms.ts')
 const SERVER_ACTIONS_PATH = resolve(ROOT, 'app/preview/dap/offer-terms/actions.ts')
 const LIST_PAGE_PATH      = resolve(ROOT, 'app/preview/dap/offer-terms/page.tsx')

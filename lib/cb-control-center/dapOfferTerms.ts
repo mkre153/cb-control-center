@@ -12,7 +12,7 @@ import type {
 import {
   isOnboardingEligibleForOfferTermsCollection,
   assertValidDapOfferTermsTransition,
-} from './dapOfferTermsRules'
+} from '../dap/registry/dapOfferTermsRules'
 import { getSupabaseAdminClient } from './supabaseClient'
 
 // collected offer terms ≠ validated offer terms

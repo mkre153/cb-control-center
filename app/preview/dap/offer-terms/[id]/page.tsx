@@ -9,7 +9,7 @@ import {
   getOfferTermsReviewEvents,
 } from '@/lib/cb-control-center/dapOfferTermsReview'
 import { getProviderParticipationByReviewId } from '@/lib/cb-control-center/dapProviderParticipation'
-import { canTransitionDapOfferTermsStatus } from '@/lib/cb-control-center/dapOfferTermsRules'
+import { canTransitionDapOfferTermsStatus } from '@/lib/dap/registry/dapOfferTermsRules'
 import type {
   DapOfferTermsDraftStatus,
   DapOfferTermsEvent,
