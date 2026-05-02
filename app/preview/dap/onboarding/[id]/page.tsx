@@ -10,7 +10,7 @@ import { canTransitionDapPracticeOnboardingStatus } from '@/lib/cb-control-cente
 import type {
   DapPracticeOnboardingEvent,
   DapPracticeOnboardingStatus,
-} from '@/lib/cb-control-center/dapPracticeOnboardingTypes'
+} from '@/lib/dap/registry/dapPracticeOnboardingTypes'
 import {
   markOutreachNeededAction,
   markOutreachStartedAction,

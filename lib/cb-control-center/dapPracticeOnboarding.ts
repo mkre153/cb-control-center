@@ -3,7 +3,7 @@ import type {
   DapPracticeOnboardingEvent,
   CreateDapPracticeOnboardingInput,
   DapPracticeOnboardingResult,
-} from './dapPracticeOnboardingTypes'
+} from '../dap/registry/dapPracticeOnboardingTypes'
 import { getSupabaseAdminClient } from './supabaseClient'
 
 // ─── createOnboardingIntakeFromApprovedRequest ────────────────────────────────

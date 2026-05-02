@@ -23,7 +23,7 @@ const ROOT = resolve(__dirname, '../../..')
 
 // ─── Key paths ────────────────────────────────────────────────────────────────
 
-const TYPES_PATH          = resolve(ROOT, 'lib/cb-control-center/dapPracticeOnboardingTypes.ts')
+const TYPES_PATH          = resolve(ROOT, 'lib/dap/registry/dapPracticeOnboardingTypes.ts')
 const MODULE_PATH         = resolve(ROOT, 'lib/cb-control-center/dapPracticeOnboarding.ts')
 const SERVER_ACTION_PATH  = resolve(ROOT, 'app/preview/dap/requests/[id]/onboardingActions.ts')
 const DETAIL_PAGE_PATH    = resolve(ROOT, 'app/preview/dap/requests/[id]/page.tsx')

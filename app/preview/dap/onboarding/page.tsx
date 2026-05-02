@@ -1,5 +1,5 @@
 import { listOnboardingIntakes } from '@/lib/cb-control-center/dapPracticeOnboarding'
-import type { DapPracticeOnboardingIntake } from '@/lib/cb-control-center/dapPracticeOnboardingTypes'
+import type { DapPracticeOnboardingIntake } from '@/lib/dap/registry/dapPracticeOnboardingTypes'
 import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'

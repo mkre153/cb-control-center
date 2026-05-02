@@ -1,5 +1,5 @@
 import type { DapOfferTermsDraftStatus } from './dapOfferTermsTypes'
-import type { DapPracticeOnboardingStatus } from './dapPracticeOnboardingTypes'
+import type { DapPracticeOnboardingStatus } from '../dap/registry/dapPracticeOnboardingTypes'
 
 // Only interested and terms_needed intakes may begin offer terms collection.
 const ELIGIBLE_ONBOARDING_STATUSES = new Set<DapPracticeOnboardingStatus>([

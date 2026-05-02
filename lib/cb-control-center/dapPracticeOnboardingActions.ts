@@ -4,7 +4,7 @@ import type {
   DapPracticeOnboardingIntake,
   DapPracticeOnboardingEventType,
   DapPracticeOnboardingStatus,
-} from './dapPracticeOnboardingTypes'
+} from '../dap/registry/dapPracticeOnboardingTypes'
 import { assertValidDapPracticeOnboardingTransition } from './dapPracticeOnboardingRules'
 import { getSupabaseAdminClient } from './supabaseClient'
 
