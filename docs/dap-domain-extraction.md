@@ -30,8 +30,10 @@ Routes stay stable. App files become thin import shells.
 | File | Old path | New path | Commit | Date |
 |------|----------|----------|--------|------|
 | dapPublicUxTypes.ts | `lib/cb-control-center/dapPublicUxTypes.ts` | `lib/dap/site/dapPublicUxTypes.ts` | TBD | 2026-05-02 |
+| dapRequestTypes.ts | `lib/cb-control-center/dapRequestTypes.ts` | `lib/dap/registry/dapRequestTypes.ts` | feat(dap): Wave 1B extract dapRequestTypes to domain registry | 2026-05-02 |
 
-Import sites updated: 34 files (app/, components/, lib/cb-control-center/, dap-phase-tests/)
+Import sites updated (dapRequestTypes): 13 files (app/, components/, lib/cb-control-center/, dap-phase-tests/)
+Note: dapPhase9A.test.ts and dapPhase9F.test.ts had hardcoded path constants — both updated to new path, assertions unchanged.
 
 ## Planned waves
 
@@ -41,7 +43,6 @@ Import sites updated: 34 files (app/, components/, lib/cb-control-center/, dap-p
 - dapOfferTermsTypes
 - dapOfferTermsReviewTypes
 - dapMemberStatusTypes
-- dapRequestTypes (imports dapPublicUxTypes — move after Wave 1 settles)
 - dapCmsTypes
 - source/dapSourceTypes
 - mkcrm/dapClientBuilderBillingTypes

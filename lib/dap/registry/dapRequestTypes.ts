@@ -1,4 +1,4 @@
-import type { DapPublicPageKind } from '../dap/site/dapPublicUxTypes'
+import type { DapPublicPageKind } from '../site/dapPublicUxTypes'
 
 // ─── Source page kinds ────────────────────────────────────────────────────────
 // All public page kinds may originate a request.

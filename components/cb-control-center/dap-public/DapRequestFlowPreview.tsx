@@ -5,7 +5,7 @@ import type { DapRequestFlowModel } from '@/lib/dap/site/dapPublicUxTypes'
 import type {
   DapRequestConfirmationModel,
   DapRequestValidationIssue,
-} from '@/lib/cb-control-center/dapRequestTypes'
+} from '@/lib/dap/registry/dapRequestTypes'
 
 // ─── Consent text ─────────────────────────────────────────────────────────────
 // Recorded verbatim in the consent_captured event on submission.

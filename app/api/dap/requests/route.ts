@@ -13,8 +13,8 @@ import {
   findDuplicateDapRequest,
   sanitizeDapRequestForConfirmation,
 } from '@/lib/cb-control-center/dapRequestPersistence'
-import type { DapRequestInput } from '@/lib/cb-control-center/dapRequestTypes'
-import { DAP_REQUEST_SCOPE } from '@/lib/cb-control-center/dapRequestTypes'
+import type { DapRequestInput } from '@/lib/dap/registry/dapRequestTypes'
+import { DAP_REQUEST_SCOPE } from '@/lib/dap/registry/dapRequestTypes'
 import { checkIpRateLimit, checkContactRateLimit } from '@/lib/cb-control-center/rateLimiter'
 
 // ─── POST /api/dap/requests ───────────────────────────────────────────────────

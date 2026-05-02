@@ -2,7 +2,7 @@
 // Phase 12 is read-only. This catalog describes actions as preview metadata.
 // No action in this catalog executes, mutates, sends, queues, or triggers payment.
 
-import type { DapRequestStatus }                  from './dapRequestTypes'
+import type { DapRequestStatus }                  from '../dap/registry/dapRequestTypes'
 import type { DapMemberStanding }                  from './dapMemberStatusTypes'
 import type { DapAdminDecisionReadinessStatus }    from './dapAdminDecisionReadiness'
 import type { DapOfferTermsReviewStatus }          from './dapOfferTermsReviewTypes'

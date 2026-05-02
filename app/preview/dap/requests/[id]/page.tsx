@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getDapRequest, getDapRequestEvents } from '@/lib/cb-control-center/dapRequestAdmin'
 import { getOnboardingIntakeByRequestId } from '@/lib/cb-control-center/dapPracticeOnboarding'
-import type { DapRequestEvent } from '@/lib/cb-control-center/dapRequestTypes'
+import type { DapRequestEvent } from '@/lib/dap/registry/dapRequestTypes'
 import type { DapPracticeOnboardingIntake } from '@/lib/cb-control-center/dapPracticeOnboardingTypes'
 import { approveRequestAction, rejectRequestAction, needsReviewRequestAction } from './actions'
 import { createOnboardingFromRequestAction } from './onboardingActions'

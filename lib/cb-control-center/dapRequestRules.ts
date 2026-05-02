@@ -6,7 +6,7 @@ import type {
   DapRequestValidationIssue,
   DapRequestSafetyFlags,
   DapRequestConfirmationModel,
-} from './dapRequestTypes'
+} from '../dap/registry/dapRequestTypes'
 
 // ─── Known source page kinds ──────────────────────────────────────────────────
 const KNOWN_SOURCE_PAGE_KINDS = new Set([

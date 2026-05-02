@@ -1,4 +1,4 @@
-import type { DapRequest, DapRequestEvent, DapRequestInput } from './dapRequestTypes'
+import type { DapRequest, DapRequestEvent, DapRequestInput } from '../dap/registry/dapRequestTypes'
 import { buildDapRequestDedupeKey } from './dapRequestRules'
 import { getSupabaseAdminClient } from './supabaseClient'
 

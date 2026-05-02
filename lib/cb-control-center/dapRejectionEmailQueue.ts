@@ -4,7 +4,7 @@
 // Pure — no Supabase, no network, no mutations.
 
 import type { DapAdminRejectionEmailTemplateKey } from './dapAdminRejectionEmailTypes'
-import type { DapRequestEvent } from './dapRequestTypes'
+import type { DapRequestEvent } from '../dap/registry/dapRequestTypes'
 
 export interface DapRejectionEmailQueueEntry {
   requestId:         string

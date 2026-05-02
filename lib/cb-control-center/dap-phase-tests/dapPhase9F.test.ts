@@ -27,7 +27,7 @@ const ROOT = resolve(__dirname, '../../..')
 const ACTIONS_MODULE_PATH = resolve(ROOT, 'lib/cb-control-center/dapRequestActions.ts')
 const SERVER_ACTIONS_PATH = resolve(ROOT, 'app/preview/dap/requests/[id]/actions.ts')
 const DETAIL_PAGE_PATH    = resolve(ROOT, 'app/preview/dap/requests/[id]/page.tsx')
-const TYPES_PATH          = resolve(ROOT, 'lib/cb-control-center/dapRequestTypes.ts')
+const TYPES_PATH          = resolve(ROOT, 'lib/dap/registry/dapRequestTypes.ts')
 
 // ─── Production boundary paths (must NOT be modified) ─────────────────────────
 

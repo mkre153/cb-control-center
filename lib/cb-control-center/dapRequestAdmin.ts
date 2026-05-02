@@ -1,4 +1,4 @@
-import type { DapRequest, DapRequestEvent } from './dapRequestTypes'
+import type { DapRequest, DapRequestEvent } from '../dap/registry/dapRequestTypes'
 import { getSupabaseAdminClient } from './supabaseClient'
 
 // ─── listDapRequests ──────────────────────────────────────────────────────────

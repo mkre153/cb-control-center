@@ -1,4 +1,4 @@
-import type { DapRequest, DapRequestStatus, DapRequestEventType } from './dapRequestTypes'
+import type { DapRequest, DapRequestStatus, DapRequestEventType } from '../dap/registry/dapRequestTypes'
 import type { DapAdminRejectionEmailTemplateKey } from './dapAdminRejectionEmailTypes'
 import { canTransitionDapRequestStatus } from './dapRequestRules'
 import { getSupabaseAdminClient } from './supabaseClient'

@@ -42,7 +42,7 @@ import type {
   DapRequestInput,
   DapRequest,
   DapRequestStatus,
-} from '../dapRequestTypes'
+} from '../../dap/registry/dapRequestTypes'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -838,7 +838,7 @@ describe('Deferred integrations remain deferred', () => {
 
   it('dapRequestTypes.ts contains no database driver imports', () => {
     const content = readFileSync(
-      resolve(ROOT, 'lib/cb-control-center/dapRequestTypes.ts'),
+      resolve(ROOT, 'lib/dap/registry/dapRequestTypes.ts'),
       'utf8'
     )
     expect(content).not.toMatch(/from ['"]@supabase/)

@@ -341,7 +341,7 @@ These integrations are deferred, not cancelled. The types and validation rules i
 
 | File | Purpose |
 |---|---|
-| `lib/cb-control-center/dapRequestTypes.ts` | All TypeScript types for the request system |
+| `lib/dap/registry/dapRequestTypes.ts` | All TypeScript types for the request system |
 | `lib/cb-control-center/dapRequestRules.ts` | Pure validation and rule functions |
 | `lib/cb-control-center/supabaseClient.ts` | Lazy-init Supabase admin client (server-side only) |
 | `lib/cb-control-center/dapRequestPersistence.ts` | `createDapRequest`, `createDapRequestEvent`, `findDuplicateDapRequest`, `sanitizeDapRequestForConfirmation` |

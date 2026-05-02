@@ -1,5 +1,5 @@
 import { listDapRequests } from '@/lib/cb-control-center/dapRequestAdmin'
-import type { DapRequest } from '@/lib/cb-control-center/dapRequestTypes'
+import type { DapRequest } from '@/lib/dap/registry/dapRequestTypes'
 import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'

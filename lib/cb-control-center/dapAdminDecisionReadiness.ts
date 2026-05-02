@@ -2,7 +2,7 @@
 // Pure — no network calls, no Supabase, no MKCRM, no payments.
 // Admin decision is required. MKCRM cannot decide. Payment standing cannot decide.
 
-import type { DapRequestStatus } from './dapRequestTypes'
+import type { DapRequestStatus } from '../dap/registry/dapRequestTypes'
 
 export type DapAdminDecisionReadinessStatus =
   | 'ready_for_review'
