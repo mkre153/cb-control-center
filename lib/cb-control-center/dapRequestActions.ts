@@ -1,4 +1,5 @@
 import type { DapRequest, DapRequestStatus, DapRequestEventType } from './dapRequestTypes'
+import type { DapAdminRejectionEmailTemplateKey } from './dapAdminRejectionEmailTypes'
 import { canTransitionDapRequestStatus } from './dapRequestRules'
 import { getSupabaseAdminClient } from './supabaseClient'
 
@@ -8,6 +9,7 @@ export interface DapRequestDecisionInput {
   requestId: string
   actorId?: string
   note?: string
+  rejectionEmailTemplateKey?: DapAdminRejectionEmailTemplateKey
 }
 
 export type DapRequestActionResult =
