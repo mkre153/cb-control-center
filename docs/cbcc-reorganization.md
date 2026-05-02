@@ -1663,4 +1663,420 @@ red herring at the bottom of `git status`. The `supabase/.temp/`
 ignore entry stops the same item from reappearing as untracked on
 every future status read.
 
+---
+
+## Part 16 Addendum — Final Architecture Boundary Audit (2026-05-01)
+
+Part 16 is an inspection pass. The directive is explicit: do not move
+files. Decide whether CBCC truly looks like
+
+```
+generic CBCC engine
+  → vertical adapters
+  → project-specific routes/components
+  → optional AI review layer
+  → stable UI shell
+```
+
+…and produce a target map and a minimal patch. After full inspection,
+the minimal patch in this part is **doc-only**. Every boundary the
+audit checks is already enforced by an existing test, and every
+duplicate that exists is structurally tied to a live route, so a
+merge in this part would not satisfy the "small, obviously correct,
+test-covered, no route change" rule.
+
+### 1. Current Folder Inventory
+
+```
+folder:                           lib/cbcc/
+responsibility:                   generic CBCC engine — pure rules,
+                                  vertical-neutral types, contracts
+should remain:                    yes
+should move later:                no
+must not contain:                 DAP language, SDK calls, IO,
+                                  framework imports, app-layer imports
+current violations:               none in code; one doc-comment in
+                                  pageCreationPolicy.ts:5 names DAP
+                                  as the example vertical (cosmetic;
+                                  not a coupling)
+
+  files (14 impl + 13 test):
+    adapters.ts            adapters.test.ts
+    agentRegistry.ts       agentRegistry.test.ts
+    agentRuntime.ts        agentRuntime.test.ts
+    aiReview.ts            aiReview.test.ts
+    aiReviewProvider.ts    aiReviewProvider.test.ts
+    evidenceLedger.ts      evidenceLedger.test.ts
+    nextAllowedAction.ts   nextAllowedAction.test.ts
+    pageCreationPolicy.ts  (page-policy tests live with the adapter)
+    projectRegistry.ts     projectRegistry.test.ts
+    stageApproval.ts       stageApproval.test.ts
+    stageLocking.ts        stageLocking.test.ts
+    stagePageModel.ts      stagePageModel.test.ts
+    types.ts               types.test.ts
+    index.ts               coreBoundary.test.ts
+
+folder:                           lib/cbcc/adapters/dap/
+responsibility:                   pure DAP-to-engine mapping data
+should remain:                    yes
+should move later:                no (this is the canonical home)
+must not contain:                 SDK, IO, fetch, supabase, Next, React,
+                                  'use server'/'use client',
+                                  cb-control-center imports, AI review
+                                  symbol references
+current violations:               none
+
+  files (6 impl + 4 test):
+    dapArtifacts.ts            dapAdapter.test.ts
+    dapEvidence.ts             dapAcceptance.test.ts
+    dapPageCreationPolicy.ts   dapEvidenceRequirements.test.ts
+    dapProject.ts              dapPageCreationPolicy.test.ts
+    dapStages.ts
+    index.ts
+
+folder:                           lib/cb-control-center/
+responsibility:                   legacy + DAP-runtime app layer —
+                                  Anthropic client, server actions,
+                                  DAP UX rules, CMS export, dispatch
+                                  layers, persistence stores, page-
+                                  model translators, route helpers
+should remain:                    yes (transitional)
+should move later:                portions, but only behind ports —
+                                  not by filename
+must not contain:                 hard requirement: must not be
+                                  imported by lib/cbcc/* (already
+                                  enforced)
+current violations:               none against current rules
+
+  scale: 98 top-level impl files + 27 top-level test files
+         + 4 subfolders (architecture/, client/, mkcrm/, source/)
+         + dap-phase-tests/ (51 phase regression test files)
+
+folder:                           app/
+responsibility:                   route surface (Next.js App Router)
+should remain:                    yes
+must not contain:                 generic engine logic — routes wrap
+                                  components, components consume engine
+current violations:               none material
+
+  scale: 60 route files (page.tsx + route.ts)
+         build emits 199 static pages
+
+folder:                           components/
+responsibility:                   UI shell + stage panels + tabs
+should remain:                    yes
+must not contain:                 server-only imports inside client
+                                  components (existing 'use client'
+                                  files only)
+current violations:               none material
+
+  scale: 38 top-level + 4 subfolders (tabs/, dap-public/, dap-pages/, v2/)
+
+folder:                           docs/
+responsibility:                   reorganization narrative + addenda
+should remain:                    yes
+current violations:               none
+
+folder:                           tests
+location policy:                  unit tests live next to source;
+                                  acceptance tests live in
+                                  lib/cb-control-center/dap-phase-tests/
+                                  and as dapStagePart{N}.test.ts files
+current violations:               none
+```
+
+### 2. Generic vs Adapter vs Legacy Classification
+
+| File | Bucket | Rationale |
+|---|---|---|
+| `lib/cbcc/{types,projectRegistry,stageLocking,stageApproval,evidenceLedger,stagePageModel,nextAllowedAction,pageCreationPolicy,adapters,agentRegistry,agentRuntime,aiReview,aiReviewProvider,index}.ts` | **A. Generic CBCC core** | All vertical-neutral, no SDK / IO / app-layer imports (verified by `coreBoundary.test.ts`). |
+| `lib/cbcc/adapters/dap/{dapProject,dapStages,dapArtifacts,dapEvidence,dapPageCreationPolicy,index}.ts` | **B. DAP adapter** | Pure data + mappings to generic engine contracts. Verified by `dapAdapter.test.ts` + `dapStagePart7.test.ts` + `dapStagePart13.test.ts`. |
+| `lib/cb-control-center/anthropicClient.ts` | **C. Legacy / app-specific** | Direct SDK client. Belongs outside the adapter purity zone until a port is introduced. |
+| `lib/cb-control-center/dapStageReviewer.ts` | **C. Legacy / app-specific** | Calls `getAnthropicClient`, depends on `DapStageGate` (also legacy). Cannot move into adapter without weakening rules — see Part 13 Addendum. |
+| `lib/cb-control-center/dapStageRubrics.ts` | **C. Legacy / app-specific** (eligible to migrate as pure data) | No forbidden imports; could move into the adapter as a future Part-N step. |
+| `lib/cb-control-center/dapStageGates.ts` | **C. Legacy / app-specific** | DAP_STAGE_GATES registry — drives v1 route + StageDetailPage shape. Translator already projects from engine to this shape. |
+| `lib/cb-control-center/cbccStageDefinitions.ts` (`CBCC_STAGE_DEFINITIONS`) | **C. Legacy / app-specific** | Vertical-neutral 7-stage seed used by DB-backed projects. Engine has equivalent type; this is data, not logic. Could become a default-adapter seed in a future part. |
+| `lib/cb-control-center/cbccStageLocking.ts` (`computeStageVisibilities`) | **C. Legacy / app-specific** | Table-shaped variant of locking used by `<CbccStagePipeline>` v2 list view. Engine has authoritative `getStageLockReason` / `isStageLocked`. |
+| `lib/cb-control-center/dapStageActions.ts` | **C. Legacy / app-specific** | Server action — `'use server'`. Calls engine via barrel; persists via store. Correct location. |
+| `lib/cb-control-center/dapStageApprovalStore.ts` | **C. Legacy / app-specific** | Supabase-backed persistence. Correct location. |
+| `lib/cb-control-center/cbccProject{Repository,Actions,Migration,…}.ts` | **C. Legacy / app-specific** | Supabase + server actions. Correct location. |
+| `lib/cb-control-center/{architecture,client,mkcrm,source}/*` | **C. Legacy / app-specific** | Cluster moves from commit `9d3647d`. Pure data shapes that consume engine types; correct location for now (no SDK/IO inside, but app-layer-coupled by name and consumer set). |
+| `lib/cb-control-center/dap-phase-tests/*` | **C. Legacy / app-specific** | Acceptance regression tests for DAP feature work. Correct location. |
+| `app/projects/[slug]/{page,stages/[stageNumber]/page,charter/page}.tsx` | **D. Route layer** | Engine-backed v2 path. Calls engine via barrel + DAP adapter via `@/lib/cbcc/adapters/dap`. |
+| `app/businesses/dental-advantage-plan/build/stages/[stageSlug]/page.tsx` | **D. Route layer** | Legacy v1 path. Reads `DAP_STAGE_GATES`. Mounts the same `<StageDetailPage>` component as v2. |
+| `app/{dental-advantage-plan,guides,treatments}/...` | **D. Route layer** | Public DAP surface (Tier 1). Gated by `DAP_PAGE_CREATION_POLICY`. |
+| `app/preview/dap/...` | **D. Route layer** | DAP preview routes — explicitly outside the page-policy restricted prefix. |
+| `app/api/businesses/dental-advantage-plan/stages/review/route.ts` | **D. Route layer + AI bridge** | Mocks `reviewStage` from legacy reviewer; advisory-only contract verified by `route.test.ts`. |
+| `components/cb-control-center/{StageDetailPage,StageAiReviewPanel,DapStageOwnerApprovalForm,NextAllowedActionCard,StageMissingEvidencePanel,…}.tsx` | **D. UI / route layer** | Consume engine + legacy types. No DAP business logic invented here. |
+
+### 3. Duplicate System Findings
+
+| Duplicate | Files involved | Current purpose | Safe to merge now? | Risk | Recommendation |
+|---|---|---|---|---|---|
+| Stage definition data | `lib/cbcc/types.ts` (type) · `lib/cbcc/adapters/dap/dapStages.ts` (DAP instance) · `lib/cb-control-center/cbccStageDefinitions.ts` (7-stage neutral seed for DB-backed projects) | Engine has the type; DAP adapter has the DAP instance; legacy const seeds non-DAP projects via `cbccCharterGenerator` + `cbccProjectRepository`. | **No** | Legacy const is consumed by 18 test assertions in `cbccProjectRepository.test.ts`, charter generator, and the v2 registry test. Merging into a generic-default adapter requires a coordinated cutover. | Defer. When a second engine-backed adapter lands, extract a generic-default `lib/cbcc/adapters/default/` seeding the same 7 stages and retire the legacy const in one move. |
+| Stage locking | `lib/cbcc/stageLocking.ts` (`getStageLockReason`/`isStageLocked`) · `lib/cb-control-center/cbccStageLocking.ts` (`computeStageVisibilities`) | Engine answers per-stage Q&A; legacy module computes a row-shaped visibility table for the v2 list component. Each consumes its own input shape. | **No** | The list-view component (`<CbccStagePipeline>`) reads `ProjectStage` rows from Supabase; the engine reads `CbccProject.stages`. Merging requires a translator inversion at the component boundary. | Defer. Rewrite `<CbccStagePipeline>` to consume `getStageLockReason` directly only when its data path moves to the engine. |
+| Stage gate registry vs page model | `lib/cb-control-center/dapStageGates.ts` (`DAP_STAGE_GATES`) · `lib/cbcc/stagePageModel.ts` + `lib/cbcc/adapters/dap/dapStages.ts` (engine equivalent) · `lib/cb-control-center/cbccStagePageModelTranslator.ts` (bridge) | Legacy registry drives `<StageDetailPage>` shape (v1 path uses it directly; v2 path translates from engine into the same shape). | **No** | `DAP_STAGE_GATES` carries hand-written directives, requirements lists, and approval metadata that the engine does not yet host. Both v1 and v2 routes converge on the registry shape today. | Defer. The provider-port migration recommended in Part 13 also unlocks moving these directives into adapter data. |
+| AI review surface | `lib/cbcc/aiReview.ts` (engine contract) · `lib/cbcc/aiReviewProvider.ts` (provider port, generic) · `lib/cb-control-center/dapStageReviewer.ts` (concrete Anthropic call + DAP truth rules) · `lib/cb-control-center/dapStageRubrics.ts` (per-stage rubric data) | Engine port is built but unwired. Concrete review still flows through the legacy reviewer. | **No** (exact same conflict Part 13 found) | Moving the reviewer into the adapter folder breaks pre-existing forbidden-deps invariants. | Carry forward Part 13's documented migration path: extract Anthropic provider into a runtime layer, then refactor the reviewer to consume the engine port. |
+| Approval surface | `lib/cb-control-center/dapStageActions.ts` (`approveDapStageAction`) + `lib/cb-control-center/cbccProjectActions.ts` (`approveCharterAction`) · engine `applyStageApproval` / `canApproveStageWithEvidence` | Both legacy actions use engine predicates internally; no logic duplication. | n/a | Not a duplicate — already a clean wrapping. | Keep as-is. |
+
+**No duplicate is safe to merge in Part 16's scope.** Each surviving duplicate is tied to either a live route shape or a deferred AI port migration.
+
+### 4. Boundary Violations
+
+The directive's three required greps were run verbatim. Every result is classified.
+
+#### Grep 1: forbidden deps in `lib/cbcc/adapters/dap/`
+
+```
+grep -R "@anthropic-ai/sdk|getAnthropicClient|fetch(|supabase|next/|react|'use server'|'use client'" lib/cbcc/adapters/dap
+```
+
+| Hit | Classification |
+|---|---|
+| `dapAdapter.test.ts:73-81` (8 lines defining `FORBIDDEN_DEPS` regex table) | **Acceptable** — the test file enumerates the patterns it then scans non-test files for. Not a coupling. |
+
+No impl-file hits. Adapter purity boundary holds.
+
+#### Grep 2: vertical-language in generic engine
+
+```
+grep -R "dental|DAP|Dental Advantage" lib/cbcc --exclude-dir=adapters
+```
+
+| Hit | Classification |
+|---|---|
+| `agentRuntime.test.ts:313`, `agentRegistry.test.ts:99`, `aiReview.test.ts:424-425`, `aiReviewProvider.test.ts:258-259`, `coreBoundary.test.ts:136`, `evidenceLedger.test.ts:312-313`, `stagePageModel.test.ts:500-501`, `adapters.test.ts:90-93` | **Acceptable** — boundary tests scanning for `\bDAP\b` / `\bdental\b` and asserting absence in impl files. |
+| `coreBoundary.test.ts:147` (doc comment about test mechanics) | **Acceptable** — meta-narrative in a test. |
+| `coreBoundary.test.ts:187` + `adapters.ts:21` + multiple `adapters.test.ts` lines matching `EMPTY_ADAPTER_REGISTRY` | **False positive** — substring match on `ADAP**TER**`. The `\bDAP\b` boundary tests use word-boundary regex; the directive's grep does not. |
+| `pageCreationPolicy.ts:5` — `// to DAP or any other vertical. Adapters supply the rules.` | **Pre-existing but tolerated** — single doc-comment naming DAP as the example vertical. Engine code itself is vertical-neutral. Cosmetic only. |
+
+No code-level coupling.
+
+#### Grep 3: legacy-folder imports from generic engine
+
+```
+grep -R "lib/cb-control-center" lib/cbcc
+```
+
+| Hit | Classification |
+|---|---|
+| (no matches) | **Clean** — engine never imports the app layer. |
+
+#### Existing boundary tests already enforce these rules
+
+| Boundary | Enforced by |
+|---|---|
+| Engine root has no DAP language | `lib/cbcc/coreBoundary.test.ts` (vertical-language scan) |
+| Engine root has no SDK / IO / Next / React / server-client directives | `coreBoundary.test.ts` (FORBIDDEN_DEPS table) |
+| Engine root has no app-layer imports | `coreBoundary.test.ts` + Part 11 grep + Part 13 Group 3 |
+| Engine barrel does not re-export DAP review symbols | Part 13 Group 3 |
+| Adapter folder has no SDK / IO / Next / React / server-client / cb-control-center imports | `lib/cbcc/adapters/dap/dapAdapter.test.ts` + `lib/cb-control-center/dapStagePart7.test.ts` ("no adapter file imports lib/cb-control-center") + Part 13 Group 2 (expanded ban list) |
+| Adapter folder has no DAP-review symbol references | Part 13 Group 2 |
+| Approval action source has no AI module imports | Part 11 Group E + Part 12 Group E |
+| Reviewer source has no approval-store imports | Part 11 Group E + Part 12 Group E |
+| Page-creation policy holds against the live tree | Part 14 standalone CLI + adapter test + part 14 test |
+
+The boundary surface is now defended at six independent points. No new test is required in Part 16.
+
+### 5. Route Stability Findings
+
+60 route files; 199 static pages built. All routes are stable. No route added, removed, renamed, or repurposed in Part 16.
+
+| Route family | Current component | Data source | Class | Should remain | Risk |
+|---|---|---|---|---|---|
+| `/` | `<CbHomeDashboard>` | `cbBusinessPortfolioData` (static) | Generic | Yes | None |
+| `/projects` | static list | static portfolio | Generic | Yes | None |
+| `/projects/new` | placeholder | none | Generic | Yes | None |
+| `/projects/[slug]` | server component + `<NextAllowedActionCard>` (Part 12) + `<CbccStagePipeline>` (v2) | engine-backed for DAP via `translateDapProjectForPipeline` + `getNextAllowedAction`; Supabase for others | Mixed (engine + legacy translator) | Yes | None |
+| `/projects/[slug]/charter` | charter view | repository | Legacy | Yes | None |
+| `/projects/[slug]/stages/[stageNumber]` | `<StageDetailPage>` + `<DapStageOwnerApprovalForm>` (DAP) or `<DeferredApprovalGate>` (others) | engine-backed gate via `cbccStagePageModelTranslator` (DAP) or generic stage adapter | Mixed | Yes | None |
+| `/businesses/dental-advantage-plan` | summary | static | Legacy | Yes | None |
+| `/businesses/dental-advantage-plan/build` | pipeline shell | mock + persisted overlays | Legacy | Yes | None |
+| `/businesses/dental-advantage-plan/build/stages/[stageSlug]` | `<StageDetailPage>` (same component as v2) | `DAP_STAGE_GATES` registry | Legacy v1 | Yes | None |
+| `/businesses/new` | placeholder | none | Generic | Yes | None |
+| `/dental-advantage-plan/...` (10 page.tsx + layout) | DAP public pages | DAP UX rules + section models | Legacy DAP runtime, gated by Part 14 policy | Yes | None |
+| `/guides/[slug]`, `/treatments/[slug]` | DAP guide/treatment pages | DAP CMS data | Legacy DAP runtime, gated by Part 14 policy | Yes | None |
+| `/preview/dap/...` (≥30 routes) | DAP preview surfaces | DAP fixtures + previews | Legacy DAP runtime, outside restricted prefixes | Yes | None |
+| `/api/businesses/dental-advantage-plan/stages/review` | POST handler | calls `reviewStage` from legacy reviewer | Legacy AI bridge | Yes | None |
+| `/api/dap/requests` | POST handler | DAP request actions | Legacy DAP runtime | Yes | None |
+
+### 6. AI Review Layer Placement
+
+Mapped against the directive's 6-bucket target:
+
+| Bucket | File | Status |
+|---|---|---|
+| Generic review contract | `lib/cbcc/aiReview.ts` (`CbccAiReviewResult`, `normalizeCbccAiReviewResult`, types) | **In place** — provider-neutral, vertical-neutral. Verified by `aiReview.test.ts` boundary scan. |
+| Provider interface | `lib/cbcc/aiReviewProvider.ts` (`CbccAiReviewProvider`, `runCbccAiReview`, error types) | **In place** — abstract provider port; no SDK import. Verified by `aiReviewProvider.test.ts`. |
+| Anthropic implementation | `lib/cb-control-center/anthropicClient.ts` | **Correct location** — Direct `@anthropic-ai/sdk` use. Cannot live in engine or adapter without breaking purity rules. |
+| DAP rubrics | `lib/cb-control-center/dapStageRubrics.ts` | **Correct location for now** — pure data, but currently consumed only by the legacy reviewer. Eligible to migrate into the adapter as a self-contained future part. |
+| Concrete reviewer (rubric + prompt + Anthropic call) | `lib/cb-control-center/dapStageReviewer.ts` | **Correct location for now** — calls `getAnthropicClient`, depends on `DapStageGate` from `lib/cb-control-center/`. Cannot move into adapter (Part 13 Addendum). |
+| UI display | `components/cb-control-center/StageAiReviewPanel.tsx` | **Correct location** — type-only import from reviewer; no SDK/IO. |
+| Route wrapper | `app/api/businesses/dental-advantage-plan/stages/review/route.ts` | **Correct location** — POST-only, advisory-only, no persistence. Verified by `route.test.ts`. |
+
+**The engine port exists but is unwired.** Routes still call the legacy `reviewStage` directly. Wiring the route to use `runCbccAiReview` + an Anthropic provider implementation is the next architecture milestone (carry-forward from Parts 8X / 10–13).
+
+### 7. Recommended Target Structure
+
+```
+TARGET STRUCTURE
+
+lib/cbcc/
+  purpose:
+    Generic, vertical-neutral CBCC engine. Pure rules, contracts, types.
+  allowed dependencies:
+    - other lib/cbcc/* modules (within engine root)
+    - standard library (Set, Map, etc.)
+  disallowed dependencies:
+    - lib/cbcc/adapters/* (engine never reaches into adapters)
+    - lib/cb-control-center/*
+    - @anthropic-ai/sdk, openai, supabase, next/*, react
+    - 'use server' / 'use client' directives
+    - vertical language (DAP, dental, …) in code (doc comments tolerated as
+      single-example illustrations only)
+  files that belong here:
+    types.ts, projectRegistry.ts, stageLocking.ts, stageApproval.ts,
+    evidenceLedger.ts, stagePageModel.ts, nextAllowedAction.ts,
+    pageCreationPolicy.ts, adapters.ts, agentRegistry.ts, agentRuntime.ts,
+    aiReview.ts, aiReviewProvider.ts, index.ts (barrel)
+
+lib/cbcc/adapters/dap/
+  purpose:
+    Pure DAP-to-engine mapping data + adapter surface.
+  allowed dependencies:
+    - lib/cbcc/* engine types and helpers
+    - sibling files within adapters/dap/
+  disallowed dependencies:
+    - @anthropic-ai/sdk, openai, supabase
+    - next/*, react, 'use server', 'use client'
+    - lib/cb-control-center/* (any path)
+    - DAP review symbol names (reviewStage, StageAiReview, DapStageRubric)
+  files that belong here:
+    dapProject.ts, dapStages.ts, dapArtifacts.ts, dapEvidence.ts,
+    dapPageCreationPolicy.ts, index.ts
+  files that may move here later (subject to AI port migration):
+    dapStageRubrics.ts (already pure data; safe self-contained move)
+
+lib/cb-control-center/
+  purpose:
+    Legacy + DAP runtime app layer. Anthropic client, server actions,
+    DAP UX rules, CMS export, dispatch / approval / outbox pipelines,
+    persistence stores, page-model translators.
+  why it still exists:
+    - Holds SDK-touching, server-only, Supabase-bound code that cannot
+      live in the engine or adapter purity zones
+    - Holds the DAP_STAGE_GATES registry that drives both v1 and v2
+      stage detail pages
+    - Holds 51 dap-phase regression tests that validate the legacy path
+  files that may remain here:
+    anthropicClient.ts, dapStageReviewer.ts, dapStageGates.ts,
+    dapStage{Actions,ApprovalStore,StateResolver}.ts, cbccProject{*}.ts,
+    architecture/, client/, mkcrm/, source/, dap-phase-tests/
+  files that may move later:
+    dapStageRubrics.ts → adapters/dap/ (safe, pure data)
+    dapStageReviewer.ts → only after AI port migration extracts the
+      Anthropic provider into a separate runtime layer
+    cbccStageDefinitions.ts → potentially become a default-seed adapter
+      under lib/cbcc/adapters/default/ when a second engine-backed
+      adapter exists
+
+app/
+  purpose:
+    Next.js App Router route surface (60 route files, 199 static pages).
+  route stability notes:
+    - Both v1 (/businesses/dental-advantage-plan/build/stages/[stageSlug])
+      and v2 (/projects/[slug]/stages/[stageNumber]) paths are live and
+      mount the same <StageDetailPage>.
+    - DAP public surface (/dental-advantage-plan, /guides, /treatments)
+      is gated by Part 14 page-creation policy.
+    - Preview routes (/preview/dap/...) are explicitly outside the
+      restricted prefix.
+    - No route should be removed or renamed without an explicit, testable
+      migration plan and a redirect strategy.
+
+components/
+  purpose:
+    UI shell and stage panels. React-rendered, may be 'use client' or
+    server components. Should consume engine models and DAP adapter data,
+    not author business logic.
+```
+
+### 8. Minimal Changes Made
+
+**This addendum is the only change.** No code modified, no files moved, no tests added or weakened, no exports altered. Justification:
+
+1. The directive's "Allowed examples" for minimal patches include
+   "add architecture map" and "add documentation" — both satisfied
+   by this section.
+2. Every other allowed example (boundary test, missing export
+   barrel, renamed misleading comment) was evaluated and rejected:
+   - **Boundary test**: every boundary the audit names is already
+     defended by an existing test (table at end of §4). Adding a
+     redundant one would be busy-work.
+   - **Export barrel**: `lib/cbcc/index.ts` already exposes the
+     full intended public surface; nothing missing.
+   - **Misleading comment**: the only candidate is
+     `pageCreationPolicy.ts:5` which says "to DAP or any other
+     vertical." Sharpening the wording removes a *DAP* word but
+     adds no enforcement. Deferred to taste.
+
+### 9. Verification Results
+
+| Gate | Result |
+|---|---|
+| `pnpm check:page-policy` | Pass (0 violations; 17 files / 3 prefixes) |
+| `pnpm typecheck` | Pass (0 errors) |
+| `pnpm test` | Pass (6056 / 1 skipped — unchanged from Part 14) |
+| `pnpm lint` | Pass (0 errors; 49 pre-existing warnings; 0 new) |
+| `pnpm build` | Pass (Compiled in 1897ms; 199 static pages, unchanged) |
+| Grep 1 (forbidden deps in adapters/dap) | Clean (only test-file pattern table; no impl hits) |
+| Grep 2 (vertical language in lib/cbcc) | Clean (only boundary-test fixtures + 1 doc comment + ADAPTER substring matches) |
+| Grep 3 (cb-control-center imports from lib/cbcc) | Clean (no matches) |
+
+### 10. Final Recommendation
+
+**The architecture is now true.** CBCC is the reusable engine
+(`lib/cbcc/`), DAP is one adapter (`lib/cbcc/adapters/dap/`), AI
+review is optional and layered (engine port + legacy concrete impl
+behind a route), routes remain stable, and tests defend the
+boundaries at six independent points.
+
+**The safe answer in Part 16 is: do not move anything.** The
+remaining duplicates are not architectural drift — they are the
+visible cost of two transitional realities (v1 + v2 routes
+coexisting, the AI port not yet wired). Both will be retired in
+their own dedicated parts; collapsing them inside Part 16 would
+either change route behavior or weaken a test, which the directive
+forbids.
+
+**Next architectural milestone (highest leverage, deferred from
+Parts 8X / 10–15):** AI review provider-port migration. Steps,
+copied from the Part 13 Addendum:
+
+1. Extract Anthropic SDK use into
+   `lib/cb-control-center/runtime/anthropicProvider.ts` (or similar)
+   implementing `CbccAiReviewProvider`.
+2. Refactor the API route to call `runCbccAiReview` with the
+   provider instance and a packet built from the engine page model.
+3. Move `dapStageRubrics.ts` into `lib/cbcc/adapters/dap/` (already
+   pure data; trivial follow-up).
+4. Drop the direct `getAnthropicClient` import from
+   `dapStageReviewer.ts`; reduce that file to a thin packet builder
+   over the engine port.
+5. Once `dapStageReviewer.ts` no longer imports the SDK or
+   `lib/cb-control-center/dapStageGates`, it qualifies for the
+   adapter purity zone and can move there without weakening any
+   pre-existing rule.
+
+**Lower-priority architectural follow-ups** (each its own future
+part): default-seed adapter for non-DAP engine-backed projects,
+generalize `<CbccStagePipeline>` to consume `getStageLockReason`
+directly, retire `DAP_STAGE_GATES` after the AI-port migration
+exposes its directives as adapter data.
+
+**Operational follow-ups** (carry-forward from Part 14): wire
+`pnpm check:page-policy` into a pre-commit hook when the repo
+adopts a hook framework; add a CI workflow running `pnpm check`
+on push and PR.
+
 
