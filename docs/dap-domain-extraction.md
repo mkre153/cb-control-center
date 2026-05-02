@@ -73,11 +73,13 @@ Wave 1 complete. Two files deferred:
 - mkcrm/dapClientBuilderBillingTypes — lives under mkcrm/ subdirectory; assess separately
 
 ### Wave 2 — Pure rules/logic (no Supabase)
-- dapDisplayRules
 - dapPublicUxRules
 
 ### Wave 2G — Inspected, not moved
 - `lib/cb-control-center/mkcrm/dapClientBuilderBillingRules.ts` — file is pure (no Supabase/Next.js/React/server deps, only static rule functions), but its sole import is from `./dapClientBuilderBillingTypes` which remains in `lib/cb-control-center/mkcrm/`. Moving the rules file would create a `lib/dap/registry → lib/cb-control-center` back-dependency, which violates the extraction boundary rule. Prerequisite: move `mkcrm/dapClientBuilderBillingTypes` first (currently deferred in Wave 1 remaining). Revisit as Wave 2G-2 once types file is extracted.
+
+### Wave 2H — Inspected, not moved
+- `lib/cb-control-center/dapDisplayRules.ts` — file is pure (no Supabase/Next.js/React/server deps, only display rules, route constants, copy constants, and pure helper functions). However, line 1 imports `ProviderStatus` from `'./types'` which is `lib/cb-control-center/types.ts`. Moving to `lib/dap/registry/` would create a `lib/dap/registry → lib/cb-control-center` back-dependency. Prerequisite: extract `ProviderStatus` (and `PublicClaimLevel`) from `lib/cb-control-center/types.ts` into the `lib/dap/` namespace first. This was noted as deferred future work in Wave 1H (dapCmsTypes has the same blocker). ~30 inbound importers across components/, app/, and lib/. Revisit once ProviderStatus is extracted.
 
 ### Wave 3 — Read models and content
 - dapMemberStatusReadModel
