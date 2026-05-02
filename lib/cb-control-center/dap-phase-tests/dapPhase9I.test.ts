@@ -21,7 +21,7 @@ import { resolve, join } from 'path'
 import {
   canTransitionDapPracticeOnboardingStatus,
   assertValidDapPracticeOnboardingTransition,
-} from '../dapPracticeOnboardingRules'
+} from '../../dap/registry/dapPracticeOnboardingRules'
 
 // ─── Project root ─────────────────────────────────────────────────────────────
 
@@ -29,7 +29,7 @@ const ROOT = resolve(__dirname, '../../..')
 
 // ─── Key paths ────────────────────────────────────────────────────────────────
 
-const RULES_PATH          = resolve(ROOT, 'lib/cb-control-center/dapPracticeOnboardingRules.ts')
+const RULES_PATH          = resolve(ROOT, 'lib/dap/registry/dapPracticeOnboardingRules.ts')
 const ACTIONS_MODULE_PATH = resolve(ROOT, 'lib/cb-control-center/dapPracticeOnboardingActions.ts')
 const SERVER_ACTIONS_PATH = resolve(ROOT, 'app/preview/dap/onboarding/actions.ts')
 const DETAIL_PAGE_PATH    = resolve(ROOT, 'app/preview/dap/onboarding/[id]/page.tsx')

@@ -6,7 +6,7 @@ import {
 } from '@/lib/cb-control-center/dapPracticeOnboarding'
 import { getOfferTermsDraftByOnboardingId } from '@/lib/cb-control-center/dapOfferTerms'
 import { createOfferTermsDraftAction } from '../../offer-terms/actions'
-import { canTransitionDapPracticeOnboardingStatus } from '@/lib/cb-control-center/dapPracticeOnboardingRules'
+import { canTransitionDapPracticeOnboardingStatus } from '@/lib/dap/registry/dapPracticeOnboardingRules'
 import type {
   DapPracticeOnboardingEvent,
   DapPracticeOnboardingStatus,

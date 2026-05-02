@@ -1,4 +1,4 @@
-import type { DapPracticeOnboardingStatus } from '../dap/registry/dapPracticeOnboardingTypes'
+import type { DapPracticeOnboardingStatus } from './dapPracticeOnboardingTypes'
 
 // Phase 9I outreach transitions only. terms_under_review and ready_for_offer_validation
 // are passive statuses — not reachable via Phase 9I actions.

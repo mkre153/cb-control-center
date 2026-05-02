@@ -5,7 +5,7 @@ import type {
   DapPracticeOnboardingEventType,
   DapPracticeOnboardingStatus,
 } from '../dap/registry/dapPracticeOnboardingTypes'
-import { assertValidDapPracticeOnboardingTransition } from './dapPracticeOnboardingRules'
+import { assertValidDapPracticeOnboardingTransition } from '../dap/registry/dapPracticeOnboardingRules'
 import { getSupabaseAdminClient } from './supabaseClient'
 
 // outreach status ≠ provider confirmation. interested ≠ confirmed DAP provider.
