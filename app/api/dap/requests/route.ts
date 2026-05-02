@@ -6,7 +6,7 @@ import {
   buildDapRequestDedupeKey,
   canSubmitDapRequest,
   getDapRequestConfirmationModel,
-} from '@/lib/cb-control-center/dapRequestRules'
+} from '@/lib/dap/registry/dapRequestRules'
 import {
   createDapRequest,
   createDapRequestEvent,

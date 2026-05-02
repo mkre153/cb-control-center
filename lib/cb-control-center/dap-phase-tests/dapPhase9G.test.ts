@@ -20,7 +20,7 @@ import { resolve, join } from 'path'
 import {
   canTransitionDapRequestStatus,
   assertValidDapRequestTransition,
-} from '../dapRequestRules'
+} from '../../dap/registry/dapRequestRules'
 
 // ─── Project root ─────────────────────────────────────────────────────────────
 
@@ -31,7 +31,7 @@ const ROOT = resolve(__dirname, '../../..')
 const ACTIONS_MODULE_PATH = resolve(ROOT, 'lib/cb-control-center/dapRequestActions.ts')
 const SERVER_ACTIONS_PATH = resolve(ROOT, 'app/preview/dap/requests/[id]/actions.ts')
 const DETAIL_PAGE_PATH    = resolve(ROOT, 'app/preview/dap/requests/[id]/page.tsx')
-const RULES_PATH          = resolve(ROOT, 'lib/cb-control-center/dapRequestRules.ts')
+const RULES_PATH          = resolve(ROOT, 'lib/dap/registry/dapRequestRules.ts')
 
 // ─── Production boundary paths ────────────────────────────────────────────────
 

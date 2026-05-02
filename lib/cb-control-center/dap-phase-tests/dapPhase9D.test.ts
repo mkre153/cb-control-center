@@ -305,7 +305,7 @@ describe('Confirmation model safety invariants preserved in component', () => {
 
   it('dapRequestRules getDapRequestConfirmationModel returns isEnrollment: false', () => {
     const src = readFileSync(
-      resolve(ROOT, 'lib/cb-control-center/dapRequestRules.ts'),
+      resolve(ROOT, 'lib/dap/registry/dapRequestRules.ts'),
       'utf8'
     )
     expect(src).toMatch(/isEnrollment.*false/)

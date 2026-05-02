@@ -363,7 +363,7 @@ describe('API route enforces safety invariants', () => {
   it('confirmation model includes explicit not-enrollment message', () => {
     // getDapRequestConfirmationModel returns a body with "not enrollment" language
     const src = readFileSync(
-      resolve(ROOT, 'lib/cb-control-center/dapRequestRules.ts'),
+      resolve(ROOT, 'lib/dap/registry/dapRequestRules.ts'),
       'utf8'
     ).toLowerCase()
     expect(src).toMatch(/not enrollment|not.*enrollm/)

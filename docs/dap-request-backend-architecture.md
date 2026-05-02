@@ -188,7 +188,7 @@ closed_* → (terminal)
 
 ## 5. Validation Rules
 
-Implemented in `lib/cb-control-center/dapRequestRules.ts`.
+Implemented in `lib/dap/registry/dapRequestRules.ts`.
 
 ### Input validation (`validateDapRequestInput`)
 
@@ -342,7 +342,7 @@ These integrations are deferred, not cancelled. The types and validation rules i
 | File | Purpose |
 |---|---|
 | `lib/dap/registry/dapRequestTypes.ts` | All TypeScript types for the request system |
-| `lib/cb-control-center/dapRequestRules.ts` | Pure validation and rule functions |
+| `lib/dap/registry/dapRequestRules.ts` | Pure validation and rule functions |
 | `lib/cb-control-center/supabaseClient.ts` | Lazy-init Supabase admin client (server-side only) |
 | `lib/cb-control-center/dapRequestPersistence.ts` | `createDapRequest`, `createDapRequestEvent`, `findDuplicateDapRequest`, `sanitizeDapRequestForConfirmation` |
 | `supabase/migrations/20260429000000_dap_requests.sql` | DB migration: `dap_requests` + `dap_request_events` tables |

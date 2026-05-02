@@ -480,7 +480,7 @@ describe('Boundary preservation', () => {
   })
 
   it('request backend remains architecture-only — dapRequestRules has no fetch() calls', () => {
-    const content = readRoute('lib/cb-control-center/dapRequestRules.ts')
+    const content = readRoute('lib/dap/registry/dapRequestRules.ts')
     expect(content).not.toMatch(/\bfetch\s*\(/)
     expect(content).not.toContain('supabase')
   })

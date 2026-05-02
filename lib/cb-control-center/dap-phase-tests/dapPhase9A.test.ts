@@ -36,7 +36,7 @@ import {
   buildDapRequestDedupeKey,
   getDapRequestConfirmationModel,
   containsPhi,
-} from '../dapRequestRules'
+} from '../../dap/registry/dapRequestRules'
 
 import type {
   DapRequestInput,
@@ -825,7 +825,7 @@ describe('Deferred integrations remain deferred', () => {
 
   it('dapRequestRules.ts does not import CRM, MKCRM, or email packages', () => {
     const content = readFileSync(
-      resolve(ROOT, 'lib/cb-control-center/dapRequestRules.ts'),
+      resolve(ROOT, 'lib/dap/registry/dapRequestRules.ts'),
       'utf8'
     )
     expect(content).not.toMatch(/from ['"].*crm/)
