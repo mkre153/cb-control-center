@@ -1,6 +1,6 @@
-import { evaluateSiteArchitecture } from '@/lib/cb-control-center/siteArchitectureEligibility'
+import { evaluateSiteArchitecture } from '@/lib/cb-control-center/architecture/siteArchitectureEligibility'
 import type { EnrichedBlocker, TruthSection } from '@/lib/cb-control-center/types'
-import type { EvaluatedPage, ArchitectureRisk, NextBuildSlice } from '@/lib/cb-control-center/siteArchitectureTypes'
+import type { EvaluatedPage, ArchitectureRisk, NextBuildSlice } from '@/lib/cb-control-center/architecture/siteArchitectureTypes'
 
 interface SiteArchitectureTabProps {
   schema: TruthSection[]

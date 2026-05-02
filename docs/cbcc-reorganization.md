@@ -1548,4 +1548,119 @@ policy is no longer hidden inside a single test file: it's a one-line
 CLI any developer or agent can run, and any future hook framework can
 trigger.
 
+---
+
+## Part 15 Addendum — Unstaged working tree inspection (2026-05-01)
+
+Parts 12–14 each intentionally left the same three working-tree items
+unstaged so the CBCC architecture work would not get tangled up with
+unrelated state. Part 15 inspects each item in isolation and disposes
+of it. **No new architecture work**, no DAP feature surface, no engine
+changes.
+
+### Items inspected
+
+```
+git status --short
+
+ M app/preview/dap/practice-decision-emails/page.tsx
+ M components/cb-control-center/tabs/SiteArchitectureTab.tsx
+?? supabase/.temp/
+```
+
+### What each diff actually was
+
+Both `M` diffs are **import-path follow-ups** to commit
+`9d3647d chore(cbcc): move mkcrm/ and architecture/ source clusters`.
+That earlier commit moved the two source clusters into subfolders but
+did not update every consumer. The two unstaged files are the missed
+consumers:
+
+```
+- @/lib/cb-control-center/dapMkcrmDispatchPayloads
++ @/lib/cb-control-center/mkcrm/dapMkcrmDispatchPayloads
+- @/lib/cb-control-center/dapMkcrmDispatchPayloadTypes
++ @/lib/cb-control-center/mkcrm/dapMkcrmDispatchPayloadTypes
+```
+
+```
+- @/lib/cb-control-center/siteArchitectureEligibility
++ @/lib/cb-control-center/architecture/siteArchitectureEligibility
+- @/lib/cb-control-center/siteArchitectureTypes
++ @/lib/cb-control-center/architecture/siteArchitectureTypes
+```
+
+The on-disk filesystem confirms only the new (subfolder) paths exist:
+
+| Path | Exists |
+|---|---|
+| `lib/cb-control-center/dapMkcrmDispatchPayloads.ts` | no |
+| `lib/cb-control-center/mkcrm/dapMkcrmDispatchPayloads.ts` | yes |
+| `lib/cb-control-center/siteArchitectureEligibility.ts` | no |
+| `lib/cb-control-center/architecture/siteArchitectureEligibility.ts` | yes |
+
+Without the working-tree modifications, both files reference deleted
+paths and the build would not pass. The current green test/build state
+is **only** because these two changes are present in the working tree.
+
+The `supabase/.temp/cli-latest` entry is local Supabase CLI generated
+state and is not currently covered by `.gitignore`.
+
+### Classification table
+
+| File | Classification | Reason |
+|---|---|---|
+| `app/preview/dap/practice-decision-emails/page.tsx` | **KEEP** | Mechanical import fixup completing reorg `9d3647d`; without it, the file references deleted paths. Lives at `app/preview/dap/...` — outside every restricted prefix in the Part 14 policy. No new DAP surface added; no Stage 7 work duplicated. |
+| `components/cb-control-center/tabs/SiteArchitectureTab.tsx` | **KEEP** | Same reorg fixup. Generic CBCC UI updating two import paths; no DAP-adapter internal coupling, no Anthropic SDK, no Supabase, no Next runtime, no `'use server'` / `'use client'` change. Diff is two type-only import lines. |
+| `supabase/.temp/` | **IGNORE** | Local Supabase CLI generated state (`cli-latest` cache). Not covered by `.gitignore`. Add the narrowest safe rule. |
+
+### Actions taken
+
+1. **Updated `.gitignore`** with one line:
+   ```
+   # supabase CLI local state
+   supabase/.temp/
+   ```
+2. **Staged** `app/preview/dap/practice-decision-emails/page.tsx`.
+3. **Staged** `components/cb-control-center/tabs/SiteArchitectureTab.tsx`.
+4. **Did not commit** anything inside `supabase/.temp/`.
+
+### Boundary impact
+
+| Boundary | Impact |
+|---|---|
+| Part 14 page-creation policy guard | Untouched. `pnpm check:page-policy` still passes (17 files / 3 prefixes); neither modified file is under a restricted prefix. |
+| Part 13 adapter purity zone | Untouched. No file in `lib/cbcc/adapters/dap/` was modified. |
+| Part 11 / 12 AI review mutation boundary | Untouched. No reviewer / approval / next-allowed-action source changed. |
+| Part 11 engine-root vertical-neutrality | Untouched. No file under `lib/cbcc/*.ts` changed. |
+| Generic CBCC UI vs DAP adapter | The SiteArchitectureTab change does not introduce DAP-adapter coupling — it switches two import paths within `lib/cb-control-center/architecture/...`, which is generic CBCC code. |
+| Pre-existing 49 lint warnings | Unchanged. |
+| Static page count | Unchanged at 199. |
+
+### Validation results
+
+| Gate | Result | Notes |
+|---|---|---|
+| `pnpm check:page-policy` | Pass | 0 violations; 17 files / 3 prefixes scanned |
+| `pnpm typecheck` | Pass | 0 errors |
+| `pnpm test` | Pass | 6056 / 1 skipped (unchanged from Part 14) |
+| `pnpm lint` | Pass | 0 errors; 49 pre-existing warnings; 0 new |
+| `pnpm build` | Pass | Compiled successfully in 1936ms; 199 static pages, unchanged |
+
+### Remaining recommendations
+
+| Item | Class | When |
+|---|---|---|
+| Audit other consumers of the moved `mkcrm/` and `architecture/` clusters | Cleanup carry-forward | If any other importer was missed by `9d3647d`, typecheck would already fail — the gate is implicit. No additional action needed unless a future commit re-introduces an old import path. |
+| Pre-commit hook running `pnpm check:page-policy` | Operational | Carry-forward from Part 14. |
+| GitHub Actions running `pnpm check` | Operational | Carry-forward from Part 14. |
+| AI review provider-port migration | Architectural — Risk rule #4 | Carry-forward from Parts 8X / 10–13. |
+
+**Part 15 closes a hygiene loop, not an architecture loop.** The two
+`M` files were never new feature work — they were cleanup that should
+have been part of `9d3647d`. Staging them now removes the persistent
+red herring at the bottom of `git status`. The `supabase/.temp/`
+ignore entry stops the same item from reappearing as untracked on
+every future status read.
+
 
