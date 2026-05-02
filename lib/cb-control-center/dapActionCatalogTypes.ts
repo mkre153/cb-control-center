@@ -3,7 +3,7 @@
 // No action in this catalog executes, mutates, sends, queues, or triggers payment.
 
 import type { DapRequestStatus }                  from '../dap/registry/dapRequestTypes'
-import type { DapMemberStanding }                  from './dapMemberStatusTypes'
+import type { DapMemberStanding }                  from '../dap/membership/dapMemberStatusTypes'
 import type { DapAdminDecisionReadinessStatus }    from './dapAdminDecisionReadiness'
 import type { DapOfferTermsReviewStatus }          from '../dap/registry/dapOfferTermsReviewTypes'
 import type { DapProviderParticipationStatus }     from '../dap/registry/dapProviderParticipationTypes'

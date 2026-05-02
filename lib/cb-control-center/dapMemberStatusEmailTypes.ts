@@ -2,7 +2,7 @@
 // Notification copy reflects derived status only.
 // No email sending, no payment processing, no PHI.
 
-import type { DapMemberStanding } from './dapMemberStatusTypes'
+import type { DapMemberStanding } from '../dap/membership/dapMemberStatusTypes'
 
 export type DapMemberStatusEmailTemplateKey =
   | 'member_status_unknown'

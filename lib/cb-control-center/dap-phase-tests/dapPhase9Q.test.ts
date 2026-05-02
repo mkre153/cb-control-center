@@ -44,12 +44,12 @@ import {
   buildDapClientBuilderBillingPayload,
   assertClientBuilderBillingSource,
 } from '../mkcrm/dapClientBuilderBillingRules'
-import type { DapMemberBillingEventForStatus } from '../dapMemberStatusTypes'
+import type { DapMemberBillingEventForStatus } from '../../dap/membership/dapMemberStatusTypes'
 
 // ─── Project root ─────────────────────────────────────────────────────────────
 
 const ROOT       = resolve(__dirname, '../../..')
-const TYPES_PATH = resolve(ROOT, 'lib/cb-control-center/dapMemberStatusTypes.ts')
+const TYPES_PATH = resolve(ROOT, 'lib/dap/membership/dapMemberStatusTypes.ts')
 const RULES_PATH = resolve(ROOT, 'lib/cb-control-center/dapMemberStatusRules.ts')
 
 // ─── Timestamps ───────────────────────────────────────────────────────────────

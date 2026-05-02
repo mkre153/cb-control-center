@@ -4,7 +4,7 @@
 // No PHI. No payment CTAs. No raw billing events. No MKCRM authority.
 // Client Builder Pro is the payment system. DAP is the registry.
 
-import type { DapMemberStanding } from './dapMemberStatusTypes'
+import type { DapMemberStanding } from '../dap/membership/dapMemberStatusTypes'
 
 export type { DapMemberStanding }
 

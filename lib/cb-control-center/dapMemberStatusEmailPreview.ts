@@ -2,7 +2,7 @@
 // MKCRM does not determine billing status.
 // Preview-only notification copy — no email sending.
 
-import type { DapMemberStanding, DapMemberStatusReadModel } from './dapMemberStatusTypes'
+import type { DapMemberStanding, DapMemberStatusReadModel } from '../dap/membership/dapMemberStatusTypes'
 import type { DapMemberStatusEmailCopy } from './dapMemberStatusEmailTypes'
 import { getDapMemberStatusEmailCopy } from './dapMemberStatusEmailCopy'
 import { getDapMemberStatusPreview } from './dapMemberStatusPreview'

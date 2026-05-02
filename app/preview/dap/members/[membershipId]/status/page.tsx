@@ -3,8 +3,8 @@ import {
   getDapMemberStatusPreview,
 } from '@/lib/cb-control-center/dapMemberStatusPreview'
 import { isTerminalDapMemberStanding } from '@/lib/cb-control-center/dapMemberStatusRules'
-import type { DapMemberStanding } from '@/lib/cb-control-center/dapMemberStatusTypes'
-import type { DapMemberBillingEventForStatus } from '@/lib/cb-control-center/dapMemberStatusTypes'
+import type { DapMemberStanding } from '@/lib/dap/membership/dapMemberStatusTypes'
+import type { DapMemberBillingEventForStatus } from '@/lib/dap/membership/dapMemberStatusTypes'
 
 export const dynamic = 'force-dynamic'
 

@@ -11,7 +11,7 @@ import {
   DAP_P10_FIXTURE_MEMBERSHIP_IDS,
 } from '@/lib/cb-control-center/dapMemberStatusReadModel'
 import type { DapMemberPublicStatus } from '@/lib/cb-control-center/dapMemberStatusPublicTypes'
-import type { DapMemberStanding }     from '@/lib/cb-control-center/dapMemberStatusTypes'
+import type { DapMemberStanding }     from '@/lib/dap/membership/dapMemberStatusTypes'
 
 export const dynamic = 'force-dynamic'
 

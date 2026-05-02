@@ -2,7 +2,7 @@
 // Shows standing source, safety flags, template availability.
 // No PHI. No payment CTA. Computed by server.
 
-import type { DapMemberStanding } from './dapMemberStatusTypes'
+import type { DapMemberStanding } from '../dap/membership/dapMemberStatusTypes'
 import type { DapMemberPublicStatus } from './dapMemberStatusPublicTypes'
 import {
   getDapMemberStatusReadModel,

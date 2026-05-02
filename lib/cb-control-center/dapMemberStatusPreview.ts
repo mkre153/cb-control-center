@@ -7,7 +7,7 @@ import type {
   DapMemberBillingEventForStatus,
   DapMemberStatusReadModel,
   DapMemberStanding,
-} from './dapMemberStatusTypes'
+} from '../dap/membership/dapMemberStatusTypes'
 import { deriveDapMemberStatusReadModel } from './dapMemberStatusRules'
 
 // ─── Fixture billing events (read-only, no Supabase, no mutations) ─────────────

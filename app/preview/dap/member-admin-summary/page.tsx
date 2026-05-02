@@ -7,7 +7,7 @@ import {
   getAllDapMemberAdminSummaries,
 } from '@/lib/cb-control-center/dapMemberAdminSummary'
 import type { DapMemberAdminSummary } from '@/lib/cb-control-center/dapMemberAdminSummary'
-import type { DapMemberStanding } from '@/lib/cb-control-center/dapMemberStatusTypes'
+import type { DapMemberStanding } from '@/lib/dap/membership/dapMemberStatusTypes'
 
 export const dynamic = 'force-dynamic'
 

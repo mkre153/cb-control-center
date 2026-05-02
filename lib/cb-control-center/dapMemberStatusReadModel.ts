@@ -4,7 +4,7 @@
 // No PHI. No payment CTAs. No raw billing events. No MKCRM authority.
 // No email sending. No Supabase mutations.
 
-import type { DapMemberStanding, DapMemberBillingEventForStatus } from './dapMemberStatusTypes'
+import type { DapMemberStanding, DapMemberBillingEventForStatus } from '../dap/membership/dapMemberStatusTypes'
 import type {
   DapMemberPublicStatus,
   DapMemberStatusPublicReadModel,

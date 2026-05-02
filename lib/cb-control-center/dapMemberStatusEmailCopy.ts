@@ -3,7 +3,7 @@
 // MKCRM does not determine billing status.
 // No email sending, no payment CTAs, no PHI.
 
-import type { DapMemberStanding } from './dapMemberStatusTypes'
+import type { DapMemberStanding } from '../dap/membership/dapMemberStatusTypes'
 import type { DapMemberStatusEmailCopy, DapMemberStatusEmailTemplateKey } from './dapMemberStatusEmailTypes'
 
 // ─── Required footer note (locked language) ────────────────────────────────────

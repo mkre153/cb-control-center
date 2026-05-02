@@ -45,7 +45,7 @@ import {
   getInternalCrmSystemForVertical,
   isResponsibilityAllowed,
 } from '../client/clientBuilderBoundaryRules'
-import type { DapMemberStanding } from '../dapMemberStatusTypes'
+import type { DapMemberStanding } from '../../dap/membership/dapMemberStatusTypes'
 import type { DapMemberStatusEmailCopy } from '../dapMemberStatusEmailTypes'
 
 // ─── Project root ─────────────────────────────────────────────────────────────
