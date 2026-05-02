@@ -1183,3 +1183,207 @@ The file has 6 describe blocks:
 something the operator can actually see — on the project page, on each
 stage page, and inside the approval form when an attempt fails.
 
+---
+
+## Part 13 Addendum — Adapter purity boundary preserved (2026-05-01)
+
+The original Part 13 directive proposed relocating
+`lib/cb-control-center/dapStageReviewer.ts` and
+`lib/cb-control-center/dapStageRubrics.ts` into
+`lib/cbcc/adapters/dap/`, on the surface a clean architectural cleanup.
+
+While executing the move, we discovered that `lib/cbcc/adapters/dap/` is
+already protected as a **pure-data, no-IO, no-app-layer-import zone** by
+two pre-existing test groups, and that the reviewer file structurally
+violates the contract of that folder. Moving it would have required
+either weakening the existing tests (forbidden by the directive) or
+silently expanding the SDK-touching surface inside the adapter folder.
+
+We therefore reverted the move and re-scoped Part 13 to a documentation
++ boundary-affirmation pass.
+
+### What was attempted
+
+1. `git mv` of four files:
+   - `lib/cb-control-center/dapStageReviewer.ts`        → `lib/cbcc/adapters/dap/`
+   - `lib/cb-control-center/dapStageRubrics.ts`         → `lib/cbcc/adapters/dap/`
+   - `lib/cb-control-center/dapStageReviewer.test.ts`   → `lib/cbcc/adapters/dap/`
+   - `lib/cb-control-center/dapStageRubrics.test.ts`    → `lib/cbcc/adapters/dap/`
+2. Path updates inside the moved reviewer
+   (`'./anthropicClient'` → `'@/lib/cb-control-center/anthropicClient'`,
+    `'./dapStageGates'`   → `'@/lib/cb-control-center/dapStageGates'`).
+3. Path updates at three importers:
+   `app/api/businesses/dental-advantage-plan/stages/review/route.ts`,
+   `…/route.test.ts`,
+   `components/cb-control-center/StageAiReviewPanel.tsx`.
+4. Path updates at two grep-based boundary tests (`dapStagePart11.test.tsx`,
+   `dapStagePart12.test.tsx`) that resolve the reviewer source by
+   `__dirname`-relative path.
+
+`pnpm typecheck` was clean after the move.
+`pnpm test` failed with **2** pre-existing boundary tests:
+
+| Test file | Failing assertion |
+|---|---|
+| `lib/cbcc/adapters/dap/dapAdapter.test.ts` | `adapters/dap/dapStageReviewer.ts does not contain "getAnthropicClient"` |
+| `lib/cb-control-center/dapStagePart7.test.ts` | `no adapter file imports lib/cb-control-center (the DAP-specific app layer)` |
+
+### The boundary conflict
+
+`lib/cbcc/adapters/dap/` enforces, via existing tests, that every
+`*.ts` file in the folder must NOT contain any of:
+
+- `@anthropic-ai/sdk`
+- `getAnthropicClient`
+- `fetch(`
+- `supabase`
+- `from "next/"`
+- `from "react"`
+- `'use server'`
+- `'use client'`
+- the substring `cb-control-center` (i.e. no imports back into the
+  legacy/app-layer folder)
+
+The reviewer module, by contract, **does** call `getAnthropicClient()` and
+imports it — plus the `DapStageGate` type — from `lib/cb-control-center/`.
+It is fundamentally an SDK-touching, app-layer-coupled module. The
+adapter folder's existing rules therefore apply to it as a *negative*
+constraint: any file like the reviewer is currently disqualified from
+living there.
+
+### Why the move was rejected (corrected interpretation)
+
+The original Part 13 directive treated `lib/cbcc/adapters/dap/` as
+"DAP stuff." It is, in fact, narrower than that:
+
+- `lib/cbcc/`                 = generic engine
+- `lib/cbcc/adapters/dap/`    = **pure** DAP adapter / data / translation layer
+- `lib/cb-control-center/`    = current UI / control-center + legacy DAP runtime surface
+
+An SDK-touching reviewer is not adapter logic in this sense. Moving it
+into the pure zone would have made the file tree *look* cleaner while
+actually **weakening** an architecture invariant we want to preserve:
+that the adapter folder is deterministic, side-effect-free, and free of
+runtime/app-layer coupling.
+
+The directive's three explicit constraints — "Do not weaken or delete
+prior tests", "Preserve behavior exactly", "Do not refactor unrelated
+files" — are mutually exclusive in this case, given the pre-existing
+adapter contract. Reverting the move is the only option that honors all
+three.
+
+### What was kept (no behavior change, no test weakening)
+
+- `lib/cb-control-center/dapStageReviewer.ts` — unchanged.
+- `lib/cb-control-center/dapStageRubrics.ts`  — unchanged.
+- `lib/cb-control-center/dapStageReviewer.test.ts` / `dapStageRubrics.test.ts` — unchanged.
+- All importers (`route.ts`, `route.test.ts`, `StageAiReviewPanel.tsx`)
+  — unchanged.
+- All path-based grep tests in Parts 11 / 12 — unchanged.
+- All pre-existing adapter boundary tests (`dapAdapter.test.ts`,
+  `dapStagePart7.test.ts`) — unchanged.
+
+### What was added
+
+A single new boundary-affirmation suite that documents the discovery
+and re-asserts the adapter folder's purity contract co-located with the
+Part 13 narrative:
+
+| File | Type | Purpose |
+|---|---|---|
+| `lib/cb-control-center/dapStagePart13.test.ts` | NEW | 4-group acceptance suite re-asserting the rules below; references the legacy reviewer location to lock the reverted state. |
+
+The suite asserts:
+
+1. **Group 1 — legacy paths preserved**: reviewer/rubric still live in
+   `lib/cb-control-center/`, still import `getAnthropicClient`, still
+   import `DapStageGate` from cb-control-center, still read-only (no
+   supabase / no approval-store coupling).
+2. **Group 2 — `lib/cbcc/adapters/dap/` remains pure**: every impl file
+   is scanned for an expanded forbidden-pattern set (the union of the
+   pre-existing `dapAdapter.test.ts` rules + a new ban on
+   `dapStageReviewer` / `dapStageRubrics` / `reviewStage` /
+   `DapStageRubric` / `StageAiReview` references, so a future move
+   attempt must explicitly defeat both gates).
+3. **Group 3 — engine root stays vertical-neutral**: no top-level
+   `lib/cbcc/*.ts` file (and nothing in `lib/cbcc/index.ts`) imports or
+   re-exports DAP review symbols.
+4. **Group 4 — importers still wire to the legacy reviewer**: API
+   route, route test mock, and `StageAiReviewPanel.tsx` all import from
+   `@/lib/cb-control-center/dapStageReviewer`; none point at a
+   premature relocation under `@/lib/cbcc/adapters/dap/`.
+
+### Boundaries now enforced (and why they hold together)
+
+| Boundary | Enforced by |
+|---|---|
+| Generic engine root cannot import DAP review surface | `dapStagePart11.test.tsx` (engine-root grep), Part 13 Group 3 |
+| Engine barrel cannot re-export DAP review symbols | Part 13 Group 3 |
+| Adapter folder cannot use SDK / IO / app-layer imports | `dapAdapter.test.ts`, Part 13 Group 2 |
+| Adapter folder cannot import `lib/cb-control-center/` | `dapStagePart7.test.ts`, Part 13 Group 2 |
+| Adapter folder cannot reference DAP review symbols (yet) | Part 13 Group 2 |
+| Reviewer remains read-only | Parts 7 / 11 / 12, Part 13 Group 1 |
+| AI review cannot mutate approval state | Parts 11 / 12 (re-asserted), unchanged |
+
+These rules together encode a single principle: **AI review is an
+SDK-touching app-layer concern. It does not belong inside the pure
+adapter zone until it has a port that hides the SDK and the legacy
+DapStageGate dependency.**
+
+### Future migration path (NOT for Part 13)
+
+When AI review is redesigned as a clean port:
+
+1. Define the generic interface in `lib/cbcc/aiReview.ts` (already
+   exists as a contract layer). Keep it provider-neutral, no SDK
+   types.
+2. Implement the Anthropic provider **outside** the pure adapter
+   folder — e.g. `lib/cbcc/runtime/anthropicProvider.ts` or
+   `lib/cb-control-center/runtime/...` — and wire it via dependency
+   injection at the route boundary, not via direct import inside the
+   adapter.
+3. Move the **rubric data** (`dapStageRubrics.ts`) into the adapter
+   first — it is pure data, has no SDK or app-layer imports, and would
+   pass every existing rule. This is the safest first step and can be
+   done independently as its own part.
+4. Refactor the reviewer's call site to consume the engine port +
+   provider, freeing it from `getAnthropicClient` and `DapStageGate`.
+5. Once the reviewer no longer touches the SDK directly and no longer
+   imports from `lib/cb-control-center/`, it can move into
+   `lib/cbcc/adapters/dap/` without weakening any existing rule.
+
+### Test coverage added
+
+| File | Tests | New / Updated |
+|---|---:|---|
+| `lib/cb-control-center/dapStagePart13.test.ts` | 82 | NEW |
+
+Test count: 5925 (post-Part-12) → 6007 (post-Part-13), +82 — all from
+Part 13 Group 2's per-file × per-pattern matrix and the four
+documentation groups. No prior tests were modified.
+
+### Validation results
+
+| Gate | Result |
+|---|---|
+| `pnpm typecheck` | Pass (0 errors) |
+| `pnpm test` | Pass (6007 / 1 skipped — was 5925, +82) |
+| `pnpm lint` | Pass (0 errors; 49 pre-existing warnings, **0 new warnings introduced by Part 13**) |
+| `pnpm build` | Pass (Compiled successfully in 1954ms; 199 static pages generated, unchanged) |
+
+### Remaining recommendations
+
+| Item | Class | When |
+|---|---|---|
+| AI review still routed through legacy `dapStageReviewer.ts` with direct SDK + legacy-folder coupling | Architectural — Risk rule #4 | Carry forward to a dedicated provider-port part (see Future migration path above). |
+| `dapStageRubrics.ts` could be moved into `lib/cbcc/adapters/dap/` independently — it has no forbidden imports | Adapter purity-compatible cleanup | A self-contained future part — single file, single `from './dapStageRubrics'` rewrite in the reviewer, and a corresponding update in this file's Group 1 + Group 2 expectations. |
+| Page-creation policy guard remains test-only, not pre-commit / CI | Coverage gap by design | Part 14 candidate (CI / pre-commit guard). |
+| Two unrelated working-tree files (`practice-decision-emails/page.tsx`, `SiteArchitectureTab.tsx`) still uncommitted | Operational | Part 15 candidate (separate inspect-and-decide pass). |
+
+**Part 13's most valuable output is not a relocation.** It is the
+explicit, test-asserted statement that `lib/cbcc/adapters/dap/` is a
+purity boundary, not a junk drawer for "anything DAP-shaped" — and the
+documented migration path that lets the reviewer eventually move there
+without compromising the boundary.
+
+
