@@ -43,11 +43,15 @@ export function StageDetailPage({
   breadcrumbBase = '/businesses/dental-advantage-plan/build',
   breadcrumbTrail,
   nextStageHref,
+  projectSlug,
 }: {
   stage: DapStageGate
   breadcrumbBase?: string
   breadcrumbTrail?: ReadonlyArray<{ label: string; href?: string }>
   nextStageHref?: (nextStage: DapStageGate) => string
+  // Project slug for the AI review API. When omitted (legacy v1 caller),
+  // the panel posts without a projectSlug and the route treats it as DAP.
+  projectSlug?: string
 }) {
   const isApproved = stage.status === 'approved'
   const isAwaiting = stage.status === 'awaiting_owner_approval'
@@ -248,7 +252,12 @@ export function StageDetailPage({
         </StageSection>
 
         {/* Opus 4.7 AI Review */}
-        <StageAiReviewPanel stageSlug={stage.slug} stageTitle={stage.title} />
+        <StageAiReviewPanel
+          stageSlug={stage.slug}
+          stageNumber={stage.stageNumber}
+          stageTitle={stage.title}
+          projectSlug={projectSlug}
+        />
 
         {/* Back to overview */}
         <div className="pt-2">

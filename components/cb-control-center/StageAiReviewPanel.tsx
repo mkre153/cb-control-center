@@ -6,6 +6,13 @@ import type { StageAiReview, StageAiChecklistResult } from '@/lib/cb-control-cen
 interface Props {
   stageSlug: string
   stageTitle: string
+  // When omitted, the API resolves DAP gates by slug only (legacy v1 behavior).
+  // When provided, the API can also resolve DAP gates by number — this is the
+  // path the v2 project routes take, where `stageSlug` is just the integer.
+  stageNumber?: number
+  // When provided and not "dental-advantage-plan", the API returns 404
+  // (advisory review for non-DAP projects is not yet supported).
+  projectSlug?: string
 }
 
 const RECOMMENDATION_STYLE: Record<StageAiReview['recommendation'], string> = {
@@ -26,7 +33,7 @@ const CONFIDENCE_LABEL: Record<StageAiReview['confidence'], string> = {
   low:    'Low confidence',
 }
 
-export function StageAiReviewPanel({ stageSlug, stageTitle }: Props) {
+export function StageAiReviewPanel({ stageSlug, stageTitle, stageNumber, projectSlug }: Props) {
   const [loading, setLoading] = useState(false)
   const [review, setReview] = useState<StageAiReview | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -39,7 +46,7 @@ export function StageAiReviewPanel({ stageSlug, stageTitle }: Props) {
       const res = await fetch('/api/businesses/dental-advantage-plan/stages/review', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ stageSlug }),
+        body: JSON.stringify({ stageSlug, stageNumber, projectSlug }),
       })
       if (!res.ok) {
         const msg = await res.text()

@@ -95,6 +95,7 @@ export default async function ProjectStageDetailRoute({ params }: { params: Para
         breadcrumbBase={breadcrumbBase}
         breadcrumbTrail={trail}
         nextStageHref={(next) => `${breadcrumbBase}/stages/${next.stageNumber}`}
+        projectSlug={slug}
       />
       {showDapApprovalForm && (
         <div className="max-w-4xl mx-auto px-6 -mt-6 pb-10">

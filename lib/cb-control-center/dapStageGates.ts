@@ -549,6 +549,10 @@ export function getDapStageGateBySlug(slug: string): DapStageGate | undefined {
   return DAP_STAGE_GATES.find(s => s.slug === slug) as DapStageGate | undefined
 }
 
+export function getDapStageGateByNumber(stageNumber: number): DapStageGate | undefined {
+  return DAP_STAGE_GATES.find(s => s.stageNumber === stageNumber) as DapStageGate | undefined
+}
+
 export function getNextDapStageGate(current: DapStageGate): DapStageGate | undefined {
   return DAP_STAGE_GATES.find(
     s => s.stageNumber === current.stageNumber + 1

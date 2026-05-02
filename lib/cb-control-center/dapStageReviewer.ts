@@ -10,6 +10,7 @@
 
 import { getAnthropicClient } from './anthropicClient'
 import type { DapStageGate } from './dapStageGates'
+import { getDapStageRubric, formatDapStageRubricForPrompt } from './dapStageRubrics'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -43,14 +44,20 @@ const DAP_TRUTH_RULES = [
 export async function reviewStage(stage: DapStageGate): Promise<StageAiReview> {
   const client = getAnthropicClient()
 
+  const rubric = getDapStageRubric(stage.stageNumber)
+  const rubricBlock = rubric
+    ? `\n\n${formatDapStageRubricForPrompt(rubric)}`
+    : '\n\n(No stage-specific rubric registered for this stage number — review against requirements and truth rules only.)'
+
   const systemPrompt = `You are a DAP build process auditor for CB Control Center. Your role is to review stage artifacts and evidence, then recommend whether the owner should approve or not.
 
 ANTI-BYPASS RULE: No DAP implementation phase may begin without a CBCC-issued directive for that stage. Each phase stops at evidence submission. Owner must approve before the next directive is issued.
 
 DAP TRUTH RULES (immutable — no artifact may contradict these):
 ${DAP_TRUTH_RULES.map((r, i) => `${i + 1}. ${r}`).join('\n')}
+${rubricBlock}
 
-CRITICAL: You are advisory only. Your recommendation does not approve anything. Only the owner approves by editing dapStageGates.ts and committing.
+CRITICAL: You are advisory only. Your recommendation does not approve anything. Owner approval is a separate, deliberate action — only the owner approves by editing dapStageGates.ts and committing.
 
 Respond with ONLY valid JSON matching this exact shape:
 {
@@ -63,6 +70,8 @@ Respond with ONLY valid JSON matching this exact shape:
 }`
 
   const userPrompt = JSON.stringify({
+    advisoryNotice: 'AI output is advisory only. Owner approval is separate and required before any stage unlocks.',
+    projectSlug: 'dental-advantage-plan',
     stageId: stage.stageId,
     stageNumber: stage.stageNumber,
     title: stage.title,
@@ -73,6 +82,7 @@ Respond with ONLY valid JSON matching this exact shape:
     implementationEvidence: stage.implementationEvidence,
     artifact: stage.artifact ?? null,
     truthRules: DAP_TRUTH_RULES,
+    rubric: rubric ?? null,
   }, null, 2)
 
   try {

@@ -77,6 +77,24 @@ describe('Group 1 — dapStageReviewer module exports', () => {
     const src = readFileSync(REVIEWER_PATH, 'utf8')
     expect(src).toContain('advisory only')
   })
+
+  it('includes the explicit "owner approval is separate" note', () => {
+    const src = readFileSync(REVIEWER_PATH, 'utf8')
+    expect(src.toLowerCase()).toContain('owner approval')
+    expect(src.toLowerCase()).toContain('separate')
+  })
+
+  it('threads the per-stage rubric into the prompt', () => {
+    const src = readFileSync(REVIEWER_PATH, 'utf8')
+    expect(src).toContain('getDapStageRubric')
+    expect(src).toContain('formatDapStageRubricForPrompt')
+  })
+
+  it('user payload includes rubric and advisoryNotice fields', () => {
+    const src = readFileSync(REVIEWER_PATH, 'utf8')
+    expect(src).toContain('rubric:')
+    expect(src).toContain('advisoryNotice:')
+  })
 })
 
 // ─── Group 2: No mutation surface ────────────────────────────────────────────
