@@ -15,10 +15,13 @@
 import type {
   CbccApprovalDecision,
   CbccApprovalResult,
+  CbccEvidenceLedger,
+  CbccEvidenceRequirement,
   CbccProject,
   CbccStage,
   CbccStageId,
 } from './types'
+import { getStageLockReason, type LockingOptions } from './stageLocking'
 
 function findStage(project: CbccProject, stageId: CbccStageId): CbccStage | null {
   return project.stages.find(s => s.id === stageId) ?? null
@@ -135,4 +138,83 @@ export function getApprovalState(
     rejected: stage.status === 'rejected',
     decision: stage.approval ?? stage.rejection,
   }
+}
+
+// ─── Evidence-gated approval check (Part 10) ──────────────────────────────────
+//
+// Pure predicate that combines stage-existence + locking (predecessor approval)
+// + required-evidence presence. Matching is by *requirement.id ↔ evidence.id*,
+// scoped to the same project and stage. This is intentionally stricter than
+// the generic type-matched validation in evidenceLedger.ts:
+//
+//   - An AI review entry with id 'opus_stage_review' cannot satisfy a
+//     requirement with id 'truth_schema' even if both have type 'note' or
+//     type 'file'.
+//   - Cross-project evidence is filtered out before matching.
+//   - Cross-stage evidence is filtered out before matching.
+//   - Only entries with status='valid' satisfy a requirement.
+//
+// Adapters supply the requirement set per stage; the engine never invents
+// requirements of its own.
+
+export interface CbccStageApprovalCheckInput {
+  project: CbccProject
+  projectId: string
+  stageId: CbccStageId
+  evidence: CbccEvidenceLedger
+  requirements: ReadonlyArray<CbccEvidenceRequirement>
+  options?: LockingOptions
+}
+
+export type CbccStageApprovalCheckReason =
+  | 'stage_not_found'
+  | 'stage_locked'
+  | 'missing_required_evidence'
+
+export type CbccStageApprovalCheckResult =
+  | {
+      ok: true
+      missingEvidence: readonly []
+    }
+  | {
+      ok: false
+      reason: CbccStageApprovalCheckReason
+      lockReason?: string
+      missingEvidence: ReadonlyArray<CbccEvidenceRequirement>
+    }
+
+export function canApproveStageWithEvidence(
+  input: CbccStageApprovalCheckInput,
+): CbccStageApprovalCheckResult {
+  const stage = findStage(input.project, input.stageId)
+  if (!stage) {
+    return { ok: false, reason: 'stage_not_found', missingEvidence: [] }
+  }
+
+  const lock = getStageLockReason(input.project, input.stageId, input.options)
+  if (lock.locked) {
+    return {
+      ok: false,
+      reason: 'stage_locked',
+      lockReason: lock.reason,
+      missingEvidence: [],
+    }
+  }
+
+  const scoped = input.evidence.filter(
+    e => e.projectId === input.projectId && e.stageId === input.stageId,
+  )
+  const missingEvidence = input.requirements
+    .filter(r => r.required)
+    .filter(r => !scoped.some(e => e.id === r.id && e.status === 'valid'))
+
+  if (missingEvidence.length > 0) {
+    return {
+      ok: false,
+      reason: 'missing_required_evidence',
+      missingEvidence,
+    }
+  }
+
+  return { ok: true, missingEvidence: [] }
 }

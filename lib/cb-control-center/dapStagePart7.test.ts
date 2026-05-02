@@ -47,6 +47,35 @@ import {
 import { translateEngineProjectToV2 } from './cbccProjectPipelineTranslator'
 import { buildDapStageGateFromEngine } from './cbccStagePageModelTranslator'
 
+// Part 10 evidence injection — these tests pre-date the evidence gate and
+// were originally about lock/double-approve/predecessor logic, NOT evidence.
+// We supply a minimal valid evidence ledger keyed to the stage being
+// approved so the evidence gate is always satisfied; the test is then back
+// to exercising what it originally exercised.
+function evidenceFor(stageNumber: number, stageId: string): import('@/lib/cbcc/types').CbccEvidenceLedger {
+  const requiredIds: Record<number, string> = {
+    1: 'business_definition',
+    2: 'discovery_asset_audit',
+    3: 'truth_schema',
+    4: 'positioning_messaging',
+    5: 'seo_aeo_content_strategy',
+    6: 'page_architecture_wireframes',
+    7: 'build_qa_launch_evidence',
+  }
+  const id = requiredIds[stageNumber]
+  if (!id) return []
+  return [{
+    id,
+    projectId: DAP_PROJECT_ID,
+    stageId,
+    type: 'file',
+    status: 'valid',
+    title: `Test evidence for ${id}`,
+    ref: 'test/fixture',
+    createdAt: '2026-05-01T00:00:00Z',
+  }]
+}
+
 // Build a "fresh-DAP" engine project where Stage 1 is awaiting (not yet
 // approved by the engine static state) so the persistence flow has somewhere
 // to land. Used by Sections 1–8 to exercise the full unlock chain.
@@ -73,7 +102,7 @@ describe('Part 7 acceptance — 1. Owner approval is persisted', () => {
     // Use the engine static project (Stage 1 already approved baseline)
     // and approve Stage 2 — it's currently unlocked.
     const result = await approveDapStage(
-      { stageNumber: 2, approvedBy: 'Owner', notes: 'reviewed audit' },
+      { stageNumber: 2, approvedBy: 'Owner', notes: 'reviewed audit', evidence: evidenceFor(2, 'discovery') },
       store,
       '2026-05-02T10:00:00Z',
     )
@@ -109,10 +138,124 @@ describe('Part 7 acceptance — 1. Owner approval is persisted', () => {
     expect(r8.ok).toBe(false)
   })
 
+  // ─── Part 10 — evidence-gated approval ────────────────────────────────────
+
+  it('Part 10: rejects Stage 2 approval when no evidence is supplied (gate fires)', async () => {
+    const store = createTestDapStageApprovalStore()
+    // Stage 2 is unlocked (Stage 1 approved baseline) but the production
+    // ledger emits no Stage 2 evidence (placeholder artifact). Gate must
+    // block approval.
+    const r = await approveDapStage({ stageNumber: 2, approvedBy: 'Owner' }, store)
+    expect(r.ok).toBe(false)
+    if (r.ok) return
+    expect(r.code).toBe('missing_required_evidence')
+    expect(r.missingEvidence).toEqual(['discovery_asset_audit'])
+    // No write happened.
+    expect((await store.list()).length).toBe(0)
+  })
+
+  it('Part 10: AI review evidence (different id) does NOT satisfy the gate', async () => {
+    const store = createTestDapStageApprovalStore()
+    const aiReview: import('@/lib/cbcc/types').CbccEvidenceLedger = [{
+      id: 'opus_stage_review',
+      projectId: DAP_PROJECT_ID,
+      stageId: 'discovery',
+      type: 'note',
+      status: 'valid',
+      title: 'Opus 4.7 review (not registered as required evidence)',
+      createdAt: '2026-05-01T00:00:00Z',
+    }]
+    const r = await approveDapStage(
+      { stageNumber: 2, approvedBy: 'Owner', evidence: aiReview },
+      store,
+    )
+    expect(r.ok).toBe(false)
+    if (r.ok) return
+    expect(r.code).toBe('missing_required_evidence')
+    expect(r.missingEvidence).toEqual(['discovery_asset_audit'])
+  })
+
+  it('Part 10: evidence from another stage does NOT count', async () => {
+    const store = createTestDapStageApprovalStore()
+    // Right id, wrong stage.
+    const wrongStage: import('@/lib/cbcc/types').CbccEvidenceLedger = [{
+      id: 'discovery_asset_audit',
+      projectId: DAP_PROJECT_ID,
+      stageId: 'definition', // belongs to Stage 1 instead
+      type: 'file',
+      status: 'valid',
+      title: 'discovery audit',
+      ref: 'fake',
+      createdAt: '2026-05-01T00:00:00Z',
+    }]
+    const r = await approveDapStage(
+      { stageNumber: 2, approvedBy: 'Owner', evidence: wrongStage },
+      store,
+    )
+    expect(r.ok).toBe(false)
+    if (r.ok) return
+    expect(r.code).toBe('missing_required_evidence')
+  })
+
+  it('Part 10: evidence from another project does NOT count', async () => {
+    const store = createTestDapStageApprovalStore()
+    const wrongProject: import('@/lib/cbcc/types').CbccEvidenceLedger = [{
+      id: 'discovery_asset_audit',
+      projectId: 'OTHER_PROJECT',
+      stageId: 'discovery',
+      type: 'file',
+      status: 'valid',
+      title: 'discovery audit',
+      ref: 'fake',
+      createdAt: '2026-05-01T00:00:00Z',
+    }]
+    const r = await approveDapStage(
+      { stageNumber: 2, approvedBy: 'Owner', evidence: wrongProject },
+      store,
+    )
+    expect(r.ok).toBe(false)
+    if (r.ok) return
+    expect(r.code).toBe('missing_required_evidence')
+  })
+
+  it('Part 10: pending-status evidence does NOT count', async () => {
+    const store = createTestDapStageApprovalStore()
+    const pending: import('@/lib/cbcc/types').CbccEvidenceLedger = [{
+      id: 'discovery_asset_audit',
+      projectId: DAP_PROJECT_ID,
+      stageId: 'discovery',
+      type: 'file',
+      status: 'pending',
+      title: 'discovery audit',
+      ref: 'fake',
+      createdAt: '2026-05-01T00:00:00Z',
+    }]
+    const r = await approveDapStage(
+      { stageNumber: 2, approvedBy: 'Owner', evidence: pending },
+      store,
+    )
+    expect(r.ok).toBe(false)
+    if (r.ok) return
+    expect(r.code).toBe('missing_required_evidence')
+  })
+
+  it('Part 10: locking check still fires before evidence gate (Stage 3 baseline)', async () => {
+    const store = createTestDapStageApprovalStore()
+    // Stage 3's predecessor (Stage 2) is not approved in baseline → locked.
+    // Even if we supply Stage 3 evidence, locking blocks first.
+    const r = await approveDapStage(
+      { stageNumber: 3, approvedBy: 'Owner', evidence: evidenceFor(3, 'truth-schema') },
+      store,
+    )
+    expect(r.ok).toBe(false)
+    if (r.ok) return
+    expect(r.code).toBe('stage_locked')
+  })
+
   it('rejects double approval of the same stage', async () => {
     const store = createTestDapStageApprovalStore()
-    await approveDapStage({ stageNumber: 2, approvedBy: 'Owner' }, store)
-    const second = await approveDapStage({ stageNumber: 2, approvedBy: 'Owner' }, store)
+    await approveDapStage({ stageNumber: 2, approvedBy: 'Owner', evidence: evidenceFor(2, 'discovery') }, store)
+    const second = await approveDapStage({ stageNumber: 2, approvedBy: 'Owner', evidence: evidenceFor(2, 'discovery') }, store)
     expect(second.ok).toBe(false)
     if (second.ok) return
     expect(second.code).toBe('already_approved')
@@ -141,7 +284,7 @@ describe('Part 7 acceptance — 2. Stage 1 approval unlocks Stage 2', () => {
     // in approveDapStage; here we exercise the action's lock check using the
     // canonical engine state where S1 IS approved — so S2 succeeds.)
     const store = createTestDapStageApprovalStore()
-    const r = await approveDapStage({ stageNumber: 2, approvedBy: 'Owner' }, store)
+    const r = await approveDapStage({ stageNumber: 2, approvedBy: 'Owner', evidence: evidenceFor(2, 'discovery') }, store)
     expect(r.ok).toBe(true) // S1 approved baseline → S2 unlocked
   })
 })
@@ -188,7 +331,7 @@ describe('Part 7 acceptance — 4. Stage 2 approval unlocks Stage 3', () => {
 
   it('full-chain test: approve S2 via action, then verify S3 unlocked', async () => {
     const store = createTestDapStageApprovalStore()
-    const r = await approveDapStage({ stageNumber: 2, approvedBy: 'Owner' }, store)
+    const r = await approveDapStage({ stageNumber: 2, approvedBy: 'Owner', evidence: evidenceFor(2, 'discovery') }, store)
     expect(r.ok).toBe(true)
     const effective = buildDapEffectiveProject(DAP_PROJECT, await store.list())
     expect(isStageLocked(effective, 'truth-schema')).toBe(false)

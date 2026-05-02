@@ -20,11 +20,15 @@
 //     no approve/unlock/persist API.
 
 import { revalidatePath } from 'next/cache'
-import { isStageLocked } from '@/lib/cbcc/index'
+import { isStageLocked, canApproveStageWithEvidence } from '@/lib/cbcc/index'
+import type { CbccEvidenceLedger } from '@/lib/cbcc/types'
 import {
   DAP_PROJECT,
+  DAP_PROJECT_ID,
   DAP_PROJECT_SLUG,
   DAP_STAGE_DEFINITIONS,
+  buildDapApprovalEvidenceLedger,
+  getDapStageEvidenceRequirements,
 } from '@/lib/cbcc/adapters/dap'
 import {
   getDapStageApprovalStore,
@@ -37,12 +41,17 @@ import {
 
 export type ApproveDapStageResult =
   | { ok: true; approval: DapStageApproval }
-  | { ok: false; code: string; message: string }
+  | { ok: false; code: string; message: string; missingEvidence?: ReadonlyArray<string> }
 
 export interface ApproveDapStageInput {
   stageNumber: number
   approvedBy: string
   notes?: string
+  // Optional override for the evidence ledger consulted by the Part 10
+  // evidence gate. Production callers omit this — the action defaults to
+  // buildDapApprovalEvidenceLedger() which scans current DAP artifacts.
+  // Tests inject a deterministic ledger to exercise the gate predictably.
+  evidence?: CbccEvidenceLedger
 }
 
 // Pure-logic core; UI calls the named server action below which delegates
@@ -88,6 +97,37 @@ export async function approveDapStage(
       ok: false,
       code: 'stage_locked',
       message: `Stage ${stageNumber} is locked — predecessor not yet approved`,
+    }
+  }
+
+  // Part 10: evidence-gated approval. Reject when required evidence is
+  // missing. AI review never satisfies a requirement (id mismatch in
+  // canApproveStageWithEvidence). Tests inject `input.evidence` to
+  // exercise the gate without depending on adapter artifact state.
+  const evidence = input.evidence ?? buildDapApprovalEvidenceLedger({ projectId: DAP_PROJECT_ID, now })
+  const requirements = getDapStageEvidenceRequirements(stageNumber)
+  const gate = canApproveStageWithEvidence({
+    project: effectiveProject,
+    projectId: DAP_PROJECT_ID,
+    stageId: def.id,
+    evidence,
+    requirements,
+  })
+  if (!gate.ok) {
+    if (gate.reason === 'missing_required_evidence') {
+      const missingIds = gate.missingEvidence.map(r => r.id)
+      return {
+        ok: false,
+        code: 'missing_required_evidence',
+        message: `Stage ${stageNumber} cannot be approved — missing required evidence: ${missingIds.join(', ')}`,
+        missingEvidence: missingIds,
+      }
+    }
+    // Stage_not_found / stage_locked are already handled above; defensive fallthrough.
+    return {
+      ok: false,
+      code: gate.reason,
+      message: `Stage ${stageNumber} cannot be approved: ${gate.reason}`,
     }
   }
 

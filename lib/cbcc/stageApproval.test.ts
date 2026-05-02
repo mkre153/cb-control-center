@@ -5,8 +5,15 @@ import {
   applyStageApproval,
   applyStageRejection,
   getApprovalState,
+  canApproveStageWithEvidence,
 } from './stageApproval'
-import type { CbccProject, CbccStage, CbccStageStatus } from './types'
+import type {
+  CbccEvidenceEntry,
+  CbccEvidenceRequirement,
+  CbccProject,
+  CbccStage,
+  CbccStageStatus,
+} from './types'
 
 const NOW = '2026-05-01T00:00:00Z'
 const LATER = '2026-05-02T00:00:00Z'
@@ -150,5 +157,223 @@ describe('getApprovalState', () => {
     expect(state.approved).toBe(false)
     expect(state.rejected).toBe(false)
     expect(state.decision).toBeUndefined()
+  })
+})
+
+// ─── Part 10: canApproveStageWithEvidence ────────────────────────────────────
+
+function makeEntry(
+  overrides: Partial<CbccEvidenceEntry> & Pick<CbccEvidenceEntry, 'id' | 'projectId' | 'stageId'>,
+): CbccEvidenceEntry {
+  return {
+    type: 'file',
+    status: 'valid',
+    title: overrides.id,
+    createdAt: NOW,
+    ...overrides,
+  } as CbccEvidenceEntry
+}
+
+const REQ_TRUTH: CbccEvidenceRequirement = {
+  id: 'truth_schema',
+  type: 'file',
+  title: 'Truth Schema artifact',
+  required: true,
+}
+
+describe('canApproveStageWithEvidence — evidence-gated approval (Part 10)', () => {
+  it('returns ok when stage exists, is unlocked, and required evidence is present', () => {
+    const p = makeProject([
+      makeStage('s1', 1, 'approved'),
+      makeStage('s2', 2, 'awaiting_owner_approval'),
+    ])
+    const evidence = [makeEntry({ id: 'truth_schema', projectId: 'p', stageId: 's2' })]
+    const result = canApproveStageWithEvidence({
+      project: p,
+      projectId: 'p',
+      stageId: 's2',
+      evidence,
+      requirements: [REQ_TRUTH],
+    })
+    expect(result.ok).toBe(true)
+    expect(result.missingEvidence).toHaveLength(0)
+  })
+
+  it('returns stage_not_found when stageId does not match any stage', () => {
+    const p = makeProject([makeStage('s1', 1)])
+    const result = canApproveStageWithEvidence({
+      project: p,
+      projectId: 'p',
+      stageId: 'nope',
+      evidence: [],
+      requirements: [],
+    })
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.reason).toBe('stage_not_found')
+  })
+
+  it('returns stage_locked when predecessor is not approved', () => {
+    const p = makeProject([
+      makeStage('s1', 1, 'in_progress'),
+      makeStage('s2', 2, 'awaiting_owner_approval'),
+    ])
+    const evidence = [makeEntry({ id: 'truth_schema', projectId: 'p', stageId: 's2' })]
+    const result = canApproveStageWithEvidence({
+      project: p,
+      projectId: 'p',
+      stageId: 's2',
+      evidence,
+      requirements: [REQ_TRUTH],
+    })
+    expect(result.ok).toBe(false)
+    if (!result.ok) {
+      expect(result.reason).toBe('stage_locked')
+      expect(result.lockReason).toMatch(/predecessor/i)
+    }
+  })
+
+  it('returns missing_required_evidence and lists the missing requirement', () => {
+    const p = makeProject([
+      makeStage('s1', 1, 'approved'),
+      makeStage('s2', 2, 'awaiting_owner_approval'),
+    ])
+    const result = canApproveStageWithEvidence({
+      project: p,
+      projectId: 'p',
+      stageId: 's2',
+      evidence: [],
+      requirements: [REQ_TRUTH],
+    })
+    expect(result.ok).toBe(false)
+    if (!result.ok) {
+      expect(result.reason).toBe('missing_required_evidence')
+      expect(result.missingEvidence.map(r => r.id)).toEqual(['truth_schema'])
+    }
+  })
+
+  it('rejects evidence that belongs to another project', () => {
+    const p = makeProject([
+      makeStage('s1', 1, 'approved'),
+      makeStage('s2', 2, 'awaiting_owner_approval'),
+    ])
+    const evidence = [makeEntry({ id: 'truth_schema', projectId: 'OTHER', stageId: 's2' })]
+    const result = canApproveStageWithEvidence({
+      project: p,
+      projectId: 'p',
+      stageId: 's2',
+      evidence,
+      requirements: [REQ_TRUTH],
+    })
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.reason).toBe('missing_required_evidence')
+  })
+
+  it('rejects evidence that belongs to another stage', () => {
+    const p = makeProject([
+      makeStage('s1', 1, 'approved'),
+      makeStage('s2', 2, 'awaiting_owner_approval'),
+    ])
+    const evidence = [makeEntry({ id: 'truth_schema', projectId: 'p', stageId: 's1' })]
+    const result = canApproveStageWithEvidence({
+      project: p,
+      projectId: 'p',
+      stageId: 's2',
+      evidence,
+      requirements: [REQ_TRUTH],
+    })
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.reason).toBe('missing_required_evidence')
+  })
+
+  it('rejects evidence that is not status=valid', () => {
+    const p = makeProject([
+      makeStage('s1', 1, 'approved'),
+      makeStage('s2', 2, 'awaiting_owner_approval'),
+    ])
+    const evidence = [
+      makeEntry({ id: 'truth_schema', projectId: 'p', stageId: 's2', status: 'pending' }),
+    ]
+    const result = canApproveStageWithEvidence({
+      project: p,
+      projectId: 'p',
+      stageId: 's2',
+      evidence,
+      requirements: [REQ_TRUTH],
+    })
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.reason).toBe('missing_required_evidence')
+  })
+
+  it('does not let an AI-review entry satisfy a non-AI-review requirement (id mismatch)', () => {
+    const p = makeProject([
+      makeStage('s1', 1, 'approved'),
+      makeStage('s2', 2, 'awaiting_owner_approval'),
+    ])
+    // AI review entry shaped as evidence — different id, so cannot satisfy
+    // a 'truth_schema' requirement.
+    const evidence = [
+      makeEntry({
+        id: 'opus_stage_review',
+        projectId: 'p',
+        stageId: 's2',
+        type: 'note',
+        title: 'Opus 4.7 Stage Review',
+      }),
+    ]
+    const result = canApproveStageWithEvidence({
+      project: p,
+      projectId: 'p',
+      stageId: 's2',
+      evidence,
+      requirements: [REQ_TRUTH],
+    })
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.reason).toBe('missing_required_evidence')
+  })
+
+  it('treats non-required requirements as optional (does not block on missing optional evidence)', () => {
+    const p = makeProject([
+      makeStage('s1', 1, 'approved'),
+      makeStage('s2', 2, 'awaiting_owner_approval'),
+    ])
+    const optional: CbccEvidenceRequirement = {
+      id: 'optional_thing',
+      type: 'note',
+      title: 'optional note',
+      required: false,
+    }
+    const result = canApproveStageWithEvidence({
+      project: p,
+      projectId: 'p',
+      stageId: 's2',
+      evidence: [],
+      requirements: [optional],
+    })
+    expect(result.ok).toBe(true)
+  })
+
+  it('does not mutate inputs', () => {
+    const stages = [
+      makeStage('s1', 1, 'approved'),
+      makeStage('s2', 2, 'awaiting_owner_approval'),
+    ]
+    const project = makeProject(stages)
+    const evidence: CbccEvidenceEntry[] = [
+      makeEntry({ id: 'truth_schema', projectId: 'p', stageId: 's2' }),
+    ]
+    const reqs: CbccEvidenceRequirement[] = [REQ_TRUTH]
+    const projectSnap = JSON.stringify(project)
+    const evidenceSnap = JSON.stringify(evidence)
+    const reqsSnap = JSON.stringify(reqs)
+    canApproveStageWithEvidence({
+      project,
+      projectId: 'p',
+      stageId: 's2',
+      evidence,
+      requirements: reqs,
+    })
+    expect(JSON.stringify(project)).toBe(projectSnap)
+    expect(JSON.stringify(evidence)).toBe(evidenceSnap)
+    expect(JSON.stringify(reqs)).toBe(reqsSnap)
   })
 })
