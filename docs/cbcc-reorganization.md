@@ -2761,5 +2761,106 @@ The strongest recommendation is direction 1: **stop refactoring
 this area.** The risk now is regression-by-cleanup, not
 under-cleanup.
 
+## Part 22 — Architecture Freeze (2026-05-02)
+
+The CBCC reorganization thread (Parts 13–21) has reached the
+target architecture. Part 22 closes that thread. No further
+casual refactoring of the areas below.
+
+### Frozen architecture summary
+
+```
+lib/cbcc/                    generic pure engine
+lib/cbcc/adapters/dap/       pure DAP adapter zone
+lib/cb-control-center/       app-adjacent legacy + runtime + UI
+                             contract zone
+```
+
+Boundary properties — protected by 30+ executable assertions
+across Parts 7, 13, 14, 17, 18, 19, 20 plus the per-zone
+purity scans (`dapAdapter.test.ts`, `aiReview.test.ts`,
+`aiReviewProvider.test.ts`):
+
+- Engine root has no DAP / Anthropic / Next / React / Supabase
+  / fetch leakage.
+- Adapter zone has no `lib/cb-control-center/` imports, no SDK,
+  no runtime markers.
+- Anthropic transport is isolated to `anthropicClient.ts` + 3
+  consumers (reviewer, charter generator, project actions),
+  all in legacy zone.
+- `StageAiReview` is the only UI-facing review contract.
+- DAP rubric, prompt builder, and page-creation policy live in
+  the adapter; barrel deliberately keeps them off the public
+  surface.
+- Stage locking, approval gates, advisory-only AI review, and
+  page-creation policy boundaries are enforced by tests.
+
+### What no longer gets refactored casually
+
+- `lib/cbcc/`
+- `lib/cbcc/adapters/dap/`
+- The CBCC AI review flow (route → engine port → provider →
+  legacy harvest → UI panel)
+- Anthropic review transport
+- `StageAiReview` compatibility contract
+- DAP stage rubric / prompt ownership
+- Page-creation policy boundaries
+- Stage locking boundaries
+
+A change to any of these requires a new explicit directive that
+names the boundary it affects and the product reason. Aesthetics,
+"cleanup," or speculative future-proofing do not qualify.
+
+### Allowed future product-work categories
+
+Subsequent work should shift to product-facing DAP features. The
+ten categories named in the Part 22 directive:
+
+1. Member status page
+2. Rejection emails
+3. Admin UX polish
+4. MKCRM webhook shadow mode
+5. CRM sync
+6. Practice SaaS billing through Client Builder Pro
+7. Patient-facing ZIP / calculator / practice discovery UX
+8. Provider onboarding improvements
+9. Public DAP marketing pages
+10. Internal dashboard improvements
+
+These should be scoped under their own numbered tracks (e.g.
+"DAP Product Phase 2 — Member Status Page + Admin Rejection
+UX"), not as additional CBCC parts.
+
+### Rule for future CBCC changes
+
+If a CBCC source change becomes necessary anyway, the touching
+work must:
+
+1. State why the change is necessary (product reason or
+   correctness fix — never aesthetics).
+2. Identify which boundary it affects: generic engine · DAP
+   adapter · legacy app zone · UI contract · AI transport.
+3. Add or preserve executable boundary coverage for the rule
+   it interacts with.
+4. Run all gates: `pnpm typecheck`, `pnpm test`, `pnpm lint`,
+   `pnpm build`, `pnpm check:page-policy`.
+5. Append a brief addendum to this document recording the
+   change, the reason, and the gates that ran.
+
+Files do not move, folders do not rename, routes do not change,
+the AI review contract does not change, provider behavior does
+not change, and tests do not weaken. Cleanup-for-aesthetics is
+out of scope.
+
+### Validation results (Part 22 baseline, no code changes)
+
+- `pnpm typecheck` — clean
+- `pnpm test` — **6260 tests pass**, 1 skipped, 105 files
+- `pnpm lint` — 0 errors, 50 pre-existing warnings
+- `pnpm build` — succeeds
+- `pnpm check:page-policy` — pass (17 files / 3 prefixes)
+
+This thread ends here.
+
 
 
