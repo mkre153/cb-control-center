@@ -1,5 +1,5 @@
-import type { DapOfferTermsReviewStatus } from '../dap/registry/dapOfferTermsReviewTypes'
-import type { DapProviderParticipationStatus } from '../dap/registry/dapProviderParticipationTypes'
+import type { DapOfferTermsReviewStatus } from './dapOfferTermsReviewTypes'
+import type { DapProviderParticipationStatus } from './dapProviderParticipationTypes'
 
 // Only review_passed reviews may proceed to participation confirmation.
 export function isOfferTermsReviewEligibleForParticipationConfirmation(

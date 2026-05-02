@@ -4,7 +4,7 @@ import {
   getProviderParticipationById,
   getProviderParticipationEvents,
 } from '@/lib/cb-control-center/dapProviderParticipation'
-import { canTransitionDapProviderParticipationStatus } from '@/lib/cb-control-center/dapProviderParticipationRules'
+import { canTransitionDapProviderParticipationStatus } from '@/lib/dap/registry/dapProviderParticipationRules'
 import type {
   DapProviderParticipationStatus,
   DapProviderParticipationEvent,

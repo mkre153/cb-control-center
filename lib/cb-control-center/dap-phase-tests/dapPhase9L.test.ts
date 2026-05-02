@@ -25,7 +25,7 @@ import {
   isOfferTermsReviewEligibleForParticipationConfirmation,
   canTransitionDapProviderParticipationStatus,
   assertValidDapProviderParticipationTransition,
-} from '../dapProviderParticipationRules'
+} from '../../dap/registry/dapProviderParticipationRules'
 
 // ─── Project root ─────────────────────────────────────────────────────────────
 
@@ -34,7 +34,7 @@ const ROOT = resolve(__dirname, '../../..')
 // ─── Key paths ────────────────────────────────────────────────────────────────
 
 const TYPES_PATH        = resolve(ROOT, 'lib/dap/registry/dapProviderParticipationTypes.ts')
-const RULES_PATH        = resolve(ROOT, 'lib/cb-control-center/dapProviderParticipationRules.ts')
+const RULES_PATH        = resolve(ROOT, 'lib/dap/registry/dapProviderParticipationRules.ts')
 const MODULE_PATH       = resolve(ROOT, 'lib/cb-control-center/dapProviderParticipation.ts')
 const ACTIONS_PATH      = resolve(ROOT, 'app/preview/dap/provider-participation/actions.ts')
 const LIST_PAGE_PATH    = resolve(ROOT, 'app/preview/dap/provider-participation/page.tsx')

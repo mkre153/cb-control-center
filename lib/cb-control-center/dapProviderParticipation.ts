@@ -12,7 +12,7 @@ import type {
 import {
   isOfferTermsReviewEligibleForParticipationConfirmation,
   assertValidDapProviderParticipationTransition,
-} from './dapProviderParticipationRules'
+} from '../dap/registry/dapProviderParticipationRules'
 import { getSupabaseAdminClient } from './supabaseClient'
 
 // participation_confirmed ≠ practice ready for public listing
