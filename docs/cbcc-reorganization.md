@@ -1386,4 +1386,166 @@ purity boundary, not a junk drawer for "anything DAP-shaped" — and the
 documented migration path that lets the reviewer eventually move there
 without compromising the boundary.
 
+---
+
+## Part 14 Addendum — Page-creation policy guard promoted to standalone CLI (2026-05-01)
+
+Parts 10–13 established that page/route creation under DAP-restricted
+prefixes is gated by an explicit policy. The policy was correct but
+only fired when the full vitest suite ran — a developer (or agent)
+who only ran `pnpm typecheck` could still slip a new restricted-prefix
+page in without anyone noticing until CI.
+
+Part 14 promotes that guard into a standalone, deterministic CLI check
+that can be run on its own and is wired into the repo's combined
+`check` script.
+
+### What guard was added
+
+A single CLI script:
+
+| File | Type | Purpose |
+|---|---|---|
+| `scripts/check-page-creation-policy.ts` | NEW | Deterministic CLI guard. Walks the restricted prefixes, runs `enforcePageCreationPolicy` in strictest mode (`approvedStageNumbers: []`), prints a clear pass/fail summary, exits 0/1. |
+
+Plus one **pure-data extract** to make the rules importable from outside
+the test file:
+
+| File | Type | Purpose |
+|---|---|---|
+| `lib/cbcc/adapters/dap/dapPageCreationPolicy.ts` | NEW | Exports `DAP_PAGE_CREATION_POLICY` (3 rules, 17 baseline files) and `DAP_PAGE_CREATION_POLICY_PREFIXES`. Pure data — no IO, no SDK, no app-layer imports. Lives inside the adapter purity zone. |
+| `lib/cbcc/adapters/dap/dapPageCreationPolicy.test.ts` | UPDATED | Now imports `DAP_PAGE_CREATION_POLICY` from the sibling module instead of declaring it inline. Behavior unchanged. |
+
+### What policy is enforced
+
+Identical to the existing test-time policy. Three restricted prefixes,
+each gated on Stage 7 with an explicit baseline allowlist:
+
+| Prefix | Required stage | Baseline files |
+|---|---:|---:|
+| `app/dental-advantage-plan/` | 7 | 13 |
+| `app/guides/` | 7 | 2 |
+| `app/treatments/` | 7 | 2 |
+
+Strictest mode (`approvedStageNumbers: []`) is intentional: every new
+restricted-prefix file forces a deliberate edit to
+`allowedBaselineFiles`. Approving Stage 7 in `DAP_PROJECT` will not
+silently widen this guard.
+
+### How to run it
+
+```
+pnpm check:page-policy
+```
+
+Pass output:
+```
+check-page-creation-policy: pass
+  scanned 17 file(s) under 3 rule prefix(es)
+```
+
+Fail output (synthetic example):
+```
+check-page-creation-policy: FAIL
+  1 violation(s):
+  - app/dental-advantage-plan/new-thing/page.tsx
+      prefix: app/dental-advantage-plan/
+      required stage: 7
+
+How to resolve:
+  - If the file is intentional baseline content, add it to
+    DAP_PAGE_CREATION_POLICY[].allowedBaselineFiles in
+    lib/cbcc/adapters/dap/dapPageCreationPolicy.ts.
+  - If the file is premature, delete it until the gating
+    stage is owner-approved.
+```
+
+The script:
+
+- requires no environment variables
+- performs no network IO
+- does not read Supabase
+- does not import the Anthropic SDK or any AI module
+- does not import Next.js runtime modules
+- runs via the repo's existing `tsx` devDependency (no new tooling)
+
+### package.json wiring
+
+Two changes — both additive:
+
+```diff
+- "check": "pnpm typecheck && pnpm lint && pnpm test"
++ "check:page-policy": "tsx scripts/check-page-creation-policy.ts",
++ "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm check:page-policy"
+```
+
+`pnpm check` now runs the page-policy gate after typecheck / lint /
+test. Anyone already using `pnpm check` as their pre-push gate
+inherits the new guard automatically.
+
+### Pre-commit / CI integration
+
+**Intentionally deferred** — the repo currently has no Husky / Lefthook
+/ simple-git-hooks / lint-staged / `.github/workflows` / `.husky`
+setup, and the directive forbids introducing a new framework as part
+of Part 14. The check is now runnable in three ways:
+
+1. Standalone: `pnpm check:page-policy`
+2. Bundled: `pnpm check` (typecheck + lint + test + page-policy)
+3. Full suite: `pnpm test` (the existing test-time policy still fires)
+
+When the repo adopts a pre-commit / CI framework in a future part, the
+recommended hook is simply:
+
+```
+pnpm check:page-policy
+```
+
+— because it's fast (no test suite startup), self-contained, and
+returns a non-zero exit code on violation.
+
+### Test coverage added
+
+| File | Tests | New / Updated |
+|---|---:|---|
+| `lib/cb-control-center/dapStagePart14.test.ts` | 31 | NEW |
+| `lib/cbcc/adapters/dap/dapPageCreationPolicy.test.ts` | 0 | UPDATED (only the import line; assertions and counts unchanged) |
+
+Test count: 6007 (post-Part-13) → 6056 (post-Part-14), +49.
+The Part 14 file has 5 describe blocks:
+
+- A. Pure-data extract (6 tests — module exists, exports shape, purity invariants, prefix list, legacy const removed)
+- B. Policy enforcement parity (4 tests — baselines pass, simulated unauthorized files fail with clear reason, gated stage flips them through, files outside prefixes ignored)
+- C. Standalone guard script boundaries (9 tests — no AI / Supabase / Next / env / network, runs against the live tree)
+- D. package.json script wiring (5 tests — check:page-policy present, uses tsx, inherited by `check`, prior scripts intact)
+- E. Prior behavior preserved (2 tests — legacy test still wired correctly, engine policy export unchanged)
+
+Several tests fan out over the rule set, so the actual it-block count
+is higher than the section count (49 in total).
+
+### Validation results
+
+| Gate | Result |
+|---|---|
+| `pnpm check:page-policy` | Pass (0 violations; 17 files scanned across 3 prefixes) |
+| `pnpm typecheck` | Pass (0 errors) |
+| `pnpm test` | Pass (6056 / 1 skipped — was 6007, +49) |
+| `pnpm lint` | Pass (0 errors; 49 pre-existing warnings, **0 new warnings introduced by Part 14**) |
+| `pnpm build` | Pass (Compiled successfully in 2.2s; 199 static pages generated, unchanged) |
+
+### Remaining recommendations
+
+| Item | Class | When |
+|---|---|---|
+| Pre-commit hook running `pnpm check:page-policy` | Operational | When the repo adopts a hook framework. Husky is the most common option for pnpm projects; lefthook is a lighter alternative. |
+| GitHub Actions workflow running `pnpm check` (which includes the new gate) | Operational | When CI is added. Recommended trigger: every push to a non-main branch + every PR. |
+| Generalize the rule data when a second engine-backed project lands | Architectural | The current rule set is DAP-specific. The pure-data module is structured to accept additional adapter-supplied rules — a future part can add `<adapter>PageCreationPolicy.ts` modules and concatenate them in the script. |
+| AI review provider-port migration | Architectural — Risk rule #4 | Carry-forward from Parts 8X / 10–13. |
+| Two unrelated working-tree files (`practice-decision-emails/page.tsx`, `SiteArchitectureTab.tsx`) still uncommitted | Operational | Carry-forward from Parts 12–13 (Part 15 candidate). |
+
+**Part 14 locks in the boundary Part 13 clarified.** The page-creation
+policy is no longer hidden inside a single test file: it's a one-line
+CLI any developer or agent can run, and any future hook framework can
+trigger.
+
 

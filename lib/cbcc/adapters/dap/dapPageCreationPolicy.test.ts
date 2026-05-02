@@ -15,10 +15,8 @@
 import { describe, it, expect } from 'vitest'
 import { readdirSync, statSync } from 'fs'
 import { resolve, relative } from 'path'
-import {
-  enforcePageCreationPolicy,
-  type CbccPageCreationPolicyRule,
-} from '../../pageCreationPolicy'
+import { enforcePageCreationPolicy } from '../../pageCreationPolicy'
+import { DAP_PAGE_CREATION_POLICY } from './dapPageCreationPolicy'
 
 const REPO_ROOT = resolve(__dirname, '../../../..')
 
@@ -54,44 +52,11 @@ function walkPageFiles(absDir: string): string[] {
 // every public/content surface on Stage 7 — i.e. those pages should not exist
 // until Build/QA/Launch is owner-approved. Today, only Stage 1 is approved
 // in DAP_PROJECT baseline, so only the baseline files below are allowed.
-
-export const DAP_PAGE_CREATION_POLICY: ReadonlyArray<CbccPageCreationPolicyRule> = [
-  {
-    pathPrefix: 'app/dental-advantage-plan/',
-    requiredStageNumber: 7,
-    allowedBaselineFiles: [
-      'app/dental-advantage-plan/cities/[city]/page.tsx',
-      'app/dental-advantage-plan/compare/page.tsx',
-      'app/dental-advantage-plan/dentists/[city]/[practiceSlug]/page.tsx',
-      'app/dental-advantage-plan/dentists/[city]/page.tsx',
-      'app/dental-advantage-plan/find-a-dentist/page.tsx',
-      'app/dental-advantage-plan/for-practices/page.tsx',
-      'app/dental-advantage-plan/guide/page.tsx',
-      'app/dental-advantage-plan/how-it-works/page.tsx',
-      'app/dental-advantage-plan/layout.tsx',
-      'app/dental-advantage-plan/member-status/[membershipId]/page.tsx',
-      'app/dental-advantage-plan/page.tsx',
-      'app/dental-advantage-plan/savings/page.tsx',
-      'app/dental-advantage-plan/vs-insurance/page.tsx',
-    ],
-  },
-  {
-    pathPrefix: 'app/guides/',
-    requiredStageNumber: 7,
-    allowedBaselineFiles: [
-      'app/guides/[slug]/page.tsx',
-      'app/guides/layout.tsx',
-    ],
-  },
-  {
-    pathPrefix: 'app/treatments/',
-    requiredStageNumber: 7,
-    allowedBaselineFiles: [
-      'app/treatments/[slug]/page.tsx',
-      'app/treatments/layout.tsx',
-    ],
-  },
-]
+//
+// The DAP_PAGE_CREATION_POLICY constant lives in `dapPageCreationPolicy.ts`
+// (Part 14 extract) so it can also be consumed by the standalone
+// `scripts/check-page-creation-policy.ts` guard without crossing the
+// adapter folder's purity boundaries.
 
 describe('Group 1 — DAP page-creation policy: baseline files are allowed', () => {
   // Snapshot of what's on disk under restricted prefixes today.

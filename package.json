@@ -10,7 +10,8 @@
     "lint": "eslint",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "check": "pnpm typecheck && pnpm lint && pnpm test"
+    "check:page-policy": "tsx scripts/check-page-creation-policy.ts",
+    "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm check:page-policy"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.92.0",
