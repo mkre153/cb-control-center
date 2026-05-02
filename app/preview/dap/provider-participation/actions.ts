@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import type { DapProviderParticipationFields } from '@/lib/cb-control-center/dapProviderParticipationTypes'
+import type { DapProviderParticipationFields } from '@/lib/dap/registry/dapProviderParticipationTypes'
 import {
   startProviderParticipationConfirmation,
   markAgreementSent,

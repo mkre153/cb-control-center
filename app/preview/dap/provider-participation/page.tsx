@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { listProviderParticipationConfirmations } from '@/lib/cb-control-center/dapProviderParticipation'
-import type { DapProviderParticipationConfirmation } from '@/lib/cb-control-center/dapProviderParticipationTypes'
+import type { DapProviderParticipationConfirmation } from '@/lib/dap/registry/dapProviderParticipationTypes'
 
 export const dynamic = 'force-dynamic'
 

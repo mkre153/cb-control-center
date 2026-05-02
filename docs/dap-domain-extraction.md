@@ -31,14 +31,17 @@ Routes stay stable. App files become thin import shells.
 |------|----------|----------|--------|------|
 | dapPublicUxTypes.ts | `lib/cb-control-center/dapPublicUxTypes.ts` | `lib/dap/site/dapPublicUxTypes.ts` | TBD | 2026-05-02 |
 | dapRequestTypes.ts | `lib/cb-control-center/dapRequestTypes.ts` | `lib/dap/registry/dapRequestTypes.ts` | feat(dap): Wave 1B extract dapRequestTypes to domain registry | 2026-05-02 |
+| dapProviderParticipationTypes.ts | `lib/cb-control-center/dapProviderParticipationTypes.ts` | `lib/dap/registry/dapProviderParticipationTypes.ts` | feat(dap): Wave 1C extract provider participation types | 2026-05-02 |
 
 Import sites updated (dapRequestTypes): 13 files (app/, components/, lib/cb-control-center/, dap-phase-tests/)
 Note: dapPhase9A.test.ts and dapPhase9F.test.ts had hardcoded path constants — both updated to new path, assertions unchanged.
 
+Import sites updated (dapProviderParticipationTypes): 8 files (app/, lib/cb-control-center/, dap-phase-tests/)
+Note: dapPhase9L.test.ts had TYPES_PATH constant — updated to new path, assertions unchanged.
+
 ## Planned waves
 
 ### Wave 1 remaining (pure types)
-- dapProviderParticipationTypes
 - dapPracticeOnboardingTypes
 - dapOfferTermsTypes
 - dapOfferTermsReviewTypes

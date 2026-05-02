@@ -8,7 +8,7 @@ import type {
   CreateDapProviderParticipationInput,
   DapProviderParticipationActionInput,
   UpdateDapProviderParticipationInput,
-} from './dapProviderParticipationTypes'
+} from '../dap/registry/dapProviderParticipationTypes'
 import {
   isOfferTermsReviewEligibleForParticipationConfirmation,
   assertValidDapProviderParticipationTransition,

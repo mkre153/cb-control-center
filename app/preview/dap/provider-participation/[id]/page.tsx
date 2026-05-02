@@ -8,7 +8,7 @@ import { canTransitionDapProviderParticipationStatus } from '@/lib/cb-control-ce
 import type {
   DapProviderParticipationStatus,
   DapProviderParticipationEvent,
-} from '@/lib/cb-control-center/dapProviderParticipationTypes'
+} from '@/lib/dap/registry/dapProviderParticipationTypes'
 import {
   markAgreementSentAction,
   markAgreementReceivedAction,

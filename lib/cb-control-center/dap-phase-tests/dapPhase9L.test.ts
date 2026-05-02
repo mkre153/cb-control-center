@@ -33,7 +33,7 @@ const ROOT = resolve(__dirname, '../../..')
 
 // ─── Key paths ────────────────────────────────────────────────────────────────
 
-const TYPES_PATH        = resolve(ROOT, 'lib/cb-control-center/dapProviderParticipationTypes.ts')
+const TYPES_PATH        = resolve(ROOT, 'lib/dap/registry/dapProviderParticipationTypes.ts')
 const RULES_PATH        = resolve(ROOT, 'lib/cb-control-center/dapProviderParticipationRules.ts')
 const MODULE_PATH       = resolve(ROOT, 'lib/cb-control-center/dapProviderParticipation.ts')
 const ACTIONS_PATH      = resolve(ROOT, 'app/preview/dap/provider-participation/actions.ts')
