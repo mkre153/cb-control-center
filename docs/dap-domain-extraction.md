@@ -41,6 +41,7 @@ Routes stay stable. App files become thin import shells.
 | dapProviderParticipationRules.ts | `lib/cb-control-center/dapProviderParticipationRules.ts` | `lib/dap/registry/dapProviderParticipationRules.ts` | feat(dap): Wave 2B extract provider participation rules | 2026-05-02 |
 | dapPracticeOnboardingRules.ts | `lib/cb-control-center/dapPracticeOnboardingRules.ts` | `lib/dap/registry/dapPracticeOnboardingRules.ts` | feat(dap): Wave 2C extract practice onboarding rules | 2026-05-02 |
 | dapOfferTermsRules.ts | `lib/cb-control-center/dapOfferTermsRules.ts` | `lib/dap/registry/dapOfferTermsRules.ts` | feat(dap): Wave 2D extract offer terms rules | 2026-05-02 |
+| dapOfferTermsReviewRules.ts | `lib/cb-control-center/dapOfferTermsReviewRules.ts` | `lib/dap/registry/dapOfferTermsReviewRules.ts` | feat(dap): Wave 2E extract offer terms review rules | 2026-05-02 |
 
 Import sites updated (dapRequestTypes): 13 files (app/, components/, lib/cb-control-center/, dap-phase-tests/)
 Note: dapPhase9A.test.ts and dapPhase9F.test.ts had hardcoded path constants — both updated to new path, assertions unchanged.
@@ -71,7 +72,6 @@ Wave 1 complete. Two files deferred:
 - mkcrm/dapClientBuilderBillingTypes — lives under mkcrm/ subdirectory; assess separately
 
 ### Wave 2 — Pure rules/logic (no Supabase)
-- dapOfferTermsReviewRules
 - dapMemberStatusRules
 - mkcrm/dapClientBuilderBillingRules
 - dapDisplayRules

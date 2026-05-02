@@ -11,7 +11,7 @@ import {
   isOfferTermsDraftEligibleForReview,
   evaluateOfferTermsReviewCriteria,
   assertValidDapOfferTermsReviewTransition,
-} from './dapOfferTermsReviewRules'
+} from '../dap/registry/dapOfferTermsReviewRules'
 import { getSupabaseAdminClient } from './supabaseClient'
 
 // review_passed ≠ practice ready for public listing
