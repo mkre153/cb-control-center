@@ -39,7 +39,7 @@ import {
   getAllDapMemberStatusEmailPreviews,
 } from '../dapMemberStatusEmailPreview'
 import { deriveDapMemberStatusReadModel } from '../../dap/registry/dapMemberStatusRules'
-import { getDapMemberStatusPreview } from '../dapMemberStatusPreview'
+import { getDapMemberStatusPreview } from '../../dap/membership/dapMemberStatusPreview'
 import {
   getPublicCommercialSystemForVertical,
   getInternalCrmSystemForVertical,

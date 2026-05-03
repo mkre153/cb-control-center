@@ -4,12 +4,12 @@
 // No PHI. No payment CTAs. No raw billing events. No MKCRM authority.
 // No email sending. No Supabase mutations.
 
-import type { DapMemberStanding, DapMemberBillingEventForStatus } from '../dap/membership/dapMemberStatusTypes'
+import type { DapMemberStanding, DapMemberBillingEventForStatus } from './dapMemberStatusTypes'
 import type {
   DapMemberPublicStatus,
   DapMemberStatusPublicReadModel,
 } from './dapMemberStatusPublicTypes'
-import { deriveDapMemberStatusReadModel } from '../dap/registry/dapMemberStatusRules'
+import { deriveDapMemberStatusReadModel } from '../registry/dapMemberStatusRules'
 
 // ─── Forbidden field names (public read model must never contain these) ────────
 

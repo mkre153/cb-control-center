@@ -269,6 +269,44 @@ Inspect `dapPublicSectionModels.ts`, `dapPageBriefBuilder.ts`, then `dapCmsExpor
 
 ---
 
+## Wave 4B Addendum — Member Status Domain Files Into lib/dap/membership/
+
+### Files moved
+- `lib/cb-control-center/dapMemberStatusPublicTypes.ts` → `lib/dap/membership/dapMemberStatusPublicTypes.ts`
+- `lib/cb-control-center/dapMemberStatusPreview.ts`     → `lib/dap/membership/dapMemberStatusPreview.ts`
+- `lib/cb-control-center/dapMemberStatusReadModel.ts`   → `lib/dap/membership/dapMemberStatusReadModel.ts`
+
+### Files intentionally not moved
+- `lib/cb-control-center/dapMemberAdminSummary.ts` — imports `getDapMemberStatusEmailCopy` from the CBCC communication pipeline (`dapMemberStatusEmailCopy.ts`). That dependency is structural; the email copy module belongs in CBCC permanently. No extraction path without severing or abstracting the email dependency.
+
+### Internal import fixes in moved files
+- `dapMemberStatusPublicTypes.ts`: `'../dap/membership/dapMemberStatusTypes'` → `'./dapMemberStatusTypes'`
+- `dapMemberStatusPreview.ts`: membership types → `'./dapMemberStatusTypes'`; rules → `'../registry/dapMemberStatusRules'`
+- `dapMemberStatusReadModel.ts`: membership types → `'./dapMemberStatusTypes'`; rules → `'../registry/dapMemberStatusRules'`; `'./dapMemberStatusPublicTypes'` unchanged (co-located)
+
+### Inbound importer updates (9 files)
+- `app/preview/dap/member-status/[membershipId]/page.tsx` — alias → `@/lib/dap/membership/`
+- `app/dental-advantage-plan/member-status/[membershipId]/page.tsx` — alias → `@/lib/dap/membership/`
+- `app/preview/dap/members/[membershipId]/status/page.tsx` — alias → `@/lib/dap/membership/`
+- `lib/cb-control-center/dapMemberAdminSummary.ts` — relative `'./...'` → `'../dap/membership/...'`
+- `lib/cb-control-center/dapMemberStatusEmailPreview.ts` — relative `'./...'` → `'../dap/membership/...'`
+- `dap-phase-tests/dapPhase10.test.ts` — relative imports + 6 path assertions updated to `join(ROOT, 'lib/dap/membership/...')`
+- `dap-phase-tests/dapPhase11.test.ts` — relative import updated
+- `dap-phase-tests/dapPhase2A.test.ts` — relative import updated
+- `dap-phase-tests/dapPhase9R.test.ts` — relative import + `HELPER_PATH` updated to `lib/dap/membership/dapMemberStatusPreview.ts`
+- `dap-phase-tests/dapPhase9S.test.ts` — relative import updated; string-presence checks unchanged (reads CBCC email preview file, string still present after its import update)
+
+### Boundary validation
+- No file under `lib/dap/membership/` imports from `lib/cb-control-center/**` (verified by grep)
+- `dapMemberAdminSummary.ts` correctly imports moved files from `'../dap/membership/'`
+
+### Validation
+- typecheck: clean
+- tests: 6260 pass, 1 skipped (baseline)
+- lint: 0 errors, 50 warnings (baseline)
+
+---
+
 ## Validation checklist (per move)
 
 ```

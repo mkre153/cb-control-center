@@ -228,7 +228,7 @@ import {
   getDapMemberAdminSummary,
   getAllDapMemberAdminSummaries,
 } from '../dapMemberAdminSummary'
-import { DAP_P10_FIXTURE_MEMBERSHIP_IDS } from '../dapMemberStatusReadModel'
+import { DAP_P10_FIXTURE_MEMBERSHIP_IDS } from '../../dap/membership/dapMemberStatusReadModel'
 
 describe('Member admin summary', () => {
   it('standing is derived from billing events — derivedFromBillingEvents is true for all fixtures', () => {
@@ -379,7 +379,7 @@ describe('Phase 11 helper file exports', () => {
 import {
   getDapMemberStatusReadModel,
   getAllDapMemberPublicStatusFixtures,
-} from '../dapMemberStatusReadModel'
+} from '../../dap/membership/dapMemberStatusReadModel'
 
 // ─── Group 8: Prior phase contracts still hold ────────────────────────────────
 

@@ -26,7 +26,7 @@ function findPages(dir: string): string[] {
 import type {
   DapMemberPublicStatus,
   DapMemberStatusPublicReadModel,
-} from '../dapMemberStatusPublicTypes'
+} from '../../dap/membership/dapMemberStatusPublicTypes'
 
 import {
   getDapMemberStatusReadModel,
@@ -38,7 +38,7 @@ import {
   validateDapMemberStatusPublicReadModel,
   FORBIDDEN_PUBLIC_READ_MODEL_FIELDS,
   DAP_P10_FIXTURE_MEMBERSHIP_IDS,
-} from '../dapMemberStatusReadModel'
+} from '../../dap/membership/dapMemberStatusReadModel'
 
 // ─── Group 1: Public type surface ────────────────────────────────────────────
 
@@ -55,13 +55,13 @@ describe('Phase 10 — public type surface exists', () => {
   })
 
   it('public types file does not import from Supabase', () => {
-    const src = readFileSync(join(__dirname, '..', 'dapMemberStatusPublicTypes.ts'), 'utf8')
+    const src = readFileSync(join(ROOT, 'lib/dap/membership/dapMemberStatusPublicTypes.ts'), 'utf8')
     expect(src).not.toMatch(/^import.*supabase/im)
     expect(src).not.toMatch(/from ['"].*supabase/i)
   })
 
   it('public read model file does not import from Supabase', () => {
-    const src = readFileSync(join(__dirname, '..', 'dapMemberStatusReadModel.ts'), 'utf8')
+    const src = readFileSync(join(ROOT, 'lib/dap/membership/dapMemberStatusReadModel.ts'), 'utf8')
     expect(src).not.toMatch(/^import.*supabase/im)
     expect(src).not.toMatch(/from ['"].*supabase/i)
   })
@@ -73,7 +73,7 @@ describe('Phase 10 — public type surface exists', () => {
   })
 
   it('public types imports from existing standing types (no duplication)', () => {
-    const src = readFileSync(join(__dirname, '..', 'dapMemberStatusPublicTypes.ts'), 'utf8')
+    const src = readFileSync(join(ROOT, 'lib/dap/membership/dapMemberStatusPublicTypes.ts'), 'utf8')
     expect(src).toMatch(/dapMemberStatusTypes/)
   })
 })
@@ -451,19 +451,19 @@ describe('Phase 10 — authority boundary', () => {
   })
 
   it('read model file has no reference to MKCRM send/deliver APIs', () => {
-    const src = readFileSync(join(__dirname, '..', 'dapMemberStatusReadModel.ts'), 'utf8')
+    const src = readFileSync(join(ROOT, 'lib/dap/membership/dapMemberStatusReadModel.ts'), 'utf8')
     expect(src).not.toMatch(/resend\.emails/i)
     expect(src).not.toMatch(/mkcrm\.send/i)
     expect(src).not.toMatch(/supabase\.(from|rpc)/i)
   })
 
   it('read model file does not contain paymentUrl string literal', () => {
-    const src = readFileSync(join(__dirname, '..', 'dapMemberStatusReadModel.ts'), 'utf8')
+    const src = readFileSync(join(ROOT, 'lib/dap/membership/dapMemberStatusReadModel.ts'), 'utf8')
     expect(src).not.toMatch(/paymentUrl\s*:/i)
   })
 
   it('read model file does not contain checkoutUrl string literal', () => {
-    const src = readFileSync(join(__dirname, '..', 'dapMemberStatusReadModel.ts'), 'utf8')
+    const src = readFileSync(join(ROOT, 'lib/dap/membership/dapMemberStatusReadModel.ts'), 'utf8')
     expect(src).not.toMatch(/checkoutUrl\s*:/i)
   })
 })

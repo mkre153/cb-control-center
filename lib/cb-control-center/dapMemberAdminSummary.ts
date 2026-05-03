@@ -3,11 +3,11 @@
 // No PHI. No payment CTA. Computed by server.
 
 import type { DapMemberStanding } from '../dap/membership/dapMemberStatusTypes'
-import type { DapMemberPublicStatus } from './dapMemberStatusPublicTypes'
+import type { DapMemberPublicStatus } from '../dap/membership/dapMemberStatusPublicTypes'
 import {
   getDapMemberStatusReadModel,
   DAP_P10_FIXTURE_MEMBERSHIP_IDS,
-} from './dapMemberStatusReadModel'
+} from '../dap/membership/dapMemberStatusReadModel'
 import { getDapMemberStatusEmailCopy } from './dapMemberStatusEmailCopy'
 
 export interface DapMemberAdminSummary {

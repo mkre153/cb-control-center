@@ -5,7 +5,7 @@
 import type { DapMemberStanding, DapMemberStatusReadModel } from '../dap/membership/dapMemberStatusTypes'
 import type { DapMemberStatusEmailCopy } from './dapMemberStatusEmailTypes'
 import { getDapMemberStatusEmailCopy } from './dapMemberStatusEmailCopy'
-import { getDapMemberStatusPreview } from './dapMemberStatusPreview'
+import { getDapMemberStatusPreview } from '../dap/membership/dapMemberStatusPreview'
 
 // ─── Result type ──────────────────────────────────────────────────────────────
 

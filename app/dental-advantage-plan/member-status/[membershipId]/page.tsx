@@ -7,8 +7,8 @@ import type { Metadata } from 'next'
 import {
   getDapMemberStatusReadModel,
   isDapMembershipKnown,
-} from '@/lib/cb-control-center/dapMemberStatusReadModel'
-import type { DapMemberPublicStatus } from '@/lib/cb-control-center/dapMemberStatusPublicTypes'
+} from '@/lib/dap/membership/dapMemberStatusReadModel'
+import type { DapMemberPublicStatus } from '@/lib/dap/membership/dapMemberStatusPublicTypes'
 
 export const dynamic = 'force-dynamic'
 

@@ -15,7 +15,7 @@ import {
   isDapMembershipKnown,
   DAP_P10_FIXTURE_MEMBERSHIP_IDS,
   validateDapMemberStatusPublicReadModel,
-} from '../dapMemberStatusReadModel'
+} from '../../dap/membership/dapMemberStatusReadModel'
 
 // ─── Forbidden terms for public-facing copy ────────────────────────────────────
 

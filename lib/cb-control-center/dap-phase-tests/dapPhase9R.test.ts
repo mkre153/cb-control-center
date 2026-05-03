@@ -33,14 +33,14 @@ import {
   getDapMemberStatusPreviewEvents,
   formatDapMemberStandingLabel,
   formatDapMemberStandingDescription,
-} from '../dapMemberStatusPreview'
+} from '../../dap/membership/dapMemberStatusPreview'
 import { deriveDapMemberStatusReadModel } from '../../dap/registry/dapMemberStatusRules'
 import type { DapMemberStanding, DapMemberStatusReadModel } from '../../dap/membership/dapMemberStatusTypes'
 
 // ─── Project root ─────────────────────────────────────────────────────────────
 
 const ROOT         = resolve(__dirname, '../../..')
-const HELPER_PATH  = resolve(ROOT, 'lib/cb-control-center/dapMemberStatusPreview.ts')
+const HELPER_PATH  = resolve(ROOT, 'lib/dap/membership/dapMemberStatusPreview.ts')
 const PAGE_PATH    = resolve(ROOT, 'app/preview/dap/members/[membershipId]/status/page.tsx')
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
