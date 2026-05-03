@@ -21,6 +21,17 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   }
 }
 
+function formatActivityDate(isoDate: string): string {
+  const [year, month, day] = isoDate.split('-').map(Number)
+  return new Date(year, month - 1, day).toLocaleDateString('en-US', {
+    year: 'numeric', month: 'long', day: 'numeric',
+  })
+}
+
+function requiresSupportContact(status: DapMemberPublicStatus): boolean {
+  return status === 'inactive' || status === 'unknown'
+}
+
 function statusBadgeClass(status: DapMemberPublicStatus): string {
   switch (status) {
     case 'active':           return 'bg-green-50 text-green-700 border border-green-200'
@@ -109,7 +120,31 @@ export default async function MemberStatusPage({ params }: { params: Params }) {
           </p>
           <p className="text-sm text-gray-700">{model.nextStep}</p>
         </div>
+
+        {model.lastActivityDate && (
+          <p className="text-xs text-gray-400" data-last-activity>
+            Last activity: {formatActivityDate(model.lastActivityDate)}
+          </p>
+        )}
       </section>
+
+      {requiresSupportContact(model.publicStatus) && (
+        <section
+          className="rounded-lg border border-gray-200 bg-white px-5 py-4 space-y-1"
+          data-support-contact
+        >
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+            Need help?
+          </p>
+          <p className="text-sm text-gray-700">
+            Contact your enrolling dental practice, or reach the DAP member support team
+            through your practice&apos;s front desk.
+          </p>
+          <p className="text-xs text-gray-400">
+            DAP does not process payments or access billing records directly.
+          </p>
+        </section>
+      )}
 
       <div className="border-t border-gray-100 pt-4">
         <p className="text-xs text-gray-400 leading-relaxed">

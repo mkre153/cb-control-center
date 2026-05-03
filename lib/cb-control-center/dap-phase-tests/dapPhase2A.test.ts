@@ -231,3 +231,71 @@ describe('Phase 2A — public copy does not contain forbidden terms', () => {
     expect(getDapMemberStatusReadModel('dap-p10-canceled').statusLabel).toBe('Canceled')
   })
 })
+
+// ─── Phase 2A — lastActivityDate ──────────────────────────────────────────────
+
+describe('Phase 2A — lastActivityDate field', () => {
+  it('lastActivityDate is present for all fixtures with billing events', () => {
+    const withEvents = DAP_P10_FIXTURE_MEMBERSHIP_IDS.filter(id => id !== 'dap-p10-unknown')
+    for (const id of withEvents) {
+      const model = getDapMemberStatusReadModel(id)
+      expect(model.lastActivityDate, `expected lastActivityDate for ${id}`).toBeDefined()
+    }
+  })
+
+  it('lastActivityDate is absent for the unknown fixture (no billing events)', () => {
+    expect(getDapMemberStatusReadModel('dap-p10-unknown').lastActivityDate).toBeUndefined()
+  })
+
+  it('lastActivityDate is formatted as YYYY-MM-DD', () => {
+    const withEvents = DAP_P10_FIXTURE_MEMBERSHIP_IDS.filter(id => id !== 'dap-p10-unknown')
+    for (const id of withEvents) {
+      const { lastActivityDate } = getDapMemberStatusReadModel(id)
+      expect(lastActivityDate, `bad format for ${id}`).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+    }
+  })
+
+  it('lastActivityDate does not contain time or event type', () => {
+    const withEvents = DAP_P10_FIXTURE_MEMBERSHIP_IDS.filter(id => id !== 'dap-p10-unknown')
+    for (const id of withEvents) {
+      const { lastActivityDate } = getDapMemberStatusReadModel(id)
+      expect(lastActivityDate).not.toContain('T')
+      expect(lastActivityDate).not.toContain('subscription')
+      expect(lastActivityDate).not.toContain('payment')
+    }
+  })
+
+  it('no fixture model contains the forbidden field lastBillingEventAt', () => {
+    for (const id of DAP_P10_FIXTURE_MEMBERSHIP_IDS) {
+      const model = getDapMemberStatusReadModel(id)
+      expect(Object.keys(model)).not.toContain('lastBillingEventAt')
+    }
+  })
+
+  it('all fixture models still pass the public validator after lastActivityDate is added', () => {
+    for (const id of DAP_P10_FIXTURE_MEMBERSHIP_IDS) {
+      const model = getDapMemberStatusReadModel(id)
+      expect(() => validateDapMemberStatusPublicReadModel(model), `failed for ${id}`).not.toThrow()
+    }
+  })
+})
+
+// ─── Phase 2A — Support contact block ────────────────────────────────────────
+
+describe('Phase 2A — support contact element on production page', () => {
+  it('production page source contains data-support-contact marker', () => {
+    const src = readFileSync(PAGE_PATH, 'utf8')
+    expect(src).toContain('data-support-contact')
+  })
+
+  it('production page source contains data-last-activity marker', () => {
+    const src = readFileSync(PAGE_PATH, 'utf8')
+    expect(src).toContain('data-last-activity')
+  })
+
+  it('support contact block does not contain payment language', () => {
+    const src = readFileSync(PAGE_PATH, 'utf8').toLowerCase()
+    expect(src).not.toContain('pay now')
+    expect(src).not.toContain('update payment')
+  })
+})

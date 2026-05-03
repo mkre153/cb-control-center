@@ -286,14 +286,19 @@ export function getDapMemberStatusReadModel(
   const billingEvents = FIXTURE_BILLING_EVENTS[membershipId] ?? []
   const internal      = deriveDapMemberStatusReadModel(membershipId, billingEvents)
 
+  const lastActivityDate = internal.lastBillingEventAt
+    ? internal.lastBillingEventAt.slice(0, 10)
+    : undefined
+
   return {
     membershipId,
-    verticalKey:   'dap',
-    publicStatus:  mapStandingToPublicStatus(internal.standing),
-    standing:      internal.standing,
-    statusLabel:   getStatusLabel(internal.standing),
-    statusSummary: getStatusSummary(internal.standing),
-    nextStep:      getNextStep(internal.standing),
+    verticalKey:      'dap',
+    publicStatus:     mapStandingToPublicStatus(internal.standing),
+    standing:         internal.standing,
+    statusLabel:      getStatusLabel(internal.standing),
+    statusSummary:    getStatusSummary(internal.standing),
+    nextStep:         getNextStep(internal.standing),
+    ...(lastActivityDate !== undefined ? { lastActivityDate } : {}),
     source: {
       derivedFromBillingEvents: true,
       paymentAuthority:         'client_builder_pro',

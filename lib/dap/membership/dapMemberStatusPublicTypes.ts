@@ -16,13 +16,14 @@ export type DapMemberPublicStatus =
   | 'unknown'
 
 export interface DapMemberStatusPublicReadModel {
-  membershipId:  string
-  verticalKey:   'dap'
-  publicStatus:  DapMemberPublicStatus
-  standing:      DapMemberStanding
-  statusLabel:   string
-  statusSummary: string
-  nextStep:      string
+  membershipId:     string
+  verticalKey:      'dap'
+  publicStatus:     DapMemberPublicStatus
+  standing:         DapMemberStanding
+  statusLabel:      string
+  statusSummary:    string
+  nextStep:         string
+  lastActivityDate?: string  // YYYY-MM-DD, derived from last billing event — no time, no raw event type
   source: {
     derivedFromBillingEvents: true
     paymentAuthority:         'client_builder_pro'
