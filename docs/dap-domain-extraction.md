@@ -127,36 +127,152 @@ Wave 2 extracted 6 files. 3 files deferred pending ProviderStatus extraction (da
 - Boundary result: `lib/dap/**` has zero imports from `lib/cb-control-center/**` (verified by grep)
 - Validation: typecheck clean, 6260 tests pass, 0 lint errors, 50 warnings (baseline)
 
-### Wave 3 — Read models and content
-- dapMemberStatusReadModel
-- dapMemberStatusPreview
-- dapMemberAdminSummary
-- dapMemberStatusPublicTypes
-- dapPublicSectionModels
-- dapPageBriefBuilder
-- dapBusinessDefinition
-- dapClaimQA
+## Wave 3C Addendum — Registry Boundary Closeout and File Classification
 
-### Wave 4 — Stage definitions extraction
-Requires splitting `dapStageGates.ts` — pure stage business definitions → `lib/dap/stages/stageDefinitions.ts`, Supabase queries stay.
+No files moved. Documentation-only wave. Establishes the canonical classification of all DAP files as of 2026-05-02.
 
-### Wave 5 — CMS / site (large, last)
-- dapCmsExport.ts (95K)
-- source/ files
+---
 
-## Files that stay in lib/cb-control-center/ (Supabase-touching)
+### Bucket 1 — DAP registry complete (lib/dap/registry/)
 
-Even when pure counterparts move, these stay:
-- dapRequestAdmin.ts, dapRequestActions.ts, dapRequestPersistence.ts
-- dapPracticeOnboarding.ts, dapPracticeOnboardingActions.ts
-- dapProviderParticipation.ts, dapOfferTerms.ts, dapOfferTermsReview.ts
-- All mkcrm/ files except dapClientBuilderBillingTypes/Rules
-- dapCmsExport.ts (move last in Wave 5)
+14 files. All pure — no Supabase, no Next.js, no React, no server actions.
+
+| File | Moved in |
+|---|---|
+| `dapProviderStatusTypes.ts` | Wave 3A |
+| `dapDisplayRules.ts` | Wave 3B |
+| `dapPublicUxRules.ts` | Wave 3B |
+| `dapProviderParticipationTypes.ts` | Wave 1 |
+| `dapProviderParticipationRules.ts` | Wave 2B |
+| `dapPracticeOnboardingTypes.ts` | Wave 1 |
+| `dapPracticeOnboardingRules.ts` | Wave 2C |
+| `dapOfferTermsTypes.ts` | Wave 1 |
+| `dapOfferTermsRules.ts` | Wave 2D |
+| `dapOfferTermsReviewTypes.ts` | Wave 1 |
+| `dapOfferTermsReviewRules.ts` | Wave 2E |
+| `dapRequestTypes.ts` | Wave 1 |
+| `dapRequestRules.ts` | Wave 1 |
+| `dapMemberStatusRules.ts` | Wave 2F |
+
+Invariant: `lib/dap/**` has zero imports from `lib/cb-control-center/**`.
+
+---
+
+### Bucket 2 — DAP-owned but outside registry (lib/dap/ subzones)
+
+| File | Zone |
+|---|---|
+| `lib/dap/membership/dapMemberStatusTypes.ts` | membership |
+| `lib/dap/site/dapCmsTypes.ts` | site |
+| `lib/dap/site/dapPublicUxTypes.ts` | site |
+
+These are correctly placed. No action needed.
+
+---
+
+### Bucket 3 — CBCC-owned forever (lib/cb-control-center/)
+
+These files touch Supabase, server actions, admin workflows, stage machinery, communication pipelines, mocks, or simulation state. They belong in `lib/cb-control-center/` permanently.
+
+**Request layer** (Supabase writes):
+- `dapRequestActions.ts`, `dapRequestPersistence.ts`, `dapRequestAdmin.ts`
+
+**Onboarding / participation / offer terms** (Supabase):
+- `dapPracticeOnboarding.ts`, `dapPracticeOnboardingActions.ts`
+- `dapProviderParticipation.ts`
+- `dapOfferTerms.ts`, `dapOfferTermsReview.ts`
+
+**Stage machinery** (Supabase + admin + AI review):
+- `dapStageGates.ts`, `dapStageActions.ts`, `dapStageApprovalStore.ts`
+- `dapStageStateResolver.ts`, `dapStageAiReviewLegacy.ts`, `dapStageReviewer.ts`
+- `dapStagePart*.test.ts` (tests for stage machinery)
+
+**Admin decision / ledger / visibility / audit**:
+- `dapAdminDecisionAudit.ts`, `dapAdminDecisionAuditTypes.ts`
+- `dapAdminDecisionLedger.ts`, `dapAdminDecisionLedgerTypes.ts`
+- `dapAdminDecisionReadiness.ts`, `dapAdminDecisionSqlContract.ts`
+- `dapAdminDecisionVisibility.ts`, `dapAdminDecisionWriteContract.ts`, `dapAdminDecisionWriteContractTypes.ts`
+- `dapAdminEventTimeline.ts`
+- `dapAdminRejectionEmailCopy.ts`, `dapAdminRejectionEmailPreview.ts`, `dapAdminRejectionEmailTypes.ts`
+- `dapAdminRejectionVisibility.ts`
+
+**Communication pipeline**:
+- `dapCommunicationApprovals.ts`, `dapCommunicationApprovalTypes.ts`
+- `dapCommunicationDispatchEvents.ts`, `dapCommunicationDispatchEventTypes.ts`
+- `dapCommunicationDispatchReadiness.ts`, `dapCommunicationDispatchTypes.ts`
+- `dapCommunicationDryRun.ts`, `dapCommunicationDryRunTypes.ts`
+- `dapPracticeDecisionEmailCopy.ts`, `dapPracticeDecisionEmailPreview.ts`, `dapPracticeDecisionEmailTypes.ts`
+- `dapMemberStatusEmailCopy.ts`, `dapMemberStatusEmailPreview.ts`, `dapMemberStatusEmailTypes.ts`
+- `dapRejectionEmailQueue.ts`
+
+**Publishing / build / discovery**:
+- `dapPublishingPipeline.ts`, `dapBuildLedger.ts`
+- `dapDiscoveryAuditArtifact.ts`, `dapTruthSchemaArtifact.ts`
+- `dapBusinessDefinition.ts`
+
+**Action catalog / availability** (admin UI, not yet inspected — see deferred):
+- `dapActionAvailabilityRules.ts`, `dapActionCatalog.ts`, `dapActionCatalogTypes.ts`
+
+**Mock / simulation / test infrastructure**:
+- `mockData.ts`, `simulationStates.ts`
+- `dapAdminWorkflowFixtures.ts`
+
+**Claim QA and city data** (CBCC admin tooling):
+- `dapClaimQA.ts`, `dapCityData.ts`
+
+**CMS export** (Supabase-touching, large):
+- `dapCmsExport.ts` (95K — move last if ever, Wave 5)
+
+**source/ subdir** (Supabase adapters):
+- `source/dapSourceAdapter.ts`, `source/dapSourceTypes.ts`, `source/dapSourceFixtures.ts`
+
+**mkcrm/ subdir** (CBCC billing bridge — mostly stays):
+- All `mkcrm/` files except the two deferred candidates below
+
+**Compatibility re-export** (temporary, in `types.ts`):
+- `export type { ProviderStatus, PublicClaimLevel }` — re-exported from `lib/dap/registry/dapProviderStatusTypes`. Remove once `mockData.ts` no longer bundles ProviderStatus with other CBCC types in a single import.
+
+---
+
+### Bucket 4 — Deferred candidates (candidate only — must be inspected before moving)
+
+Each file below is a *candidate* for extraction. None have been inspected for this wave. Do not move without a dedicated inspect step.
+
+| File | Likely destination if pure | Wave |
+|---|---|---|
+| `mkcrm/dapClientBuilderBillingTypes.ts` | `lib/dap/registry/` or `lib/dap/billing/` | 2G-2 |
+| `mkcrm/dapClientBuilderBillingRules.ts` | same (blocked until types move first) | 2G-2 |
+| `dapMemberStatusReadModel.ts` | `lib/dap/membership/` | 4A |
+| `dapMemberStatusPreview.ts` | `lib/dap/membership/` | 4A |
+| `dapMemberAdminSummary.ts` | `lib/dap/membership/` | 4A |
+| `dapMemberStatusPublicTypes.ts` | `lib/dap/membership/` | 4A |
+| `dapActionAvailabilityRules.ts` | `lib/dap/registry/` or `lib/dap/actions/` | 4B |
+| `dapActionCatalog.ts` | same (depends on inspection) | 4B |
+| `dapPublicSectionModels.ts` | `lib/dap/site/` | 5 |
+| `dapPageBriefBuilder.ts` | `lib/dap/site/` | 5 |
+| `dapCmsExport.ts` | last — only if Supabase layer is split out | 5 |
+
+Stop conditions for each: touches Supabase, imports from `lib/cb-control-center/` non-type files, contains `'use server'`/`'use client'`, imports Next.js routing, or imports admin/action modules.
+
+---
+
+### Planned future waves
+
+**Wave 4A** — member read model inspection
+Inspect `dapMemberStatusReadModel.ts`, `dapMemberStatusPreview.ts`, `dapMemberAdminSummary.ts`, `dapMemberStatusPublicTypes.ts`. Target zone: `lib/dap/membership/`. Stop if any touch Supabase, admin actions, or route/UI concerns.
+
+**Wave 4B** — action availability/catalog inspection
+Inspect `dapActionAvailabilityRules.ts`, `dapActionCatalog.ts`. Target zone: `lib/dap/registry/` if pure domain rules; `lib/dap/actions/` if they model admin UI state. Resolve `dapActionCatalogTypes.ts` placement at same time.
+
+**Wave 5** — content/page layer (last)
+Inspect `dapPublicSectionModels.ts`, `dapPageBriefBuilder.ts`, then `dapCmsExport.ts` last. The CMS export is large and Supabase-touching; splitting its pure output shape from its Supabase fetch layer may be necessary before any move is possible.
+
+---
 
 ## Validation checklist (per move)
 
 ```
 pnpm typecheck   → must be clean
 pnpm test        → must be 6260 pass
-pnpm lint        → must be clean (run before commit)
+pnpm lint        → must be 0 errors, 50 warnings (baseline)
 ```
