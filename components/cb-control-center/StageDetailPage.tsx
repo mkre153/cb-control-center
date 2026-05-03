@@ -80,7 +80,7 @@ export function StageDetailPage({
         {/* Breadcrumb */}
         <nav
           data-breadcrumb
-          className="flex items-center gap-2 text-sm text-gray-500 flex-wrap"
+          className="flex items-center gap-2 text-base text-gray-500 flex-wrap"
           aria-label="Breadcrumb"
         >
           {trail.map((crumb, i) => (
@@ -108,10 +108,10 @@ export function StageDetailPage({
               {stage.stageNumber}
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">{stage.title}</h1>
-              <p className="text-xs text-gray-400 font-mono mt-0.5">{stage.stageId}</p>
+              <h1 className="text-2xl font-bold text-gray-900">{stage.title}</h1>
+              <p className="text-sm text-gray-400 font-mono mt-0.5">{stage.stageId}</p>
             </div>
-            <span className={`ml-auto inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${STATUS_BADGE[stage.status]}`}>
+            <span className={`ml-auto inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold ${STATUS_BADGE[stage.status]}`}>
               {STATUS_LABEL[stage.status]}
             </span>
           </div>
@@ -151,10 +151,10 @@ export function StageDetailPage({
         {/* Purpose */}
         <StageSection title="Purpose">
           <div className="space-y-3">
-            <p className="text-sm text-gray-800 leading-relaxed">{stage.description}</p>
+            <p className="text-base text-gray-800 leading-relaxed">{stage.description}</p>
             <div className="border-l-2 border-gray-200 pl-3">
-              <p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-1">Why this stage matters</p>
-              <p className="text-sm text-gray-600 leading-relaxed italic">{stage.whyItMatters}</p>
+              <p className="text-sm text-gray-500 font-medium uppercase tracking-wide mb-1">Why this stage matters</p>
+              <p className="text-base text-gray-600 leading-relaxed italic">{stage.whyItMatters}</p>
             </div>
           </div>
         </StageSection>
@@ -165,7 +165,7 @@ export function StageDetailPage({
             <div data-external-tool className="space-y-3">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-semibold text-gray-900">{stage.externalTool.name}</p>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-mono">
+                <span className="text-sm px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-mono">
                   {stage.externalTool.executionMode}
                 </span>
               </div>
@@ -175,7 +175,7 @@ export function StageDetailPage({
                   <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Required Inputs</p>
                   <ul className="space-y-1">
                     {stage.externalTool.requiredInputs.map((input, i) => (
-                      <li key={i} className="text-xs text-gray-600">· {input}</li>
+                      <li key={i} className="text-sm text-gray-600">· {input}</li>
                     ))}
                   </ul>
                 </div>
@@ -183,12 +183,12 @@ export function StageDetailPage({
                   <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Expected Outputs</p>
                   <ul className="space-y-1">
                     {stage.externalTool.expectedOutputs.map((output, i) => (
-                      <li key={i} className="text-xs text-gray-600">· {output}</li>
+                      <li key={i} className="text-sm text-gray-600">· {output}</li>
                     ))}
                   </ul>
                 </div>
               </div>
-              <p className="text-xs text-gray-400 border-t border-gray-100 pt-2">
+              <p className="text-sm text-gray-400 border-t border-gray-100 pt-2">
                 Reference only — execution is manual or triggered separately.
               </p>
             </div>
@@ -202,7 +202,7 @@ export function StageDetailPage({
           </StageSection>
         ) : isNotStarted ? (
           <StageSection title="Reviewable Artifact">
-            <p className="text-sm text-gray-400 italic">
+            <p className="text-base text-gray-400 italic">
               Not generated yet. This stage requires prior stage approval before a directive is issued.
             </p>
           </StageSection>
@@ -251,13 +251,13 @@ export function StageDetailPage({
           <StageSection title="Blockers / Dependencies" accent="red">
             <ul className="space-y-2">
               {stage.blockers.map(b => (
-                <li key={b} className="flex items-start gap-2 text-sm text-red-700">
+                <li key={b} className="flex items-start gap-2 text-base text-red-700">
                   <span className="shrink-0 mt-0.5">⊘</span>
                   {b}
                 </li>
               ))}
               {stage.implementationEvidence.unresolvedIssues?.map(i => (
-                <li key={i} className="flex items-start gap-2 text-sm text-red-700">
+                <li key={i} className="flex items-start gap-2 text-base text-red-700">
                   <span className="shrink-0 mt-0.5">⊘</span>
                   {i}
                 </li>
@@ -266,7 +266,7 @@ export function StageDetailPage({
           </StageSection>
         ) : (
           <StageSection title="Blockers / Dependencies">
-            <p className="text-sm text-gray-400">No blockers.</p>
+            <p className="text-base text-gray-400">No blockers.</p>
           </StageSection>
         )}
 
@@ -274,29 +274,29 @@ export function StageDetailPage({
         <StageSection title="Next-Stage Unlock Rule">
           {isApproved && stage.nextStageUnlocked ? (
             <div className="space-y-2">
-              <p className="text-sm text-green-700 font-semibold">
+              <p className="text-base text-green-700 font-semibold">
                 ✓ Stage {stage.stageNumber} is approved. Stage {stage.stageNumber + 1} is unlocked.
               </p>
               {nextStage && (
                 <a
                   href={nextStageHref ? nextStageHref(nextStage) : `${BUILD_BASE}/stages/${nextStage.slug}`}
-                  className="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+                  className="inline-flex items-center gap-1.5 text-base text-indigo-600 hover:text-indigo-800 font-medium"
                 >
                   Open Stage {nextStage.stageNumber}: {nextStage.title} →
                 </a>
               )}
             </div>
           ) : isAwaiting ? (
-            <p className="text-sm text-amber-700">
+            <p className="text-base text-amber-700">
               Owner approval required before Stage {stage.stageNumber + 1} can begin.
               Approve this stage in <code className="font-mono bg-amber-50 px-0.5 rounded">dapStageGates.ts</code>.
             </p>
           ) : isNotStarted ? (
-            <p className="text-sm text-gray-500">
+            <p className="text-base text-gray-500">
               Stage {stage.stageNumber - 1} must be owner-approved before this stage&apos;s directive is issued.
             </p>
           ) : (
-            <p className="text-sm text-gray-500">
+            <p className="text-base text-gray-500">
               This stage must be approved before Stage {stage.stageNumber + 1} can begin.
             </p>
           )}
@@ -314,7 +314,7 @@ export function StageDetailPage({
         <div className="pt-2">
           <a
             href={BUILD_BASE}
-            className="text-sm text-gray-500 hover:text-gray-800 transition-colors"
+            className="text-base text-gray-500 hover:text-gray-800 transition-colors"
           >
             ← Back to Build Pipeline
           </a>

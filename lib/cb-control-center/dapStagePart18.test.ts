@@ -92,10 +92,11 @@ function fakeLegacy(overrides: Partial<StageAiReview> = {}): StageAiReview {
 // ─── A. Responsibility map ─────────────────────────────────────────────────
 
 describe('Part 18 — A. Responsibility map (inspection asserted against source)', () => {
-  it('legacy reviewer continues to own the SDK call site (cannot move yet)', () => {
+  it('legacy reviewer continues to own the CLI transport call site (cannot move yet)', () => {
     const src = readFileSync(REVIEWER_PATH, 'utf-8')
-    expect(src).toContain('getAnthropicClient')
-    expect(src).toMatch(/messages\.create\s*\(/)
+    expect(src).toContain('spawn')
+    expect(src).toContain('CLAUDE_BIN')
+    expect(src).toContain('claude-opus-4-7')
     // Part 19 → 20: reviewer reaches into the adapter zone via a
     // path-aliased import. Pre-Part-20 it pulled the rubric directly;
     // Part 20 replaced that with the prompt builder, which in turn

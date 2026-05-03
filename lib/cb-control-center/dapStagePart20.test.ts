@@ -195,10 +195,10 @@ describe('Part 20 — D. Reviewer no longer owns prompt content', () => {
 // ─── E. Runtime boundary preserved ─────────────────────────────────────────
 
 describe('Part 20 — E. Anthropic transport stays in lib/cb-control-center/', () => {
-  it('reviewer still owns the SDK call site', () => {
+  it('reviewer still owns the CLI transport call site', () => {
     const src = readFileSync(REVIEWER_PATH, 'utf-8')
-    expect(src).toContain('getAnthropicClient')
-    expect(src).toMatch(/messages\.create\s*\(/)
+    expect(src).toContain('spawn')
+    expect(src).toContain('CLAUDE_BIN')
     expect(src).toContain('claude-opus-4-7')
   })
 

@@ -113,9 +113,10 @@ describe('Part 13 — Group 1: reviewer stays in legacy folder; rubric moved to 
     expect(existsSync(LEGACY_RUBRICS_OLD)).toBe(false)
   })
 
-  it('legacy reviewer is structurally why it cannot move yet — it imports getAnthropicClient', () => {
+  it('legacy reviewer is structurally why it cannot move yet — it owns the CLI transport (spawn)', () => {
     const src = readFileSync(LEGACY_REVIEWER, 'utf-8')
-    expect(src).toContain('getAnthropicClient')
+    expect(src).toContain('spawn')
+    expect(src).toContain('CLAUDE_BIN')
   })
 
   it('legacy reviewer imports DapStageGate from cb-control-center (carry-forward dependency)', () => {

@@ -28,7 +28,7 @@ const ARTIFACT_STATUS_LABEL: Record<StageArtifactStatus, string> = {
 function ArtifactSection({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div data-artifact-section={label.toLowerCase().replace(/\s+/g, '-')} className="space-y-1">
-      <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">{label}</p>
+      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">{label}</p>
       {children}
     </div>
   )
@@ -40,7 +40,7 @@ function ClaimList({ items, variant }: { items: readonly string[]; variant: 'all
   return (
     <ul data-claim-list={variant} className="space-y-0.5">
       {items.map(item => (
-        <li key={item} className="flex items-start gap-1.5 text-xs text-gray-700">
+        <li key={item} className="flex items-start gap-1.5 text-sm text-gray-700">
           <span className={`shrink-0 mt-0.5 font-bold ${dot}`}>{symbol}</span>
           {item}
         </li>
@@ -53,7 +53,7 @@ function BulletList({ items }: { items: readonly string[] }) {
   return (
     <ul className="space-y-0.5">
       {items.map(item => (
-        <li key={item} className="flex items-start gap-1.5 text-xs text-gray-700">
+        <li key={item} className="flex items-start gap-1.5 text-sm text-gray-700">
           <span className="shrink-0 mt-1 w-1 h-1 rounded-full bg-gray-400 inline-block" />
           {item}
         </li>
@@ -68,7 +68,7 @@ function BusinessDefinitionArtifact({ artifact }: { artifact: DapBusinessDefinit
   return (
     <div data-artifact-type="business_definition" className="space-y-4">
       {/* Identity */}
-      <div className="grid grid-cols-2 gap-3 text-xs">
+      <div className="grid grid-cols-2 gap-3 text-sm">
         <div>
           <span className="text-gray-400">Business</span>
           <p className="font-semibold text-gray-900">{artifact.businessName}</p>
@@ -99,7 +99,7 @@ function BusinessDefinitionArtifact({ artifact }: { artifact: DapBusinessDefinit
 
       {/* Customers */}
       <ArtifactSection label="Customers">
-        <div className="space-y-1.5 text-xs">
+        <div className="space-y-1.5 text-sm">
           <div>
             <span className="text-gray-400">Primary — </span>
             <span className="text-gray-700">{artifact.primaryCustomer}</span>
@@ -113,7 +113,7 @@ function BusinessDefinitionArtifact({ artifact }: { artifact: DapBusinessDefinit
 
       {/* Conversion goals */}
       <ArtifactSection label="Conversion Goals">
-        <div className="space-y-1.5 text-xs">
+        <div className="space-y-1.5 text-sm">
           <div>
             <span className="text-gray-400">Primary — </span>
             <span className="text-gray-700">{artifact.primaryConversionGoal}</span>
@@ -127,7 +127,7 @@ function BusinessDefinitionArtifact({ artifact }: { artifact: DapBusinessDefinit
 
       {/* Claims */}
       <details open>
-        <summary className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide cursor-pointer hover:text-gray-600 select-none">
+        <summary className="text-xs font-semibold text-gray-400 uppercase tracking-wide cursor-pointer hover:text-gray-600 select-none">
           Allowed Claims ▸
         </summary>
         <div className="mt-1.5">
@@ -136,7 +136,7 @@ function BusinessDefinitionArtifact({ artifact }: { artifact: DapBusinessDefinit
       </details>
 
       <details open>
-        <summary className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide cursor-pointer hover:text-gray-600 select-none">
+        <summary className="text-xs font-semibold text-gray-400 uppercase tracking-wide cursor-pointer hover:text-gray-600 select-none">
           Forbidden Claims ▸
         </summary>
         <div className="mt-1.5">
@@ -145,13 +145,13 @@ function BusinessDefinitionArtifact({ artifact }: { artifact: DapBusinessDefinit
       </details>
 
       <details open>
-        <summary className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide cursor-pointer hover:text-gray-600 select-none">
+        <summary className="text-xs font-semibold text-gray-400 uppercase tracking-wide cursor-pointer hover:text-gray-600 select-none">
           Truth Rules ▸
         </summary>
         <div className="mt-1.5">
           <ol className="space-y-0.5 list-decimal list-inside">
             {artifact.truthRules.map((rule, i) => (
-              <li key={i} className="text-xs text-gray-700">{rule}</li>
+              <li key={i} className="text-sm text-gray-700">{rule}</li>
             ))}
           </ol>
         </div>
@@ -177,13 +177,13 @@ function TruthSchemaArtifact({ artifact }: { artifact: DapTruthSchemaArtifact })
       <ArtifactSection label="7 DAP Truth Rules">
         <ol className="space-y-0.5 list-decimal list-inside">
           {artifact.truthRules.map((rule, i) => (
-            <li key={i} className="text-xs text-gray-700">{rule}</li>
+            <li key={i} className="text-sm text-gray-700">{rule}</li>
           ))}
         </ol>
       </ArtifactSection>
 
       <details open>
-        <summary className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide cursor-pointer hover:text-gray-600 select-none">
+        <summary className="text-xs font-semibold text-gray-400 uppercase tracking-wide cursor-pointer hover:text-gray-600 select-none">
           Forbidden Claims ▸
         </summary>
         <div className="mt-1.5">
@@ -191,17 +191,94 @@ function TruthSchemaArtifact({ artifact }: { artifact: DapTruthSchemaArtifact })
         </div>
       </details>
 
+      {artifact.allowedClaims && artifact.allowedClaims.length > 0 && (
+        <details>
+          <summary className="text-xs font-semibold text-gray-400 uppercase tracking-wide cursor-pointer hover:text-gray-600 select-none">
+            Allowed Claims (with qualifiers) ▸
+          </summary>
+          <div className="mt-1.5">
+            <ClaimList items={artifact.allowedClaims} variant="allowed" />
+          </div>
+        </details>
+      )}
+
       <details open>
-        <summary className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide cursor-pointer hover:text-gray-600 select-none">
-          Required Disclaimers ▸
+        <summary className="text-xs font-semibold text-gray-400 uppercase tracking-wide cursor-pointer hover:text-gray-600 select-none">
+          Required Disclaimers (with placement) ▸
         </summary>
         <div className="mt-1.5">
           <BulletList items={artifact.requiredDisclaimers} />
         </div>
       </details>
 
+      {artifact.claimScannerPatterns && artifact.claimScannerPatterns.length > 0 && (
+        <details>
+          <summary className="text-xs font-semibold text-gray-400 uppercase tracking-wide cursor-pointer hover:text-gray-600 select-none">
+            Claim Scanner Patterns ▸
+          </summary>
+          <div className="mt-1.5">
+            <BulletList items={artifact.claimScannerPatterns} />
+          </div>
+        </details>
+      )}
+
+      {artifact.approvedVocabulary && artifact.approvedVocabulary.length > 0 && (
+        <details>
+          <summary className="text-xs font-semibold text-gray-400 uppercase tracking-wide cursor-pointer hover:text-gray-600 select-none">
+            Approved Vocabulary ▸
+          </summary>
+          <div className="mt-1.5">
+            <BulletList items={artifact.approvedVocabulary} />
+          </div>
+        </details>
+      )}
+
+      {artifact.audienceSafetyRules && artifact.audienceSafetyRules.length > 0 && (
+        <details>
+          <summary className="text-xs font-semibold text-gray-400 uppercase tracking-wide cursor-pointer hover:text-gray-600 select-none">
+            Audience Safety Rules ▸
+          </summary>
+          <div className="mt-1.5">
+            <BulletList items={artifact.audienceSafetyRules} />
+          </div>
+        </details>
+      )}
+
+      {artifact.sourceOfTruthHierarchy && artifact.sourceOfTruthHierarchy.length > 0 && (
+        <details>
+          <summary className="text-xs font-semibold text-gray-400 uppercase tracking-wide cursor-pointer hover:text-gray-600 select-none">
+            Source-of-Truth Hierarchy ▸
+          </summary>
+          <div className="mt-1.5">
+            <BulletList items={artifact.sourceOfTruthHierarchy} />
+          </div>
+        </details>
+      )}
+
+      {artifact.verifiedPricingSourceRules && artifact.verifiedPricingSourceRules.length > 0 && (
+        <details>
+          <summary className="text-xs font-semibold text-gray-400 uppercase tracking-wide cursor-pointer hover:text-gray-600 select-none">
+            Verified Pricing Source Rules ▸
+          </summary>
+          <div className="mt-1.5">
+            <BulletList items={artifact.verifiedPricingSourceRules} />
+          </div>
+        </details>
+      )}
+
+      {artifact.qualifierProximityRules && artifact.qualifierProximityRules.length > 0 && (
+        <details>
+          <summary className="text-xs font-semibold text-gray-400 uppercase tracking-wide cursor-pointer hover:text-gray-600 select-none">
+            Qualifier Proximity Rules ▸
+          </summary>
+          <div className="mt-1.5">
+            <BulletList items={artifact.qualifierProximityRules} />
+          </div>
+        </details>
+      )}
+
       <details>
-        <summary className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide cursor-pointer hover:text-gray-600 select-none">
+        <summary className="text-xs font-semibold text-gray-400 uppercase tracking-wide cursor-pointer hover:text-gray-600 select-none">
           Safety Flags ▸
         </summary>
         <div className="mt-1.5">
@@ -212,7 +289,7 @@ function TruthSchemaArtifact({ artifact }: { artifact: DapTruthSchemaArtifact })
       <ArtifactSection label="Page Types Governed">
         <div className="flex flex-wrap gap-1">
           {artifact.pageTypesGoverned.map(pt => (
-            <span key={pt} className="text-[10px] font-mono bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
+            <span key={pt} className="text-xs font-mono bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
               {pt}
             </span>
           ))}
@@ -273,14 +350,14 @@ export function StageArtifactPanel({ artifact }: { artifact: StageArtifact }) {
       {/* Artifact header — always visible */}
       <div className="flex items-center justify-between gap-2 px-3 py-2 bg-gray-50 border-b border-gray-200">
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
             Artifact
           </span>
-          <span className="text-xs font-semibold text-gray-800">{artifact.title}</span>
+          <span className="text-sm font-semibold text-gray-800">{artifact.title}</span>
         </div>
         <span
           data-artifact-status-badge
-          className={`text-[10px] font-semibold px-2 py-0.5 rounded ${ARTIFACT_STATUS_STYLE[artifact.status]}`}
+          className={`text-xs font-semibold px-2 py-0.5 rounded ${ARTIFACT_STATUS_STYLE[artifact.status]}`}
         >
           {ARTIFACT_STATUS_LABEL[artifact.status]}
         </span>
@@ -288,7 +365,7 @@ export function StageArtifactPanel({ artifact }: { artifact: StageArtifact }) {
 
       {/* Summary — always visible */}
       <div className="px-3 py-2 border-b border-gray-100 bg-white">
-        <p data-artifact-summary className="text-xs text-gray-700 leading-relaxed">
+        <p data-artifact-summary className="text-sm text-gray-700 leading-relaxed">
           {artifact.summary}
         </p>
       </div>

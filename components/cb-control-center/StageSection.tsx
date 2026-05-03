@@ -22,9 +22,9 @@ export function StageSection({
   return (
     <section className={`border ${border} rounded-lg bg-white overflow-hidden`}>
       <div className={`px-5 py-3 border-b ${border} bg-gray-50`}>
-        <h2 className="text-sm font-semibold text-gray-700">{title}</h2>
+        <h2 className="text-base font-semibold text-gray-700">{title}</h2>
       </div>
-      <div className="px-5 py-4">{children}</div>
+      <div className="px-5 py-5">{children}</div>
     </section>
   )
 }
