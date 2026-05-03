@@ -155,7 +155,8 @@ export async function createProjectAction(_prevState: ActionResult | null, formD
     return { ok: false, code: 'db_error', message: 'Failed to create project. Please try again.' }
   }
 
-  redirect(`/projects/${slug}`)
+  const redirectBase = (formData.get('redirectBase') as string | null)?.trim()
+  redirect(redirectBase ? `${redirectBase}?project=${slug}` : `/projects/${slug}`)
 }
 
 export async function generateCharterAction(_prevState: ActionResult | null, formData: FormData): Promise<ActionResult> {

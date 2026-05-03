@@ -155,9 +155,9 @@ describe('Group 4 — Navigation architecture', () => {
     expect(src).not.toContain('SimulationShell')
   })
 
-  it('app/page.tsx imports CbccProjectRegistry (v2 home)', () => {
+  it('app/page.tsx imports CbccProjectWorkspaceLeft (two-column workspace)', () => {
     const src = readFileSync(resolve(ROOT, 'app/page.tsx'), 'utf8')
-    expect(src).toContain('CbccProjectRegistry')
+    expect(src).toContain('CbccProjectWorkspaceLeft')
   })
 
   it('DAP build pipeline page imports StagePipelineOverview (overview links to per-stage detail pages)', () => {
