@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import {
   getDefaultSavingsEducationModel,
   getDefaultFaqModel,
-} from '@/lib/cb-control-center/dapPublicSectionModels'
+} from '@/lib/dap/site/dapPublicSectionModels'
 import { DapSavingsEducationSection } from '@/components/cb-control-center/dap-public/DapSavingsEducationSection'
 import { DapFaqSection } from '@/components/cb-control-center/dap-public/DapFaqSection'
 

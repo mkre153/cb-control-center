@@ -4,7 +4,7 @@ import type {
   DapFaqSectionModel,
   DapComparisonSectionModel,
   DapSavingsEducationModel,
-} from '../dap/site/dapPublicUxTypes'
+} from './dapPublicUxTypes'
 
 export function getDefaultHowItWorksModel(): DapHowItWorksSectionModel {
   return {

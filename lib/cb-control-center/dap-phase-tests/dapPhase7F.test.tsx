@@ -16,7 +16,7 @@ import {
   getDefaultFaqModel,
   getDefaultComparisonModel,
   getDefaultSavingsEducationModel,
-} from '../dapPublicSectionModels'
+} from '../../dap/site/dapPublicSectionModels'
 import {
   getHomepageHeroModel,
   getRequestFlowModel,

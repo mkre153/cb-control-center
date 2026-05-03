@@ -4,7 +4,7 @@ import {
   getDefaultComparisonModel,
   getDefaultSavingsEducationModel,
   getDefaultFaqModel,
-} from '../dapPublicSectionModels'
+} from '../../dap/site/dapPublicSectionModels'
 import { exportDapCmsSnapshot } from '../dapCmsExport'
 import { getLaunchReadiness } from '../launchReadiness'
 import { FORBIDDEN_HERO_PHRASES, FORBIDDEN_CITY_CLAIMS } from '../../dap/registry/dapDisplayRules'

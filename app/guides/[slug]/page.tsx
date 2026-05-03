@@ -6,7 +6,7 @@ import {
   getDefaultSavingsEducationModel,
   getDefaultComparisonModel,
   getDefaultFaqModel,
-} from '@/lib/cb-control-center/dapPublicSectionModels'
+} from '@/lib/dap/site/dapPublicSectionModels'
 import { DapPublicCta } from '@/components/cb-control-center/dap-public/DapPublicCta'
 import { DapSavingsEducationSection } from '@/components/cb-control-center/dap-public/DapSavingsEducationSection'
 import { DapComparisonSection } from '@/components/cb-control-center/dap-public/DapComparisonSection'

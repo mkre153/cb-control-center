@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { exportDapCmsSnapshot } from '@/lib/cb-control-center/dapCmsExport'
 import { DapPublicCta } from '@/components/cb-control-center/dap-public/DapPublicCta'
 import { DapSavingsEducationSection } from '@/components/cb-control-center/dap-public/DapSavingsEducationSection'
-import { getDefaultSavingsEducationModel } from '@/lib/cb-control-center/dapPublicSectionModels'
+import { getDefaultSavingsEducationModel } from '@/lib/dap/site/dapPublicSectionModels'
 import type { DapCtaModel } from '@/lib/dap/site/dapPublicUxTypes'
 
 type Params = Promise<{ city: string; practiceSlug: string }>

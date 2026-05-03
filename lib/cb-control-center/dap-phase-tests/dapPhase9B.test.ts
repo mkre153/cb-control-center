@@ -27,7 +27,7 @@ import {
 } from '../../dap/registry/dapPublicUxRules'
 import {
   getDefaultSavingsEducationModel,
-} from '../dapPublicSectionModels'
+} from '../../dap/site/dapPublicSectionModels'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

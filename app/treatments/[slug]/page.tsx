@@ -5,7 +5,7 @@ import { getTreatmentPageCtaModel } from '@/lib/dap/registry/dapPublicUxRules'
 import {
   getDefaultSavingsEducationModel,
   getDefaultFaqModel,
-} from '@/lib/cb-control-center/dapPublicSectionModels'
+} from '@/lib/dap/site/dapPublicSectionModels'
 import { DapPublicCta } from '@/components/cb-control-center/dap-public/DapPublicCta'
 import { DapSavingsEducationSection } from '@/components/cb-control-center/dap-public/DapSavingsEducationSection'
 import { DapFaqSection } from '@/components/cb-control-center/dap-public/DapFaqSection'

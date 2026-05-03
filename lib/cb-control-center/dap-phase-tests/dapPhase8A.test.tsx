@@ -44,7 +44,7 @@ import {
   getDefaultFaqModel,
   getDefaultComparisonModel,
   getDefaultSavingsEducationModel,
-} from '../dapPublicSectionModels'
+} from '../../dap/site/dapPublicSectionModels'
 
 import type { DapAvailabilityState, DapGateState, DapProviderCardModel } from '../../dap/site/dapPublicUxTypes'
 

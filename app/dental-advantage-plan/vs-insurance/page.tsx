@@ -3,7 +3,7 @@ import {
   getDefaultComparisonModel,
   getDefaultSavingsEducationModel,
   getDefaultFaqModel,
-} from '@/lib/cb-control-center/dapPublicSectionModels'
+} from '@/lib/dap/site/dapPublicSectionModels'
 import { DapComparisonSection } from '@/components/cb-control-center/dap-public/DapComparisonSection'
 import { DapSavingsEducationSection } from '@/components/cb-control-center/dap-public/DapSavingsEducationSection'
 import { DapFaqSection } from '@/components/cb-control-center/dap-public/DapFaqSection'

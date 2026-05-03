@@ -435,6 +435,57 @@ The provider/practice action boundary is CBCC admin workflow behavior. The three
 
 ---
 
+## Wave 5B Addendum — DAP Content/Page Layer Inspection
+
+### Files inspected
+
+**`dapPublicSectionModels.ts`**
+- Single import: `DapPublicPageKind`, `DapHowItWorksSectionModel`, `DapFaqSectionModel`, `DapComparisonSectionModel`, `DapSavingsEducationModel` — all from `lib/dap/site/dapPublicUxTypes` (already in lib/dap/)
+- No CBCC imports whatsoever
+- Exports: `getDefaultHowItWorksModel`, `getDefaultFaqModel`, `getDefaultComparisonModel`, `getDefaultSavingsEducationModel` — all pure public page content
+- Answers: "What does the public DAP page display?" → **DAP public-site domain**
+- Consumers: 6 app/ pages (public dental advantage plan pages + guide + treatment pages), 1 design preview page, 6 test files (import-only, no path assertions)
+- **Moved to `lib/dap/site/dapPublicSectionModels.ts`**
+
+**`dapPageBriefBuilder.ts`**
+- Imports `getPageContract`, `getAllPageTypes`, `LOCKED_SAFETY_FLAGS`, `DAP_REQUIRED_TRUTH_RULES`, `CBSeoAeoPageType`, `CBSeoAeoPageSafetyFlags` from `./cbSeoAeoPageGeneration` **(CBCC)**
+- Imports `NeilLlmFormattingUsage` from `./cbSeoAeoLlmFormatting` **(CBCC)**
+- Content: BrandScript roles, SEO/AEO roles, Neil LLM formatting usage, wireframe orders, prompt seeds for content operators
+- Answers: "What does the CBCC content operator need to know to generate this page?" → **CBCC editorial/review brief infrastructure**
+- Moving would create `lib/dap/ → lib/cb-control-center/` back-dependency
+- **Stays in `lib/cb-control-center/`**
+
+### Move executed
+
+- `lib/cb-control-center/dapPublicSectionModels.ts` → `lib/dap/site/dapPublicSectionModels.ts`
+- Internal import fixed: `'../dap/site/dapPublicUxTypes'` → `'./dapPublicUxTypes'`
+- 6 app/ alias imports updated: `@/lib/cb-control-center/dapPublicSectionModels` → `@/lib/dap/site/dapPublicSectionModels`
+- 6 test files updated: `'../dapPublicSectionModels'` → `'../../dap/site/dapPublicSectionModels'`
+- No path assertions existed for this file
+
+### Boundary validation
+- `lib/dap/**` has zero imports from `lib/cb-control-center/**` (verified by grep)
+
+### Validation
+- typecheck: clean
+- tests: 6260 pass, 1 skipped (baseline)
+- lint: 0 errors, 50 warnings (baseline)
+
+### Migration freeze recommendation
+
+With Wave 5B complete, all safe extraction targets have been addressed:
+- `lib/dap/registry/` — 14 files (pure types + rules)
+- `lib/dap/membership/` — 4 files (member status domain)
+- `lib/dap/site/` — 3 files (CMS types, UX types, section models)
+
+The remaining files in `lib/cb-control-center/` that carry DAP names fall into two frozen categories:
+1. **CBCC admin/operator machinery** — action catalog, stage gates, admin decisions, communication pipeline, brief builder. Correctly owned by CBCC.
+2. **Supabase-touching runtime** — request/persistence/actions, onboarding, offer terms, CMS export. Cannot move without splitting the data access layer.
+
+**Recommended: freeze the migration here.** No further extraction is safe or beneficial at this stage.
+
+---
+
 ## Validation checklist (per move)
 
 ```

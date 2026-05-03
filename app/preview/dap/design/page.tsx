@@ -19,7 +19,7 @@ import {
   getDefaultFaqModel,
   getDefaultComparisonModel,
   getDefaultSavingsEducationModel,
-} from '@/lib/cb-control-center/dapPublicSectionModels'
+} from '@/lib/dap/site/dapPublicSectionModels'
 
 import { DapHomepagePage } from '@/components/cb-control-center/dap-pages/DapHomepagePage'
 import { DapCityPage } from '@/components/cb-control-center/dap-pages/DapCityPage'
