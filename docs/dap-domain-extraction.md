@@ -307,6 +307,58 @@ Inspect `dapPublicSectionModels.ts`, `dapPageBriefBuilder.ts`, then `dapCmsExpor
 
 ---
 
+## Wave 4C Addendum — Member Admin and Email Boundary Inspection
+
+Inspection-only wave. No files moved.
+
+### Files inspected
+
+| File | Imports from lib/dap/? | Imports from CBCC? | Consumers |
+|---|---|---|---|
+| `dapMemberStatusEmailTypes.ts` | Yes (`dapMemberStatusTypes`) | No | `dapMemberStatusEmailCopy.ts`, `dapMemberStatusEmailPreview.ts` |
+| `dapMemberStatusEmailCopy.ts` | Yes (`dapMemberStatusTypes`) | Yes (`dapMemberStatusEmailTypes`) | `dapMemberAdminSummary`, `dapMemberStatusEmailPreview`, `dapCommunicationDispatchReadiness`, tests |
+| `dapMemberAdminSummary.ts` | Yes (3 lib/dap/membership/ imports) | Yes (`dapMemberStatusEmailCopy`) | `app/preview/dap/member-admin-summary/page.tsx`, `dapPhase11.test.ts` |
+
+### Classification
+
+**`dapMemberStatusEmailTypes.ts` — Correctly retained in CBCC**
+
+Pure types with one lib/dap/ import. Could move to `lib/dap/membership/` without creating a back-dependency (it has no lib/cb-control-center/ imports). However, nothing in `lib/dap/**` needs `DapMemberStatusEmailCopy` or `DapMemberStatusEmailTemplateKey` — email composition is a CBCC notification concern, not a membership domain concern. No extraction benefit.
+
+**`dapMemberStatusEmailCopy.ts` — Correctly retained in CBCC**
+
+Pure functions, no Supabase, no server, no React. But its role is confirmed CBCC communication pipeline: `dapCommunicationDispatchReadiness.ts` calls `isDapMemberStatusEmailCopySafe` as a pre-send safety check. This file drives the notification dispatch layer. Even though all functions are computationally pure, their purpose is to compose and validate member notification copy — a CBCC communication concern, not a DAP membership domain concern. Analogous: these are to the notification pipeline what `REQUEST_EXPECTATION_COPY` is to the public page layer — but the notification pipeline lives in CBCC, not lib/dap/.
+
+**`dapMemberAdminSummary.ts` — Correctly retained in CBCC**
+
+Admin-facing adapter that combines the pure membership read model (now in `lib/dap/membership/`) with CBCC communication layer state (`communicationTemplatesAvailable`, `communicationTemplateCount`). These are CBCC admin concerns — asking "can we send a notification to this member?" is an orchestration question, not a membership domain question. Only consumer is the CBCC admin preview page.
+
+### Is any pure membership domain logic trapped?
+
+No. The extraction is complete:
+- Standing classification rules → `lib/dap/registry/dapMemberStatusRules.ts` ✓
+- Member status types → `lib/dap/membership/dapMemberStatusTypes.ts` ✓
+- Public read model types + builder → `lib/dap/membership/dapMemberStatusPublicTypes.ts`, `dapMemberStatusReadModel.ts` ✓
+- Preview fixtures → `lib/dap/membership/dapMemberStatusPreview.ts` ✓
+
+What remains in CBCC is exclusively communication-pipeline and admin-layer logic. No pure domain logic is trapped.
+
+### Dependency direction
+
+All CBCC → lib/dap/ imports are in the correct direction. No lib/dap/ file imports from lib/cb-control-center/. The boundary is clean and correctly drawn.
+
+### Future extraction worth considering?
+
+None. `dapMemberStatusEmailTypes.ts` is the only candidate (it has no CBCC imports) but there is no use case for the email copy shape inside lib/dap/. Freeze this boundary.
+
+### Validation
+- No source changes made
+- typecheck: clean
+- tests: 6260 pass, 1 skipped (baseline)
+- lint: 0 errors, 50 warnings (baseline)
+
+---
+
 ## Validation checklist (per move)
 
 ```
