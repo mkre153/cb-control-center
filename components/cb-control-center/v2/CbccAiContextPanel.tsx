@@ -80,7 +80,7 @@ function SectionHeader({ label, dot }: { label: string; dot: 'green' | 'blue' | 
 
 function FieldRow({ label, value }: { label: string; value: string }) {
   return (
-    <p className="text-xs leading-relaxed">
+    <p className="text-sm leading-relaxed">
       <span className="text-gray-500">{label}: </span>
       <span className="text-gray-300">{value}</span>
     </p>
@@ -89,7 +89,7 @@ function FieldRow({ label, value }: { label: string; value: string }) {
 
 function Bullet({ text }: { text: string }) {
   return (
-    <li className="flex gap-2 text-xs text-gray-400">
+    <li className="flex gap-2 text-sm text-gray-400">
       <span className="text-gray-600 shrink-0 mt-px">—</span>
       <span className="leading-relaxed">{text}</span>
     </li>
@@ -99,8 +99,8 @@ function Bullet({ text }: { text: string }) {
 function Check({ text }: { text: string }) {
   return (
     <div className="flex gap-2 items-start">
-      <div className="mt-0.5 w-3.5 h-3.5 rounded-sm border border-gray-700 shrink-0" />
-      <p className="text-xs text-gray-400 leading-relaxed">{text}</p>
+      <div className="mt-1 w-3.5 h-3.5 rounded-sm border border-gray-700 shrink-0" />
+      <p className="text-sm text-gray-400 leading-relaxed">{text}</p>
     </div>
   )
 }
@@ -156,7 +156,7 @@ function DapCharterDigest({ lastApproved }: { lastApproved: DapStageGate | null 
         <FieldRow label="Project" value={d.businessName} />
         <div>
           <p className="text-xs text-gray-500 mb-1">What this project is:</p>
-          <p className="text-xs text-gray-300 leading-relaxed">{d.summary}</p>
+          <p className="text-sm text-gray-300 leading-relaxed">{d.summary}</p>
         </div>
         <FieldRow label="Primary user" value={d.primaryCustomer} />
         <FieldRow label="Primary business goal" value={d.primaryConversionGoal} />
@@ -184,7 +184,7 @@ function DapStageBriefing({ stage }: { stage: DapStageGate }) {
         </div>
         <div>
           <p className="text-xs text-gray-500 mb-1">Purpose:</p>
-          <p className="text-xs text-gray-300 leading-relaxed">{stage.description}</p>
+          <p className="text-sm text-gray-300 leading-relaxed">{stage.description}</p>
         </div>
         <div>
           <p className="text-xs text-gray-500 mb-1.5">What Stage {stage.stageNumber} must produce:</p>
@@ -194,7 +194,7 @@ function DapStageBriefing({ stage }: { stage: DapStageGate }) {
         </div>
         <div>
           <p className="text-xs text-gray-500 mb-1">Why this matters:</p>
-          <p className="text-xs text-gray-400 leading-relaxed italic">{stage.whyItMatters}</p>
+          <p className="text-sm text-gray-400 leading-relaxed italic">{stage.whyItMatters}</p>
         </div>
       </div>
     </div>
@@ -225,10 +225,10 @@ function DapRecommendation({ stage }: { stage: DapStageGate }) {
     <div>
       <SectionHeader label="Recommended Next Action" dot="amber" />
       <div className="rounded-md bg-amber-950/30 border border-amber-800/30 px-3 py-3 space-y-2">
-        <p className="text-xs text-amber-300 font-medium">
+        <p className="text-sm text-amber-300 font-medium">
           Open Stage {stage.stageNumber} and begin the {short}.
         </p>
-        <p className="text-xs text-gray-400 leading-relaxed">
+        <p className="text-sm text-gray-400 leading-relaxed">
           {stage.externalTool
             ? `This stage uses ${stage.externalTool.name}. ${stage.externalTool.role}`
             : `Issue the Stage ${stage.stageNumber} directive and submit evidence before requesting owner approval.`}
