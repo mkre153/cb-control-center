@@ -359,6 +359,82 @@ None. `dapMemberStatusEmailTypes.ts` is the only candidate (it has no CBCC impor
 
 ---
 
+## Wave 5A Addendum — Provider / Practice Enrollment + Action Boundary Inspection
+
+Inspection-only wave. No files moved.
+
+### Files inspected
+
+| File | Location | Imports from lib/dap/? | Imports from CBCC? |
+|---|---|---|---|
+| `dapActionCatalogTypes.ts` | `lib/cb-control-center/` | Yes (4 lib/dap/ types) | Yes (3 CBCC types) |
+| `dapActionCatalog.ts` | `lib/cb-control-center/` | No | Yes (`dapActionCatalogTypes`) |
+| `dapActionAvailabilityRules.ts` | `lib/cb-control-center/` | No | Yes (`dapActionCatalogTypes`, `dapActionCatalog`) |
+
+### Type dependency detail — `dapActionCatalogTypes.ts`
+
+Mixed imports:
+- `DapRequestStatus` ← `lib/dap/registry/dapRequestTypes` ✓
+- `DapMemberStanding` ← `lib/dap/membership/dapMemberStatusTypes` ✓
+- `DapOfferTermsReviewStatus` ← `lib/dap/registry/dapOfferTermsReviewTypes` ✓
+- `DapProviderParticipationStatus` ← `lib/dap/registry/dapProviderParticipationTypes` ✓
+- `DapAdminDecisionReadinessStatus` ← `./dapAdminDecisionReadiness` **(CBCC)** ✗
+- `DapCommunicationApprovalStatus` ← `./dapCommunicationApprovalTypes` **(CBCC)** ✗
+- `DapCommunicationDryRunStatus` ← `./dapCommunicationDryRunTypes` **(CBCC)** ✗
+
+The `DapActionAvailabilityContext` composite type aggregates 4 lib/dap/ status values together with 3 CBCC admin state values (`decisionReadinessStatus`, `communicationApprovalStatus`, `dryRunStatus`). This means the composite context is fundamentally CBCC admin state, not DAP domain state.
+
+### Inbound importers
+
+All CBCC admin workflow machinery:
+- `app/preview/dap/action-catalog/page.tsx` — CBCC admin action catalog preview page
+- `app/preview/dap/admin-decision-ledger/page.tsx` — CBCC admin decision ledger page
+- `lib/cb-control-center/dapAdminDecisionLedger.ts` — uses `DAP_ACTION_DEFINITIONS`, `buildDapActionAvailabilityCatalog`, `DapActionAvailabilityContext`
+- `lib/cb-control-center/dapAdminDecisionAuditTypes.ts` — uses `DapActionAuthoritySource`
+- `lib/cb-control-center/dapAdminDecisionLedgerTypes.ts` — uses `DapActionAvailability`, `DapActionAuthoritySource`
+- `lib/cb-control-center/dapAdminDecisionWriteContract.ts` — uses `DapActionAuthoritySource`
+- `lib/cb-control-center/dap-phase-tests/dapPhase12.test.ts`
+
+Zero non-CBCC consumers. Nothing in `lib/dap/**`, `app/` domain pages, or component files imports these.
+
+### Classification
+
+**`dapActionCatalogTypes.ts` — Stay put (blocked candidate)**
+
+Three CBCC type dependencies block any extraction. More fundamentally, the `DapActionAvailabilityContext` composite type is the wrong level of abstraction for `lib/dap/` — it bundles DAP domain status values with CBCC admin pipeline state (`decisionReadinessStatus`, `communicationApprovalStatus`, `dryRunStatus`). Moving it would inject CBCC admin concerns into the DAP domain namespace.
+
+**`dapActionCatalog.ts` — Stay put**
+
+Static readonly array of action definitions, but `authoritySource: 'cb_control_center'` on the majority of entries makes the ownership explicit. This catalog defines what the *CB Control Center operator* can do at each enrollment workflow stage — approve requests, mark offer terms, manage communication approval. That is CBCC operator capability, not DAP product/domain behavior. The two `authoritySource: 'provider_submission'` entries are future-phase stubs that describe actions that don't exist yet.
+
+**`dapActionAvailabilityRules.ts` — Stay put**
+
+Computationally pure, but answers the wrong question for `lib/dap/`. The question is: *what can the CBCC operator click right now?* That is a CBCC admin affordance computation, not a DAP domain rule. Its input context spans all CBCC admin pipeline phases (decision readiness, communication approval, dry-run status) and its outputs drive the CBCC admin action panel UI. Every inbound importer is CBCC admin machinery.
+
+### Is any pure DAP domain logic trapped?
+
+No. The DAP domain artifacts these files depend on are already in `lib/dap/`:
+- `DapRequestStatus` → `lib/dap/registry/dapRequestTypes` ✓
+- `DapOfferTermsReviewStatus` → `lib/dap/registry/dapOfferTermsReviewTypes` ✓
+- `DapProviderParticipationStatus` → `lib/dap/registry/dapProviderParticipationTypes` ✓
+- `DapMemberStanding` → `lib/dap/membership/dapMemberStatusTypes` ✓
+
+The action availability logic layers *on top of* those domain types — it is the CBCC admin view of the domain state, not the domain state itself. No extraction is needed or useful.
+
+### Boundary conclusion
+
+**Conclusion B: No Wave 5B move recommended.**
+
+The provider/practice action boundary is CBCC admin workflow behavior. The three action files describe and compute what the CB Control Center operator can do across the DAP enrollment pipeline. They correctly belong in `lib/cb-control-center/`. Freeze this boundary.
+
+### Validation
+- No source changes made
+- typecheck: clean
+- tests: 6260 pass, 1 skipped (baseline)
+- lint: 0 errors, 50 warnings (baseline)
+
+---
+
 ## Validation checklist (per move)
 
 ```
