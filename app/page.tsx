@@ -2,6 +2,7 @@ import { CbccNav } from '@/components/cb-control-center/v2/CbccNav'
 import { CbccWorkspaceLayout } from '@/components/cb-control-center/v2/CbccWorkspaceLayout'
 import { CbccProjectWorkspaceLeft } from '@/components/cb-control-center/v2/CbccProjectWorkspaceLeft'
 import { CbccAiChatPanel } from '@/components/cb-control-center/v2/CbccAiChatPanel'
+import { CbccAiContextPanel, getCbccSuggestedPrompts } from '@/components/cb-control-center/v2/CbccAiContextPanel'
 import { CbccProjectPipelinePanel } from '@/components/cb-control-center/v2/CbccProjectPipelinePanel'
 import { listProjects } from '@/lib/cb-control-center/cbccProjectRepository'
 import { mergeProjectsWithEngineBacked } from '@/lib/cb-control-center/cbccEngineRegistry'
@@ -23,6 +24,9 @@ export default async function CBControlCenterHomePage({
     </div>
   )
 
+  const contextNode = selectedSlug ? <CbccAiContextPanel slug={selectedSlug} /> : undefined
+  const suggestedPrompts = selectedSlug ? getCbccSuggestedPrompts(selectedSlug) : undefined
+
   return (
     <div className="h-screen bg-gray-950 font-sans text-gray-300 flex flex-col overflow-hidden">
       <CbccNav />
@@ -30,7 +34,13 @@ export default async function CBControlCenterHomePage({
         leftPanel={
           <CbccProjectWorkspaceLeft projects={projects} selectedSlug={selectedSlug ?? null} />
         }
-        centerPanel={<CbccAiChatPanel projectSlug={selectedSlug ?? null} />}
+        centerPanel={
+          <CbccAiChatPanel
+            projectSlug={selectedSlug ?? null}
+            contextNode={contextNode}
+            suggestedPrompts={suggestedPrompts}
+          />
+        }
         rightPanel={rightPanel}
       />
     </div>

@@ -1,13 +1,22 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import type { ReactNode } from 'react'
 
 interface Message {
   role: 'user' | 'assistant'
   content: string
 }
 
-export function CbccAiChatPanel({ projectSlug }: { projectSlug: string | null }) {
+export function CbccAiChatPanel({
+  projectSlug,
+  contextNode,
+  suggestedPrompts,
+}: {
+  projectSlug: string | null
+  contextNode?: ReactNode
+  suggestedPrompts?: string[]
+}) {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [streaming, setStreaming] = useState(false)
@@ -17,8 +26,8 @@ export function CbccAiChatPanel({ projectSlug }: { projectSlug: string | null })
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  async function send() {
-    const text = input.trim()
+  async function send(overrideText?: string) {
+    const text = (overrideText ?? input).trim()
     if (!text || !projectSlug || streaming) return
 
     const userMsg: Message = { role: 'user', content: text }
@@ -63,6 +72,8 @@ export function CbccAiChatPanel({ projectSlug }: { projectSlug: string | null })
     }
   }
 
+  const hasMessages = messages.length > 0
+
   return (
     <div className="flex flex-col h-full">
       <div className="px-4 py-3 border-b border-gray-800 flex items-center gap-2 shrink-0">
@@ -72,7 +83,15 @@ export function CbccAiChatPanel({ projectSlug }: { projectSlug: string | null })
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-        {messages.length === 0 ? (
+        {/* Context panel — visible until first message */}
+        {!hasMessages && contextNode && (
+          <div className="mb-2">
+            {contextNode}
+          </div>
+        )}
+
+        {/* Empty state when no context either */}
+        {!hasMessages && !contextNode && (
           <div className="flex flex-col items-center justify-center h-full text-center px-6">
             <p className="text-gray-600 text-sm leading-relaxed">
               {projectSlug
@@ -80,29 +99,46 @@ export function CbccAiChatPanel({ projectSlug }: { projectSlug: string | null })
                 : 'Select a project to start a conversation.'}
             </p>
           </div>
-        ) : (
-          messages.map((msg, i) => {
-            const isLastAssistant = msg.role === 'assistant' && i === messages.length - 1
-            return (
-              <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div
-                  className={`max-w-[88%] rounded-lg px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap ${
-                    msg.role === 'user'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-800 text-gray-300'
-                  }`}
-                >
-                  {msg.content}
-                  {isLastAssistant && streaming && (
-                    <span className="inline-block w-[2px] h-[1em] bg-gray-400 ml-0.5 align-middle animate-pulse" />
-                  )}
-                </div>
-              </div>
-            )
-          })
         )}
+
+        {/* Chat messages */}
+        {messages.map((msg, i) => {
+          const isLastAssistant = msg.role === 'assistant' && i === messages.length - 1
+          return (
+            <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div
+                className={`max-w-[88%] rounded-lg px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap ${
+                  msg.role === 'user'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-800 text-gray-300'
+                }`}
+              >
+                {msg.content}
+                {isLastAssistant && streaming && (
+                  <span className="inline-block w-[2px] h-[1em] bg-gray-400 ml-0.5 align-middle animate-pulse" />
+                )}
+              </div>
+            </div>
+          )
+        })}
         <div ref={bottomRef} />
       </div>
+
+      {/* Suggested prompt chips — only before first message */}
+      {!hasMessages && suggestedPrompts && suggestedPrompts.length > 0 && projectSlug && (
+        <div className="px-4 pb-2 flex flex-wrap gap-1.5 shrink-0">
+          {suggestedPrompts.map((prompt, i) => (
+            <button
+              key={i}
+              onClick={() => send(prompt)}
+              disabled={streaming}
+              className="text-xs px-2.5 py-1.5 rounded-md border border-gray-700 text-gray-400 hover:border-blue-600 hover:text-blue-400 transition-colors bg-gray-900 disabled:opacity-40"
+            >
+              {prompt}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="px-4 py-3 border-t border-gray-800 shrink-0">
         <div className="flex gap-2">
@@ -116,7 +152,7 @@ export function CbccAiChatPanel({ projectSlug }: { projectSlug: string | null })
             className="flex-1 rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-blue-600 disabled:opacity-40"
           />
           <button
-            onClick={send}
+            onClick={() => send()}
             disabled={!input.trim() || !projectSlug || streaming}
             className="px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white text-sm rounded-md transition-colors min-w-[56px]"
           >
