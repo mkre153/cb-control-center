@@ -6,10 +6,14 @@
 import type { DapCommunicationDispatchReadiness, DapCommunicationDispatchBlocker, DapCommunicationDispatchAudience } from './dapCommunicationDispatchTypes'
 import type { DapPracticeDecisionEmailPreview }  from './dapPracticeDecisionEmailPreview'
 import type { DapMemberStatusEmailPreview }       from './dapMemberStatusEmailPreview'
+import type { DapAdminRejectionEmailPreview }     from './dapAdminRejectionEmailPreview'
+import type { DapRejectionEmailQueueEntry }       from './dapRejectionEmailQueue'
 import { getAllDapPracticeDecisionEmailPreviews } from './dapPracticeDecisionEmailPreview'
 import { getAllDapMemberStatusEmailPreviews }     from './dapMemberStatusEmailPreview'
+import { getAllDapAdminRejectionEmailPreviews }   from './dapAdminRejectionEmailPreview'
 import { isDapPracticeDecisionEmailCopySafe }     from './dapPracticeDecisionEmailCopy'
 import { isDapMemberStatusEmailCopySafe }         from './dapMemberStatusEmailCopy'
+import { isDapAdminRejectionEmailCopySafe }       from './dapAdminRejectionEmailCopy'
 
 // ─── Runtime field reader (defense-in-depth against cast-injected bad data) ───
 
@@ -219,4 +223,80 @@ export function getDapMemberStatusEmailDispatchReadiness(
 
 export function getAllDapMemberStatusEmailDispatchReadiness(): DapCommunicationDispatchReadiness[] {
   return getAllDapMemberStatusEmailPreviews().map(getDapMemberStatusEmailDispatchReadiness)
+}
+
+// ─── Admin rejection email dispatch readiness ─────────────────────────────────
+
+export function getDapAdminRejectionEmailDispatchReadiness(
+  preview: DapAdminRejectionEmailPreview,
+  queueEntry: DapRejectionEmailQueueEntry | null,
+): DapCommunicationDispatchReadiness {
+  const { copy, source } = preview
+  const blockers: DapCommunicationDispatchBlocker[] = []
+
+  if (queueEntry === null) {
+    blockers.push({
+      code:     'missing_operational_decision',
+      message:  'No request_rejected event. Rejection email cannot be dispatched without a confirmed rejection decision.',
+      severity: 'blocking',
+    })
+  }
+
+  if (field(source, 'decisionAuthority') !== 'cb_control_center') {
+    blockers.push({
+      code:     'missing_cb_control_center_authority',
+      message:  'source.decisionAuthority must be cb_control_center.',
+      severity: 'blocking',
+    })
+  }
+
+  if (field(source, 'crmAuthority') !== false) {
+    blockers.push({
+      code:     'mkcrm_authority_detected',
+      message:  'source.crmAuthority must be false. MKCRM does not decide rejections.',
+      severity: 'blocking',
+    })
+  }
+
+  if (field(source, 'paymentAuthority') !== false) {
+    blockers.push({
+      code:     'payment_authority_detected',
+      message:  'source.paymentAuthority must be false. Payment systems have no rejection authority.',
+      severity: 'blocking',
+    })
+  }
+
+  if (field(copy, 'includesPaymentCta') !== false) {
+    blockers.push({
+      code:     'payment_cta_detected',
+      message:  'copy.includesPaymentCta must be false.',
+      severity: 'blocking',
+    })
+  }
+
+  if (field(copy, 'includesPhi') !== false) {
+    blockers.push({
+      code:     'phi_detected',
+      message:  'copy.includesPhi must be false. No PHI in rejection communications.',
+      severity: 'blocking',
+    })
+  }
+
+  const copySafe = isDapAdminRejectionEmailCopySafe(copy)
+  if (!copySafe) {
+    blockers.push({
+      code:     'unsafe_copy',
+      message:  'Copy did not pass safety scan (forbidden terms or flags).',
+      severity: 'blocking',
+    })
+  }
+
+  const audience = copy.audience === 'member' ? 'member' : 'practice' as DapCommunicationDispatchAudience
+  return resolveReadiness(copy.templateKey, audience, blockers, copySafe)
+}
+
+export function getAllDapAdminRejectionEmailDispatchReadiness(): DapCommunicationDispatchReadiness[] {
+  return getAllDapAdminRejectionEmailPreviews().map(preview =>
+    getDapAdminRejectionEmailDispatchReadiness(preview, null)
+  )
 }

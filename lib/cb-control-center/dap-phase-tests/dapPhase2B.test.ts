@@ -9,6 +9,44 @@ import { join, resolve } from 'path'
 const ROOT      = join(__dirname, '..', '..', '..')
 const PAGE_PATH = resolve(ROOT, 'app/preview/dap/admin-rejection-emails/page.tsx')
 
+import {
+  getDapAdminRejectionEmailDispatchReadiness,
+  getAllDapAdminRejectionEmailDispatchReadiness,
+  getDapPracticeDecisionEmailDispatchReadiness,
+  getDapMemberStatusEmailDispatchReadiness,
+} from '../dapCommunicationDispatchReadiness'
+import type { DapRejectionEmailQueueEntry } from '../dapRejectionEmailQueue'
+import { getDapRejectionEmailQueueEntryFromEvent, findDapRejectionEmailQueueEntry } from '../dapRejectionEmailQueue'
+import { getAllDapPracticeDecisionEmailPreviews } from '../dapPracticeDecisionEmailPreview'
+import { getAllDapMemberStatusEmailPreviews } from '../dapMemberStatusEmailPreview'
+import type { DapRequestEvent } from '../../dap/registry/dapRequestTypes'
+
+// ─── Fixture helpers ──────────────────────────────────────────────────────────
+
+function makeRejectionEvent(requestId = 'req-test-001'): DapRequestEvent {
+  return {
+    id:              'evt-001',
+    request_id:      requestId,
+    event_type:      'request_rejected',
+    event_timestamp: '2026-05-01T12:00:00Z',
+    actor_type:      'admin',
+    event_note:      null,
+    metadata_json:   null,
+  }
+}
+
+function makeNonRejectionEvent(): DapRequestEvent {
+  return {
+    id:              'evt-002',
+    request_id:      'req-test-002',
+    event_type:      'request_approved',
+    event_timestamp: '2026-05-01T12:00:00Z',
+    actor_type:      'admin',
+    event_note:      null,
+    metadata_json:   null,
+  }
+}
+
 import type {
   DapAdminRejectionEmailTemplateKey,
   DapAdminRejectionEmailAudience,
@@ -296,5 +334,175 @@ describe('Phase 2B — preview page', () => {
   it('preview page does not import Supabase', () => {
     const src = readFileSync(PAGE_PATH, 'utf8')
     expect(src).not.toMatch(/from ['"].*supabase/i)
+  })
+})
+
+// ─── Phase 2B — Rejection email queue entry ───────────────────────────────────
+
+describe('Phase 2B — rejection email queue gated on request_rejected event', () => {
+  it('getDapRejectionEmailQueueEntryFromEvent returns a queue entry for request_rejected', () => {
+    const entry = getDapRejectionEmailQueueEntryFromEvent(makeRejectionEvent())
+    expect(entry).not.toBeNull()
+    expect(entry!.decisionAuthority).toBe('cb_control_center')
+    expect(entry!.crmAuthority).toBe(false)
+    expect(entry!.paymentAuthority).toBe(false)
+    expect(entry!.sent).toBe(false)
+  })
+
+  it('getDapRejectionEmailQueueEntryFromEvent returns null for non-rejection events', () => {
+    expect(getDapRejectionEmailQueueEntryFromEvent(makeNonRejectionEvent())).toBeNull()
+  })
+
+  it('findDapRejectionEmailQueueEntry returns entry when event list contains request_rejected', () => {
+    const events: DapRequestEvent[] = [makeNonRejectionEvent(), makeRejectionEvent()]
+    const entry = findDapRejectionEmailQueueEntry(events)
+    expect(entry).not.toBeNull()
+    expect(entry!.requestId).toBe('req-test-001')
+  })
+
+  it('findDapRejectionEmailQueueEntry returns null when no request_rejected event', () => {
+    const events: DapRequestEvent[] = [makeNonRejectionEvent()]
+    expect(findDapRejectionEmailQueueEntry(events)).toBeNull()
+  })
+
+  it('queue entry has safety flags locked', () => {
+    const entry = getDapRejectionEmailQueueEntryFromEvent(makeRejectionEvent())!
+    expect(entry.safety.includesPhi).toBe(false)
+    expect(entry.safety.includesPaymentCta).toBe(false)
+  })
+
+  it('queue entry preserves requestId from the event', () => {
+    const entry = getDapRejectionEmailQueueEntryFromEvent(makeRejectionEvent('req-specific-123'))!
+    expect(entry.requestId).toBe('req-specific-123')
+  })
+
+  it('queue entry queuedAt matches event timestamp', () => {
+    const entry = getDapRejectionEmailQueueEntryFromEvent(makeRejectionEvent())!
+    expect(entry.queuedAt).toBe('2026-05-01T12:00:00Z')
+  })
+})
+
+// ─── Phase 2B — Dispatch readiness: rejection emails ─────────────────────────
+
+describe('Phase 2B — dispatch readiness blocked without rejection event', () => {
+  for (const key of ALL_TEMPLATE_KEYS) {
+    it(`${key} is blocked when queueEntry is null`, () => {
+      const preview = getDapAdminRejectionEmailPreview(key)
+      const readiness = getDapAdminRejectionEmailDispatchReadiness(preview, null)
+      expect(readiness.status).toBe('blocked')
+      expect(readiness.eligibleForFutureDispatch).toBe(false)
+    })
+
+    it(`${key} blocked readiness has missing_operational_decision blocker`, () => {
+      const preview = getDapAdminRejectionEmailPreview(key)
+      const readiness = getDapAdminRejectionEmailDispatchReadiness(preview, null)
+      const codes = readiness.blockers.map(b => b.code)
+      expect(codes).toContain('missing_operational_decision')
+    })
+  }
+})
+
+describe('Phase 2B — dispatch readiness ready when rejection event present', () => {
+  for (const key of ALL_TEMPLATE_KEYS) {
+    it(`${key} is ready_for_review when queue entry is present`, () => {
+      const preview  = getDapAdminRejectionEmailPreview(key)
+      const entry    = getDapRejectionEmailQueueEntryFromEvent(makeRejectionEvent()) as DapRejectionEmailQueueEntry
+      const readiness = getDapAdminRejectionEmailDispatchReadiness(preview, entry)
+      expect(readiness.status).toBe('ready_for_review')
+      expect(readiness.eligibleForFutureDispatch).toBe(true)
+    })
+
+    it(`${key} readiness has no blockers when event is present`, () => {
+      const preview  = getDapAdminRejectionEmailPreview(key)
+      const entry    = getDapRejectionEmailQueueEntryFromEvent(makeRejectionEvent()) as DapRejectionEmailQueueEntry
+      const readiness = getDapAdminRejectionEmailDispatchReadiness(preview, entry)
+      expect(readiness.blockers).toHaveLength(0)
+    })
+  }
+})
+
+describe('Phase 2B — dispatch readiness authority and safety invariants', () => {
+  it('all rejection readiness models have source.decisionAuthority: cb_control_center', () => {
+    const entry = getDapRejectionEmailQueueEntryFromEvent(makeRejectionEvent()) as DapRejectionEmailQueueEntry
+    for (const key of ALL_TEMPLATE_KEYS) {
+      const r = getDapAdminRejectionEmailDispatchReadiness(getDapAdminRejectionEmailPreview(key), entry)
+      expect(r.source.decisionAuthority).toBe('cb_control_center')
+    }
+  })
+
+  it('all rejection readiness models have source.crmAuthority: false', () => {
+    const entry = getDapRejectionEmailQueueEntryFromEvent(makeRejectionEvent()) as DapRejectionEmailQueueEntry
+    for (const key of ALL_TEMPLATE_KEYS) {
+      const r = getDapAdminRejectionEmailDispatchReadiness(getDapAdminRejectionEmailPreview(key), entry)
+      expect(r.source.crmAuthority).toBe(false)
+    }
+  })
+
+  it('all rejection readiness models have source.paymentAuthority: false', () => {
+    const entry = getDapRejectionEmailQueueEntryFromEvent(makeRejectionEvent()) as DapRejectionEmailQueueEntry
+    for (const key of ALL_TEMPLATE_KEYS) {
+      const r = getDapAdminRejectionEmailDispatchReadiness(getDapAdminRejectionEmailPreview(key), entry)
+      expect(r.source.paymentAuthority).toBe(false)
+    }
+  })
+
+  it('all rejection readiness models have safety.includesPaymentCta: false', () => {
+    const entry = getDapRejectionEmailQueueEntryFromEvent(makeRejectionEvent()) as DapRejectionEmailQueueEntry
+    for (const key of ALL_TEMPLATE_KEYS) {
+      const r = getDapAdminRejectionEmailDispatchReadiness(getDapAdminRejectionEmailPreview(key), entry)
+      expect(r.safety.includesPaymentCta).toBe(false)
+    }
+  })
+
+  it('all rejection readiness models have safety.includesPhi: false', () => {
+    const entry = getDapRejectionEmailQueueEntryFromEvent(makeRejectionEvent()) as DapRejectionEmailQueueEntry
+    for (const key of ALL_TEMPLATE_KEYS) {
+      const r = getDapAdminRejectionEmailDispatchReadiness(getDapAdminRejectionEmailPreview(key), entry)
+      expect(r.safety.includesPhi).toBe(false)
+    }
+  })
+
+  it('all rejection readiness models have safety.copySafe: true', () => {
+    const entry = getDapRejectionEmailQueueEntryFromEvent(makeRejectionEvent()) as DapRejectionEmailQueueEntry
+    for (const key of ALL_TEMPLATE_KEYS) {
+      const r = getDapAdminRejectionEmailDispatchReadiness(getDapAdminRejectionEmailPreview(key), entry)
+      expect(r.safety.copySafe).toBe(true)
+    }
+  })
+
+  it('getAllDapAdminRejectionEmailDispatchReadiness returns 4 blocked entries (no event context)', () => {
+    const all = getAllDapAdminRejectionEmailDispatchReadiness()
+    expect(all).toHaveLength(4)
+    for (const r of all) {
+      expect(r.status).toBe('blocked')
+    }
+  })
+})
+
+// ─── Phase 2B — Existing dispatch readiness unchanged ────────────────────────
+
+describe('Phase 2B — existing practice/member dispatch readiness still correct', () => {
+  it('practice decision email dispatch readiness functions still exist', () => {
+    expect(typeof getDapPracticeDecisionEmailDispatchReadiness).toBe('function')
+  })
+
+  it('member status email dispatch readiness functions still exist', () => {
+    expect(typeof getDapMemberStatusEmailDispatchReadiness).toBe('function')
+  })
+
+  it('all practice decision email previews are ready_for_review', () => {
+    const previews = getAllDapPracticeDecisionEmailPreviews()
+    for (const p of previews) {
+      const r = getDapPracticeDecisionEmailDispatchReadiness(p)
+      expect(r.status, `${p.copy.templateKey} should be ready_for_review`).toBe('ready_for_review')
+    }
+  })
+
+  it('all member status email previews are ready_for_review', () => {
+    const previews = getAllDapMemberStatusEmailPreviews()
+    for (const p of previews) {
+      const r = getDapMemberStatusEmailDispatchReadiness(p)
+      expect(r.status, `${p.copy.templateKey} should be ready_for_review`).toBe('ready_for_review')
+    }
   })
 })
