@@ -159,6 +159,42 @@ export function StageDetailPage({
           </div>
         </StageSection>
 
+        {/* External Tool */}
+        {stage.externalTool && (
+          <StageSection title="External Tool">
+            <div data-external-tool className="space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold text-gray-900">{stage.externalTool.name}</p>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-mono">
+                  {stage.externalTool.executionMode}
+                </span>
+              </div>
+              <p className="text-sm text-gray-600">{stage.externalTool.role}</p>
+              <div className="grid grid-cols-2 gap-3 pt-1">
+                <div>
+                  <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Required Inputs</p>
+                  <ul className="space-y-1">
+                    {stage.externalTool.requiredInputs.map((input, i) => (
+                      <li key={i} className="text-xs text-gray-600">· {input}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Expected Outputs</p>
+                  <ul className="space-y-1">
+                    {stage.externalTool.expectedOutputs.map((output, i) => (
+                      <li key={i} className="text-xs text-gray-600">· {output}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <p className="text-xs text-gray-400 border-t border-gray-100 pt-2">
+                Reference only — execution is manual or triggered separately.
+              </p>
+            </div>
+          </StageSection>
+        )}
+
         {/* Reviewable artifact */}
         {stage.artifact ? (
           <StageSection title="Reviewable Artifact" accent={isAwaiting ? 'amber' : isApproved ? 'green' : undefined}>

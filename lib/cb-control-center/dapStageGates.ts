@@ -21,6 +21,7 @@
  *   7. Build / QA / Launch                                ← collapses old 5+6+7
  */
 
+import type { CbccExternalToolRef } from '@/lib/cbcc/types'
 import {
   DAP_BUSINESS_DEFINITION,
   type StageArtifact,
@@ -72,6 +73,7 @@ export interface DapStageGate {
   readonly blockers: readonly string[]  // unresolved blockers preventing approval
   readonly ledgerPhaseId?: string       // cross-reference to dapBuildLedger entry
   readonly artifact?: StageArtifact    // reviewable artifact — required for approved/awaiting stages
+  readonly externalTool?: CbccExternalToolRef
 }
 
 // ─── Registry ─────────────────────────────────────────────────────────────────
@@ -310,6 +312,13 @@ Do not begin Stage 5 until owner approval is recorded.`,
     blockers: [
       'Stage 3 (Truth Schema) must be owner-approved before Stage 4 directive is issued',
     ],
+    externalTool: {
+      name: 'StoryBrand Coach',
+      role: 'Generates the DAP BrandScript — character, problem, guide, plan, CTA, stakes, and tone.',
+      requiredInputs: ['Business definition (Stage 1 artifact)', 'Truth schema (Stage 3 artifact)'],
+      expectedOutputs: ['BrandScript contract', 'Positioning lock artifact for Stage 4 approval'],
+      executionMode: 'manual',
+    },
   },
 
   // ── Stage 5: SEO / AEO / Core30 / Content Strategy ───────────────────────
@@ -370,6 +379,13 @@ Do not begin Stage 6 until owner approval is recorded.`,
     blockers: [
       'Stage 4 (Positioning / StoryBrand) must be owner-approved before Stage 5 directive is issued',
     ],
+    externalTool: {
+      name: 'CBSeoAeo',
+      role: 'Generates the Core30 keyword set, AEO answer targets, and content cluster architecture.',
+      requiredInputs: ['BrandScript / positioning lock (Stage 4 artifact)', 'Business definition (Stage 1 artifact)'],
+      expectedOutputs: ['Core30 keyword set', 'AEO answer targets', 'Content cluster architecture'],
+      executionMode: 'api',
+    },
     artifact: {
       type: 'seo_strategy',
       title: 'DAP SEO / AEO / Core30 Strategy',
@@ -440,6 +456,13 @@ Do not begin Stage 7 until owner approval is recorded.`,
     blockers: [
       'Stage 5 (SEO / AEO / Core30) must be owner-approved before Stage 6 directive is issued',
     ],
+    externalTool: {
+      name: 'CBDesignEngine',
+      role: 'Generates page architecture wireframes and content brief templates for all DAP page types.',
+      requiredInputs: ['Discovery audit (Stage 2)', 'Truth schema (Stage 3)', 'BrandScript (Stage 4)', 'Core30 strategy (Stage 5)'],
+      expectedOutputs: ['Page type contracts', 'Wireframe order per page type', 'Content brief templates'],
+      executionMode: 'manual',
+    },
   },
 
   // ── Stage 7: Build / QA / Launch ──────────────────────────────────────────

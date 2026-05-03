@@ -18,7 +18,7 @@ import { readFileSync, existsSync } from 'fs'
 import { resolve } from 'path'
 import React from 'react'
 import { StageDetailPage } from './StageDetailPage'
-import { getDapStageGateBySlug } from '@/lib/cb-control-center/dapStageGates'
+import { getDapStageGateBySlug, DAP_STAGE_GATES } from '@/lib/cb-control-center/dapStageGates'
 import { DAP_BUSINESS_DEFINITION } from '@/lib/cb-control-center/dapBusinessDefinition'
 
 const ROOT = resolve(__dirname, '../..')
@@ -284,5 +284,59 @@ describe('Group 5 — Stage detail route file', () => {
       'utf8'
     )
     expect(src).not.toContain('<StageGatePanel')
+  })
+})
+
+// ─── Group 6: External tool card ──────────────────────────────────────────────
+
+describe('Group 6 — External tool card', () => {
+  it('stage 4 renders External Tool section with StoryBrand Coach', () => {
+    const stage = DAP_STAGE_GATES.find(s => s.stageNumber === 4)!
+    const html = renderToString(React.createElement(StageDetailPage, { stage }))
+    expect(html).toContain('External Tool')
+    expect(html).toContain('StoryBrand Coach')
+    expect(html).toContain('manual')
+  })
+
+  it('stage 5 renders External Tool section with CBSeoAeo', () => {
+    const stage = DAP_STAGE_GATES.find(s => s.stageNumber === 5)!
+    const html = renderToString(React.createElement(StageDetailPage, { stage }))
+    expect(html).toContain('External Tool')
+    expect(html).toContain('CBSeoAeo')
+    expect(html).toContain('api')
+  })
+
+  it('stage 6 renders External Tool section with CBDesignEngine', () => {
+    const stage = DAP_STAGE_GATES.find(s => s.stageNumber === 6)!
+    const html = renderToString(React.createElement(StageDetailPage, { stage }))
+    expect(html).toContain('External Tool')
+    expect(html).toContain('CBDesignEngine')
+    expect(html).toContain('manual')
+  })
+
+  it('stage 1 does not render External Tool section', () => {
+    const stage = DAP_STAGE_GATES.find(s => s.stageNumber === 1)!
+    const html = renderToString(React.createElement(StageDetailPage, { stage }))
+    expect(html).not.toContain('data-external-tool')
+  })
+
+  it('stage 7 does not render External Tool section', () => {
+    const stage = DAP_STAGE_GATES.find(s => s.stageNumber === 7)!
+    const html = renderToString(React.createElement(StageDetailPage, { stage }))
+    expect(html).not.toContain('data-external-tool')
+  })
+
+  it('external tool card has data-external-tool marker for stages 4, 5, 6', () => {
+    for (const n of [4, 5, 6]) {
+      const stage = DAP_STAGE_GATES.find(s => s.stageNumber === n)!
+      const html = renderToString(React.createElement(StageDetailPage, { stage }))
+      expect(html, `stage ${n} missing data-external-tool`).toContain('data-external-tool')
+    }
+  })
+
+  it('external tool card shows reference-only footer text', () => {
+    const stage = DAP_STAGE_GATES.find(s => s.stageNumber === 4)!
+    const html = renderToString(React.createElement(StageDetailPage, { stage }))
+    expect(html).toContain('Reference only')
   })
 })

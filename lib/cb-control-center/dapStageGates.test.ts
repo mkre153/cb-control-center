@@ -94,6 +94,43 @@ describe('Group 1 — Schema integrity', () => {
       expect(Array.isArray(s.requiredApprovals), `${s.stageId} missing requiredApprovals`).toBe(true)
     }
   })
+
+  it('stages 4, 5, 6 have externalTool populated', () => {
+    for (const n of [4, 5, 6]) {
+      const s = DAP_STAGE_GATES.find(g => g.stageNumber === n)!
+      expect(s.externalTool, `stage ${n} missing externalTool`).toBeDefined()
+      expect(s.externalTool!.name, `stage ${n} externalTool.name empty`).toBeTruthy()
+      expect(s.externalTool!.role, `stage ${n} externalTool.role empty`).toBeTruthy()
+      expect(s.externalTool!.requiredInputs.length, `stage ${n} externalTool.requiredInputs empty`).toBeGreaterThan(0)
+      expect(s.externalTool!.expectedOutputs.length, `stage ${n} externalTool.expectedOutputs empty`).toBeGreaterThan(0)
+      expect(['manual', 'prefilled-launch', 'api']).toContain(s.externalTool!.executionMode)
+    }
+  })
+
+  it('stages 1, 2, 3, 7 do not have externalTool', () => {
+    for (const n of [1, 2, 3, 7]) {
+      const s = DAP_STAGE_GATES.find(g => g.stageNumber === n)!
+      expect(s.externalTool, `stage ${n} should not have externalTool`).toBeUndefined()
+    }
+  })
+
+  it('stage 4 externalTool is StoryBrand Coach with executionMode manual', () => {
+    const s = DAP_STAGE_GATES.find(g => g.stageNumber === 4)!
+    expect(s.externalTool!.name).toBe('StoryBrand Coach')
+    expect(s.externalTool!.executionMode).toBe('manual')
+  })
+
+  it('stage 5 externalTool is CBSeoAeo with executionMode api', () => {
+    const s = DAP_STAGE_GATES.find(g => g.stageNumber === 5)!
+    expect(s.externalTool!.name).toBe('CBSeoAeo')
+    expect(s.externalTool!.executionMode).toBe('api')
+  })
+
+  it('stage 6 externalTool is CBDesignEngine with executionMode manual', () => {
+    const s = DAP_STAGE_GATES.find(g => g.stageNumber === 6)!
+    expect(s.externalTool!.name).toBe('CBDesignEngine')
+    expect(s.externalTool!.executionMode).toBe('manual')
+  })
 })
 
 // ─── Group 2: Status invariants ───────────────────────────────────────────────

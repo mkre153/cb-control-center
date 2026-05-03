@@ -115,6 +115,14 @@ export interface CbccStageRequirement {
   description?: string
 }
 
+export interface CbccExternalToolRef {
+  name: string
+  role: string
+  requiredInputs: ReadonlyArray<string>
+  expectedOutputs: ReadonlyArray<string>
+  executionMode: 'manual' | 'prefilled-launch' | 'api'
+}
+
 export interface CbccStageDefinition {
   id: CbccStageId
   order: number
@@ -133,6 +141,7 @@ export interface CbccStageDefinition {
   // can render. The locked-stage UX (StageDetailPage) labels it as a preview
   // when the stage has unresolved blockers, regardless of content.
   directive?: string
+  externalTool?: CbccExternalToolRef
   requirements: ReadonlyArray<CbccStageRequirement>
   requiredApprovals: ReadonlyArray<string>
 }
