@@ -8,21 +8,19 @@ interface Props {
   rightPanel: React.ReactNode
 }
 
+const LEFT_WIDTH = 224
+
 export function CbccWorkspaceLayout({ leftPanel, centerPanel, rightPanel }: Props) {
-  const [leftWidth, setLeftWidth] = useState(224)
-  const [centerWidth, setCenterWidth] = useState(380)
+  const [centerWidth, setCenterWidth] = useState(560)
 
   const startResize = useCallback(
-    (column: 'left' | 'center', e: React.MouseEvent) => {
+    (e: React.MouseEvent) => {
       e.preventDefault()
       const startX = e.clientX
-      const startWidth = column === 'left' ? leftWidth : centerWidth
-      const min = column === 'left' ? 140 : 240
-      const max = column === 'left' ? 480 : 720
-      const setter = column === 'left' ? setLeftWidth : setCenterWidth
+      const startWidth = centerWidth
 
       const onMove = (ev: MouseEvent) => {
-        setter(Math.min(max, Math.max(min, startWidth + ev.clientX - startX)))
+        setCenterWidth(Math.min(860, Math.max(320, startWidth + ev.clientX - startX)))
       }
       const onUp = () => {
         document.removeEventListener('mousemove', onMove)
@@ -36,30 +34,24 @@ export function CbccWorkspaceLayout({ leftPanel, centerPanel, rightPanel }: Prop
       document.addEventListener('mousemove', onMove)
       document.addEventListener('mouseup', onUp)
     },
-    [leftWidth, centerWidth],
+    [centerWidth],
   )
 
   return (
     <div className="flex flex-1 overflow-hidden">
-      {/* Left */}
-      <div style={{ width: leftWidth }} className="shrink-0 flex flex-col overflow-y-auto">
+      {/* Left — fixed width */}
+      <div style={{ width: LEFT_WIDTH }} className="shrink-0 flex flex-col overflow-y-auto border-r border-gray-800">
         {leftPanel}
       </div>
-
-      {/* Divider 1 */}
-      <div
-        onMouseDown={e => startResize('left', e)}
-        className="w-1 shrink-0 bg-gray-800 hover:bg-blue-500/50 cursor-col-resize transition-colors"
-      />
 
       {/* Center */}
       <div style={{ width: centerWidth }} className="shrink-0 flex flex-col">
         {centerPanel}
       </div>
 
-      {/* Divider 2 */}
+      {/* Divider — center/right only */}
       <div
-        onMouseDown={e => startResize('center', e)}
+        onMouseDown={startResize}
         className="w-1 shrink-0 bg-gray-800 hover:bg-blue-500/50 cursor-col-resize transition-colors"
       />
 
