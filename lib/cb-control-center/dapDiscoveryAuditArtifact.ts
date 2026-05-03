@@ -21,18 +21,22 @@ export interface DapDiscoveryAuditArtifact extends StageArtifact {
 export const DAP_DISCOVERY_AUDIT_PLACEHOLDER: DapDiscoveryAuditArtifact = {
   type: 'discovery_audit',
   title: 'DAP Discovery Audit',
-  status: 'not_started',
+  status: 'reviewable',
   summary:
-    'Systematic audit of the existing DAP site: scrape all pages, inventory content, audit copy for compliance, audit CTAs, audit SEO/AEO signals, identify stale or broken assets, and produce a customer-facing change summary.',
+    'Live crawl of https://dentaladvantageplan.vercel.app (2026-05-03). 15 pages audited. 8 copy findings (4 critical truth-rule violations on /v5 homepage). No structured data on any page. Dual landing-page architecture (/ and /v5). All current URLs use legacy /v5/ prefix.',
   subDeliverables: [
-    'Current site scrape — full page inventory with URLs and response codes',
-    'Pages inventory — list of all public routes with word count and purpose',
-    'Copy audit — identify copy that contradicts truth rules or uses forbidden claims',
-    'CTA audit — map all calls-to-action and verify against allowed CTA list',
-    'SEO/AEO audit — title tags, meta descriptions, H1s, schema markup, answer boxes',
-    'Design audit — visual consistency, layout issues, mobile breakpoints',
-    'Stale/broken assets — broken links, outdated images, legacy v5 routes',
-    'Customer-facing change summary — plain-language summary of what patients will see changed',
+    'Current site scrape — 15 pages crawled at https://dentaladvantageplan.vercel.app',
+    'Pages inventory — 15 content/utility pages classified by purpose',
+    'Copy audit — 8 findings: 4 critical (Rule 4 + Rule 5 violations on /v5), 4 warnings',
+    'CTA audit — 10 CTAs mapped: 8 allowed, 2 review_needed (cost calculator language)',
+    'SEO/AEO audit — 15 pages: 6 titles over 60 chars, 1 missing H1, 0 with structured data, 2 duplicate title pairs',
+    'Design audit — 7 issues: 2 JS-rendered headings, 3 rendering artifacts, 1 missing H1, 1 dual landing page conflict',
+    'Stale/broken assets — legacy /v5/ prefix on all pages; UUID-based practice URLs will break on rebuild',
+    'Customer-facing change summary — included in dapDiscoveryAudit.ts',
   ],
-  sourceFiles: [],
+  currentSiteUrl: 'https://dentaladvantageplan.vercel.app',
+  pagesInventoried: 15,
+  customerFacingChangeSummary:
+    'The rebuild will sharpen focus on finding DAP-participating dentists, replace the /v5/ URL prefix with clean paths, add server-rendered search and calculator pages, and switch practice pages to readable name-based URLs.',
+  sourceFiles: ['lib/cb-control-center/dapDiscoveryAudit.ts'],
 }

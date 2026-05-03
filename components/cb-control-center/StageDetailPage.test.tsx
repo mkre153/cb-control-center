@@ -216,8 +216,8 @@ describe('Group 4 — Pending stages render not-started state', () => {
     return renderToString(React.createElement(StageDetailPage, { stage }))
   }
 
-  it('Stage 2 (discovery-audit, not_started) renders artifact with not_started status', () => {
-    expect(render('2-discovery-audit')).toContain('data-artifact-status="not_started"')
+  it('Stage 2 (discovery-audit, not_started) renders artifact with reviewable status after audit submitted', () => {
+    expect(render('2-discovery-audit')).toContain('data-artifact-status="reviewable"')
   })
 
   it('Stage 2 does NOT show approved state', () => {
