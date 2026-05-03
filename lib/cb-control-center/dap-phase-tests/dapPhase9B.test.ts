@@ -96,6 +96,7 @@ describe('Production route allowlist', () => {
     const KNOWN_ROUTES = [
       'app/api/dap/requests/route.ts',
       'app/api/businesses/dental-advantage-plan/stages/review/route.ts',
+      'app/api/cbcc/chat/route.ts',
     ]
     const unexpected = routeFiles.filter(r => !KNOWN_ROUTES.some(k => r.endsWith(k)))
     expect(unexpected).toHaveLength(0)
@@ -466,6 +467,7 @@ describe('Boundary preservation', () => {
     const KNOWN_ROUTES = [
       'app/api/dap/requests/route.ts',
       'app/api/businesses/dental-advantage-plan/stages/review/route.ts',
+      'app/api/cbcc/chat/route.ts',
     ]
     const unexpected = routeFiles.filter(r => !KNOWN_ROUTES.some(k => r.endsWith(k)))
     expect(unexpected).toHaveLength(0)

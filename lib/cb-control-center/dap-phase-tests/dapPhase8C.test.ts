@@ -242,6 +242,7 @@ describe('API route inventory (Phase 9C added POST /api/dap/requests)', () => {
     const KNOWN_ROUTES = [
       'app/api/dap/requests/route.ts',
       'app/api/businesses/dental-advantage-plan/stages/review/route.ts',
+      'app/api/cbcc/chat/route.ts',
     ]
     const unexpected = routes.filter(r => !KNOWN_ROUTES.some(k => r.endsWith(k)))
     expect(unexpected).toHaveLength(0)
