@@ -84,6 +84,29 @@ Wave 1 complete. Two files deferred:
 ### Wave 2 — Summary
 Wave 2 extracted 6 files. 3 files deferred pending ProviderStatus extraction (dapDisplayRules, dapPublicUxRules, dapCmsTypes). 1 file deferred pending types co-extraction (dapClientBuilderBillingRules). All deferred files are pure — no runtime blockers, only import-graph blockers.
 
+## Wave 3A Addendum — ProviderStatus/PublicClaimLevel Extraction
+
+- Source inspected: `lib/cb-control-center/types.ts`
+- New DAP-owned type file: `lib/dap/registry/dapProviderStatusTypes.ts`
+- Types extracted: `ProviderStatus`, `PublicClaimLevel`
+- Importers updated (11 files):
+  - `lib/dap/site/dapCmsTypes.ts` — `@/lib/cb-control-center/types` → `../registry/dapProviderStatusTypes` (key fix: breaks lib/dap → lib/cb-control-center dependency)
+  - `lib/cb-control-center/dapDisplayRules.ts` — `./types` → `../dap/registry/dapProviderStatusTypes`
+  - `lib/cb-control-center/dapPublicUxRules.ts` — `./types` → `../dap/registry/dapProviderStatusTypes`
+  - `lib/cb-control-center/dapDisplayRules.test.ts` — `./types` → `../dap/registry/dapProviderStatusTypes`
+  - `lib/cb-control-center/dap-phase-tests/dapPhase2.test.ts` — `../types` → `../../dap/registry/dapProviderStatusTypes`
+  - `components/dap-preview/ProviderStatusBadge.tsx` — alias → `@/lib/dap/registry/dapProviderStatusTypes`
+  - `lib/cb-control-center/source/dapSourceTypes.ts` — `../types` → `../../dap/registry/dapProviderStatusTypes`
+  - `lib/cb-control-center/source/dapSourceAdapter.ts` — `../types` → `../../dap/registry/dapProviderStatusTypes`
+  - `lib/cb-control-center/dapCmsExport.ts` — split import (kept MockDentistPage from `./types`)
+  - `components/cb-control-center/tabs/TemplatesTab.tsx` — split import (kept DentistTemplateId from `@/lib/cb-control-center/types`)
+  - `lib/cb-control-center/mockData.ts` — unchanged, imports via re-export in types.ts (imports many co-located CBCC types alongside ProviderStatus)
+- Compatibility re-export: YES — `lib/cb-control-center/types.ts` re-exports both types from `lib/dap/registry/dapProviderStatusTypes`. Required so types.ts can still reference them in `ProviderStatusSpec`, `DentistPageTemplate`, `MockDentistPage` interfaces, and for mockData.ts which bundles ProviderStatus with 13 other CBCC types in one import.
+- Files intentionally not moved: `lib/cb-control-center/dapDisplayRules.ts`, `lib/cb-control-center/dapCmsTypes.ts`, `lib/cb-control-center/dapPublicUxRules.ts`
+- Boundary result: `lib/dap/**` has zero imports from `lib/cb-control-center/**` (verified by grep)
+- Validation: typecheck clean, 6260 tests pass, 0 lint errors, 50 warnings (baseline)
+- Next wave: Wave 3B should re-inspect dapDisplayRules, dapCmsTypes, dapPublicUxRules — all three were blocked only on ProviderStatus/PublicClaimLevel which are now in lib/dap/.
+
 ### Wave 3 — Read models and content
 - dapMemberStatusReadModel
 - dapMemberStatusPreview

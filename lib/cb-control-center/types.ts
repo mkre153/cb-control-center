@@ -1,3 +1,7 @@
+import type { ProviderStatus, PublicClaimLevel } from '@/lib/dap/registry/dapProviderStatusTypes'
+
+export type { ProviderStatus, PublicClaimLevel }
+
 export type PipelineStatus = "complete" | "in_progress" | "blocked" | "not_started"
 export type BlockerSeverity = "high" | "medium" | "low"
 
@@ -127,19 +131,11 @@ export interface InitialInput {
 
 // v0.3 — Provider status + dentist page template system
 
-export type ProviderStatus =
-  | 'confirmed_dap_provider'  // signed agreement on file → Template A, Path 1
-  | 'not_confirmed'           // in dataset, not verified as offering DAP → Template B, Path 2
-  | 'recruitment_requested'   // patient submitted a request → Template B, Path 3
-  | 'pending_confirmation'    // DAP outreach made — patient still sees Path 2
-  | 'declined'                // practice declined DAP — internal only, no patient-facing template
-
 export type DentistTemplateId = 'confirmed-provider' | 'unconfirmed-practice' | 'internal_only'
 
 // Separate verification gates — each is independent of provider_status
 export type PricingStatus = 'verified' | 'unverified' | 'partial'
 export type OfferTermsStatus = 'complete' | 'incomplete' | 'pending'
-export type PublicClaimLevel = 'full' | 'limited' | 'none'
 
 export interface ProviderStatusSpec {
   status: ProviderStatus

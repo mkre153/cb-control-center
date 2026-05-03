@@ -1,4 +1,4 @@
-import type { ProviderStatus, PublicClaimLevel } from '../types'
+import type { ProviderStatus, PublicClaimLevel } from '../../dap/registry/dapProviderStatusTypes'
 
 // ─── DAP CMS Source Record Types ─────────────────────────────────────────────
 //

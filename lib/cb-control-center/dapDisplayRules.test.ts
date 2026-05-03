@@ -14,7 +14,7 @@ import {
   HERO_SUBHEAD,
   FORBIDDEN_HERO_PHRASES,
 } from './dapDisplayRules'
-import type { ProviderStatus } from './types'
+import type { ProviderStatus } from '../dap/registry/dapProviderStatusTypes'
 
 const ALL_STATUSES: ProviderStatus[] = [
   'confirmed_dap_provider',

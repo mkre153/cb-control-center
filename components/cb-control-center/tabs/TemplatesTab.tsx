@@ -1,4 +1,5 @@
-import type { ProviderStatus, DentistTemplateId } from '@/lib/cb-control-center/types'
+import type { ProviderStatus } from '@/lib/dap/registry/dapProviderStatusTypes'
+import type { DentistTemplateId } from '@/lib/cb-control-center/types'
 import { DENTIST_PAGE_TEMPLATES, MOCK_DENTIST_PAGES } from '@/lib/cb-control-center/mockData'
 
 const STATUS_LABELS: Record<ProviderStatus, { label: string; className: string; template: DentistTemplateId }> = {

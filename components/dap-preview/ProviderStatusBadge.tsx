@@ -1,5 +1,5 @@
 import { shouldShowConfirmedBadge } from '@/lib/cb-control-center/dapDisplayRules'
-import type { ProviderStatus } from '@/lib/cb-control-center/types'
+import type { ProviderStatus } from '@/lib/dap/registry/dapProviderStatusTypes'
 
 interface ProviderStatusBadgeProps {
   status: ProviderStatus

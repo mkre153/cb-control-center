@@ -22,7 +22,7 @@ import {
   DAP_CITY_PAGES,
 } from '../dapCityData'
 import { MOCK_DENTIST_PAGES } from '../mockData'
-import type { ProviderStatus } from '../types'
+import type { ProviderStatus } from '../../dap/registry/dapProviderStatusTypes'
 
 // ─── Test 1: City pages do not use forbidden directory claims ─────────────────
 

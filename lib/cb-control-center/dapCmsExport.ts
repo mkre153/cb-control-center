@@ -1,4 +1,5 @@
-import type { MockDentistPage, ProviderStatus } from './types'
+import type { MockDentistPage } from './types'
+import type { ProviderStatus } from '../dap/registry/dapProviderStatusTypes'
 import {
   shouldShowJoinCta,
   shouldShowPricingClaims,
