@@ -8,8 +8,8 @@ interface Props {
   rightPanel: React.ReactNode
 }
 
-const LEFT_WIDTH = 360
-const RIGHT_WIDTH = 390
+const LEFT_WIDTH = 270
+const RIGHT_WIDTH = 585
 
 export function CbccWorkspaceLayout({ leftPanel, centerPanel, rightPanel }: Props) {
   const [rightWidth, setRightWidth] = useState(RIGHT_WIDTH)
