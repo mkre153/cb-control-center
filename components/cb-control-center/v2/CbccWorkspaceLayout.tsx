@@ -8,10 +8,10 @@ interface Props {
   rightPanel: React.ReactNode
 }
 
-const LEFT_WIDTH = 224
+const LEFT_WIDTH = 280
 
 export function CbccWorkspaceLayout({ leftPanel, centerPanel, rightPanel }: Props) {
-  const [centerWidth, setCenterWidth] = useState(560)
+  const [centerWidth, setCenterWidth] = useState(480)
 
   const startResize = useCallback(
     (e: React.MouseEvent) => {
