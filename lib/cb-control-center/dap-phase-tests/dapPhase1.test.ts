@@ -7,7 +7,7 @@ import {
 } from '../dapPublicSectionModels'
 import { exportDapCmsSnapshot } from '../dapCmsExport'
 import { getLaunchReadiness } from '../launchReadiness'
-import { FORBIDDEN_HERO_PHRASES, FORBIDDEN_CITY_CLAIMS } from '../dapDisplayRules'
+import { FORBIDDEN_HERO_PHRASES, FORBIDDEN_CITY_CLAIMS } from '../../dap/registry/dapDisplayRules'
 import type { EnrichedBlocker } from '../types'
 
 // ─── Section model safety ───────────────────────────────────────────────────

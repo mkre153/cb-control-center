@@ -8,7 +8,7 @@ import {
   REQUEST_EXPECTATION_COPY,
   DIRECTORY_ROUTE,
   REQUEST_FLOW_ROUTE,
-} from '@/lib/cb-control-center/dapDisplayRules'
+} from '@/lib/dap/registry/dapDisplayRules'
 import { ProviderStatusBadge } from './ProviderStatusBadge'
 import type { MockDentistPage } from '@/lib/cb-control-center/types'
 

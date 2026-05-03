@@ -4,7 +4,7 @@ import { resolve } from 'path'
 import { exportDapCmsSnapshot, exportDentistPageToCmsRecord } from '../dapCmsExport'
 import { MOCK_DENTIST_PAGES } from '../mockData'
 import { ALL_PREVIEW_PRACTICES } from '../dapCityData'
-import { REQUEST_FLOW_ROUTE } from '../dapDisplayRules'
+import { REQUEST_FLOW_ROUTE } from '../../dap/registry/dapDisplayRules'
 
 const snapshot = exportDapCmsSnapshot()
 const ROOT     = process.cwd()  // /Users/mike/cb-control-center when running npx vitest

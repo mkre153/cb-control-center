@@ -1,4 +1,4 @@
-import type { ProviderStatus } from '../dap/registry/dapProviderStatusTypes'
+import type { ProviderStatus } from './dapProviderStatusTypes'
 import type {
   DapAvailabilityState,
   DapPublicCtaType,
@@ -18,7 +18,7 @@ import type {
   DapTreatmentPageCtaModel,
   DapSearchResultsInput,
   DapSearchResultsModel,
-} from '../dap/site/dapPublicUxTypes'
+} from '../site/dapPublicUxTypes'
 
 // ─── Availability State Mapping ───────────────────────────────────────────────
 

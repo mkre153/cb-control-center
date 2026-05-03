@@ -24,7 +24,7 @@ import {
   getHomepageHeroModel,
   getDecisionPageCtaModel,
   getTreatmentPageCtaModel,
-} from '../dapPublicUxRules'
+} from '../../dap/registry/dapPublicUxRules'
 import {
   getDefaultSavingsEducationModel,
 } from '../dapPublicSectionModels'

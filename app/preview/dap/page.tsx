@@ -4,7 +4,7 @@ import { ProviderResultCard } from '@/components/dap-preview/ProviderResultCard'
 import { HowItWorksSection } from '@/components/dap-preview/HowItWorksSection'
 import { SearchStateDisplay } from '@/components/dap-preview/SearchStateDisplay'
 import { exportDapCmsSnapshot } from '@/lib/cb-control-center/dapCmsExport'
-import { REQUEST_FLOW_ROUTE } from '@/lib/cb-control-center/dapDisplayRules'
+import { REQUEST_FLOW_ROUTE } from '@/lib/dap/registry/dapDisplayRules'
 import Link from 'next/link'
 
 export default function DAPDirectoryPage() {

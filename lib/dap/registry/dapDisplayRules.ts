@@ -1,4 +1,4 @@
-import type { ProviderStatus } from '../dap/registry/dapProviderStatusTypes'
+import type { ProviderStatus } from './dapProviderStatusTypes'
 
 // ─── Route constants ──────────────────────────────────────────────────────────
 

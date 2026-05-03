@@ -38,7 +38,7 @@ import {
   getPrimaryCtaForPractice,
   getSecondaryCtaForPractice,
   getAllowedPublicClaimsForPractice,
-} from '../dapPublicUxRules'
+} from '../../dap/registry/dapPublicUxRules'
 import {
   getDefaultHowItWorksModel,
   getDefaultFaqModel,

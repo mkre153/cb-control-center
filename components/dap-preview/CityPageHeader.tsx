@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { getCityHeading, getCitySubheading } from '@/lib/cb-control-center/dapCityData'
-import { DIRECTORY_ROUTE, REQUEST_FLOW_ROUTE } from '@/lib/cb-control-center/dapDisplayRules'
+import { DIRECTORY_ROUTE, REQUEST_FLOW_ROUTE } from '@/lib/dap/registry/dapDisplayRules'
 
 interface CityPageHeaderProps {
   cityName: string

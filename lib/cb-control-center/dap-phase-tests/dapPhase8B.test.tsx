@@ -42,7 +42,7 @@ import {
   getPrimaryCtaForPractice,
   getSecondaryCtaForPractice,
   getAllowedPublicClaimsForPractice,
-} from '../dapPublicUxRules'
+} from '../../dap/registry/dapPublicUxRules'
 import {
   getDefaultHowItWorksModel,
   getDefaultFaqModel,
@@ -352,7 +352,7 @@ describe('Route boundary and safety attributes unchanged after Phase 8B', () => 
   })
 
   it('no new API routes were added in Phase 8B (no route.ts files)', () => {
-    const src = readFileSync(resolve(ROOT, 'lib/cb-control-center/dapPublicUxRules.ts'), 'utf8')
+    const src = readFileSync(resolve(ROOT, 'lib/dap/registry/dapPublicUxRules.ts'), 'utf8')
     expect(src).not.toMatch(/\bfetch\s*\(/)
     expect(src).not.toContain('/api/')
   })

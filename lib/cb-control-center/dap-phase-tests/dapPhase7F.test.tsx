@@ -31,7 +31,7 @@ import {
   getPrimaryCtaForPractice,
   getSecondaryCtaForPractice,
   getAllowedPublicClaimsForPractice,
-} from '../dapPublicUxRules'
+} from '../../dap/registry/dapPublicUxRules'
 import type {
   DapProviderCardModel,
   DapGateState,

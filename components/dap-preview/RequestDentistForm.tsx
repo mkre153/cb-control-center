@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { REQUEST_EXPECTATION_COPY, DIRECTORY_ROUTE } from '@/lib/cb-control-center/dapDisplayRules'
+import { REQUEST_EXPECTATION_COPY, DIRECTORY_ROUTE } from '@/lib/dap/registry/dapDisplayRules'
 import Link from 'next/link'
 
 export function RequestDentistForm() {

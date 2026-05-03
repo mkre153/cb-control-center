@@ -18,7 +18,7 @@ import {
   getAllowedPublicClaimsForPractice,
   getPrimaryCtaForPractice,
   getSecondaryCtaForPractice,
-} from '../dapPublicUxRules'
+} from '../../dap/registry/dapPublicUxRules'
 import type {
   DapCtaModel,
   DapProviderCardModel,

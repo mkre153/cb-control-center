@@ -1,4 +1,4 @@
-import { FORBIDDEN_CITY_CLAIMS } from './dapDisplayRules'
+import { FORBIDDEN_CITY_CLAIMS } from '../dap/registry/dapDisplayRules'
 import type {
   DapCmsSnapshot,
   DapPracticeCmsRecord,

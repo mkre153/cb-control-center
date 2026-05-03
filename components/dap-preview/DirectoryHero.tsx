@@ -1,4 +1,4 @@
-import { HERO_HEADLINE, HERO_SUBHEAD, REQUEST_FLOW_ROUTE } from '@/lib/cb-control-center/dapDisplayRules'
+import { HERO_HEADLINE, HERO_SUBHEAD, REQUEST_FLOW_ROUTE } from '@/lib/dap/registry/dapDisplayRules'
 import Link from 'next/link'
 
 export function DirectoryHero() {

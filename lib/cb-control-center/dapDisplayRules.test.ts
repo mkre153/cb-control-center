@@ -13,7 +13,7 @@ import {
   HERO_HEADLINE,
   HERO_SUBHEAD,
   FORBIDDEN_HERO_PHRASES,
-} from './dapDisplayRules'
+} from '../dap/registry/dapDisplayRules'
 import type { ProviderStatus } from '../dap/registry/dapProviderStatusTypes'
 
 const ALL_STATUSES: ProviderStatus[] = [

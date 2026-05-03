@@ -4,7 +4,7 @@ import { resolve } from 'path'
 import { buildDapCmsSnapshotFromSource } from '../source/dapSourceAdapter'
 import { exportDapCmsSnapshot, buildMockSourceBundle } from '../dapCmsExport'
 import { runClaimQA } from '../dapClaimQA'
-import { REQUEST_FLOW_ROUTE } from '../dapDisplayRules'
+import { REQUEST_FLOW_ROUTE } from '../../dap/registry/dapDisplayRules'
 import {
   SAFE_FIXTURE_BUNDLE,
   FIXTURE_CONFIRMED_PRACTICE,

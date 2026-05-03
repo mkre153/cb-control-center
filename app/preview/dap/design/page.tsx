@@ -13,7 +13,7 @@ import {
   getPrimaryCtaForPractice,
   getSecondaryCtaForPractice,
   getAllowedPublicClaimsForPractice,
-} from '@/lib/cb-control-center/dapPublicUxRules'
+} from '@/lib/dap/registry/dapPublicUxRules'
 import {
   getDefaultHowItWorksModel,
   getDefaultFaqModel,

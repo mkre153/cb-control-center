@@ -1,7 +1,7 @@
 import Link from 'next/link'
-import { DIRECTORY_ROUTE } from '@/lib/cb-control-center/dapDisplayRules'
+import { DIRECTORY_ROUTE } from '@/lib/dap/registry/dapDisplayRules'
 import { DapRequestFlowPreview } from '@/components/cb-control-center/dap-public/DapRequestFlowPreview'
-import { getRequestFlowModel } from '@/lib/cb-control-center/dapPublicUxRules'
+import { getRequestFlowModel } from '@/lib/dap/registry/dapPublicUxRules'
 
 export default function RequestDentistPage() {
   const model = getRequestFlowModel('city_availability')

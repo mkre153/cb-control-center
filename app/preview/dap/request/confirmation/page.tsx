@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { REQUEST_CONFIRMATION_COPY, DIRECTORY_ROUTE } from '@/lib/cb-control-center/dapDisplayRules'
+import { REQUEST_CONFIRMATION_COPY, DIRECTORY_ROUTE } from '@/lib/dap/registry/dapDisplayRules'
 
 export default function RequestConfirmationPage() {
   return (

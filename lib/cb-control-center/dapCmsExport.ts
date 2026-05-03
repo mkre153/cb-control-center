@@ -12,7 +12,7 @@ import {
   REQUEST_FLOW_ROUTE,
   getPatientCtaForSearchState,
   getSearchResultState,
-} from './dapDisplayRules'
+} from '../dap/registry/dapDisplayRules'
 import {
   getDentistSlug,
   getCityHeading,

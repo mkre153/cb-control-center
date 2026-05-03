@@ -10,7 +10,7 @@ import {
   FORBIDDEN_CITY_CLAIMS,
   MOCK_SEARCH_SCENARIOS,
   type SearchResultState,
-} from '../dapDisplayRules'
+} from '../../dap/registry/dapDisplayRules'
 import {
   getCityHeading,
   getCitySubheading,

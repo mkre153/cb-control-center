@@ -3,7 +3,7 @@ import { readFileSync } from 'fs'
 import { resolve } from 'path'
 import { exportDapCmsSnapshot, exportTreatmentPagesToCmsRecords } from '../dapCmsExport'
 import { runClaimQA } from '../dapClaimQA'
-import { REQUEST_FLOW_ROUTE } from '../dapDisplayRules'
+import { REQUEST_FLOW_ROUTE } from '../../dap/registry/dapDisplayRules'
 
 const snapshot = exportDapCmsSnapshot()
 const ROOT     = process.cwd()

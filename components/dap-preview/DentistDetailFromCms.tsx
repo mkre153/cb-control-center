@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { DIRECTORY_ROUTE, REQUEST_FLOW_ROUTE } from '@/lib/cb-control-center/dapDisplayRules'
+import { DIRECTORY_ROUTE, REQUEST_FLOW_ROUTE } from '@/lib/dap/registry/dapDisplayRules'
 import { ProviderStatusBadge } from './ProviderStatusBadge'
 import type { DapDentistPageCmsRecord } from '@/lib/dap/site/dapCmsTypes'
 

@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { exportDapCmsSnapshot } from '@/lib/cb-control-center/dapCmsExport'
-import { getDecisionPageCtaModel } from '@/lib/cb-control-center/dapPublicUxRules'
+import { getDecisionPageCtaModel } from '@/lib/dap/registry/dapPublicUxRules'
 import {
   getDefaultSavingsEducationModel,
   getDefaultComparisonModel,

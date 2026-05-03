@@ -8,7 +8,7 @@ import {
 } from './dapCmsExport'
 import { MOCK_DENTIST_PAGES } from './mockData'
 import { ALL_PREVIEW_PRACTICES } from './dapCityData'
-import { REQUEST_FLOW_ROUTE, FORBIDDEN_CITY_CLAIMS } from './dapDisplayRules'
+import { REQUEST_FLOW_ROUTE, FORBIDDEN_CITY_CLAIMS } from '../dap/registry/dapDisplayRules'
 
 const declined    = MOCK_DENTIST_PAGES.find(p => p.provider_status === 'declined')!
 const confirmed   = MOCK_DENTIST_PAGES.find(p => p.provider_status === 'confirmed_dap_provider')!

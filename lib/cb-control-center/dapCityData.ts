@@ -1,5 +1,5 @@
 import { MOCK_DENTIST_PAGES } from './mockData'
-import { isPublicOfferCard } from './dapDisplayRules'
+import { isPublicOfferCard } from '../dap/registry/dapDisplayRules'
 import type { MockDentistPage } from './types'
 
 // ─── Extended mock practices ──────────────────────────────────────────────────

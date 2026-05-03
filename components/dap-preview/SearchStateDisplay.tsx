@@ -3,7 +3,7 @@ import {
   MOCK_SEARCH_SCENARIOS,
   getPatientCtaForSearchState,
   type SearchResultState,
-} from '@/lib/cb-control-center/dapDisplayRules'
+} from '@/lib/dap/registry/dapDisplayRules'
 
 const STATE_CONFIG: Record<SearchResultState, { dot: string; label: string; border: string }> = {
   confirmed_available: { dot: 'bg-green-500', label: 'Path 1',  border: 'border-green-200' },

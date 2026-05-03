@@ -9,7 +9,7 @@ import {
   REQUEST_FLOW_ROUTE,
   getSearchResultState,
   getPatientCtaForSearchState,
-} from '../dapDisplayRules'
+} from '../../dap/registry/dapDisplayRules'
 import { getCityHeading, getCitySubheading } from '../dapCityData'
 import type {
   DapPracticeCmsRecord,

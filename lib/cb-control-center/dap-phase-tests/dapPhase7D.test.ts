@@ -16,7 +16,7 @@ import {
   getTreatmentPageCtaModel,
   getRequestFlowModel,
   getCityPageModel,
-} from '../dapPublicUxRules'
+} from '../../dap/registry/dapPublicUxRules'
 import type { DapGateState } from '../../dap/site/dapPublicUxTypes'
 
 // ─── Gate state helpers ───────────────────────────────────────────────────────

@@ -1,4 +1,4 @@
-import { REQUEST_FLOW_ROUTE } from '../dapDisplayRules'
+import { REQUEST_FLOW_ROUTE } from '../../dap/registry/dapDisplayRules'
 import type {
   DapPracticeSourceRecord,
   DapCitySourceRecord,

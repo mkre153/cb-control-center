@@ -107,6 +107,26 @@ Wave 2 extracted 6 files. 3 files deferred pending ProviderStatus extraction (da
 - Validation: typecheck clean, 6260 tests pass, 0 lint errors, 50 warnings (baseline)
 - Next wave: Wave 3B should re-inspect dapDisplayRules, dapCmsTypes, dapPublicUxRules — all three were blocked only on ProviderStatus/PublicClaimLevel which are now in lib/dap/.
 
+## Wave 3B Addendum — Display Rules and Public UX Rules
+
+- Files moved:
+  - `lib/cb-control-center/dapDisplayRules.ts` → `lib/dap/registry/dapDisplayRules.ts`
+  - `lib/cb-control-center/dapPublicUxRules.ts` → `lib/dap/registry/dapPublicUxRules.ts`
+- Internal imports fixed in moved files:
+  - `dapDisplayRules.ts`: `'../dap/registry/dapProviderStatusTypes'` → `'./dapProviderStatusTypes'`
+  - `dapPublicUxRules.ts`: ProviderStatus path → `'./dapProviderStatusTypes'`; `'../dap/site/dapPublicUxTypes'` → `'../site/dapPublicUxTypes'`
+- Inbound importers updated (29 total for dapDisplayRules, 13 for dapPublicUxRules):
+  - 11 `components/dap-preview/` files — alias `@/lib/cb-control-center/dapDisplayRules` → `@/lib/dap/registry/dapDisplayRules`
+  - 2 `app/preview/dap/` files — alias updated
+  - `app/preview/dap/request/page.tsx` — both aliases updated
+  - 6 `lib/cb-control-center/` files — relative `'./dapDisplayRules'` → `'../dap/registry/dapDisplayRules'`
+  - 9 `lib/cb-control-center/source/` and `dap-phase-tests/` files — relative `'../dapDisplayRules'` → `'../../dap/registry/dapDisplayRules'`
+  - 3 `app/` alias files for dapPublicUxRules
+  - 7 `dap-phase-tests/` test files for dapPublicUxRules
+- Path assertions updated: `dapPhase8B.test.tsx:355` — `lib/cb-control-center/dapPublicUxRules.ts` → `lib/dap/registry/dapPublicUxRules.ts`
+- Boundary result: `lib/dap/**` has zero imports from `lib/cb-control-center/**` (verified by grep)
+- Validation: typecheck clean, 6260 tests pass, 0 lint errors, 50 warnings (baseline)
+
 ### Wave 3 — Read models and content
 - dapMemberStatusReadModel
 - dapMemberStatusPreview
