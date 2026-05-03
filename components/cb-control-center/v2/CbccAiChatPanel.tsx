@@ -78,8 +78,8 @@ export function CbccAiChatPanel({
     <div className="flex flex-col h-full">
       <div className="px-4 py-3 border-b border-gray-800 flex items-center gap-2 shrink-0">
         <div className={`w-2 h-2 rounded-full transition-colors ${streaming ? 'bg-green-400 animate-pulse' : 'bg-blue-500'}`} />
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest">AI Assistant</p>
-        {streaming && <span className="text-xs text-gray-500 ml-auto">Thinking...</span>}
+        <p className="text-sm font-semibold text-gray-400 uppercase tracking-widest">AI Assistant</p>
+        {streaming && <span className="text-sm text-gray-500 ml-auto">Thinking...</span>}
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
@@ -107,7 +107,7 @@ export function CbccAiChatPanel({
           return (
             <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div
-                className={`max-w-[88%] rounded-lg px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap ${
+                className={`max-w-[88%] rounded-lg px-4 py-3 text-base leading-relaxed whitespace-pre-wrap ${
                   msg.role === 'user'
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-800 text-gray-300'
@@ -132,7 +132,7 @@ export function CbccAiChatPanel({
               key={i}
               onClick={() => send(prompt)}
               disabled={streaming}
-              className="text-xs px-2.5 py-1.5 rounded-md border border-gray-700 text-gray-400 hover:border-blue-600 hover:text-blue-400 transition-colors bg-gray-900 disabled:opacity-40"
+              className="text-sm px-3 py-2 rounded-md border border-gray-700 text-gray-400 hover:border-blue-600 hover:text-blue-400 transition-colors bg-gray-900 disabled:opacity-40"
             >
               {prompt}
             </button>
@@ -140,21 +140,21 @@ export function CbccAiChatPanel({
         </div>
       )}
 
-      <div className="px-4 py-3 border-t border-gray-800 shrink-0">
-        <div className="flex gap-2">
-          <input
-            type="text"
+      <div className="px-4 py-4 border-t border-gray-800 shrink-0">
+        <div className="flex gap-3 items-end">
+          <textarea
+            rows={3}
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }}
             placeholder={projectSlug ? 'Ask about this stage...' : 'Select a project first...'}
             disabled={!projectSlug || streaming}
-            className="flex-1 rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-blue-600 disabled:opacity-40"
+            className="flex-1 rounded-md border border-gray-700 bg-gray-800 px-4 py-3 text-base text-white placeholder:text-gray-500 focus:outline-none focus:border-blue-600 disabled:opacity-40 resize-none leading-relaxed"
           />
           <button
             onClick={() => send()}
             disabled={!input.trim() || !projectSlug || streaming}
-            className="px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white text-sm rounded-md transition-colors min-w-[56px]"
+            className="px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white text-base rounded-md transition-colors min-w-[72px]"
           >
             {streaming ? '...' : 'Send'}
           </button>
