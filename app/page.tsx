@@ -1,5 +1,6 @@
 import { CbccNav } from '@/components/cb-control-center/v2/CbccNav'
 import { CbccProjectWorkspaceLeft } from '@/components/cb-control-center/v2/CbccProjectWorkspaceLeft'
+import { CbccAiChatPanel } from '@/components/cb-control-center/v2/CbccAiChatPanel'
 import { CbccProjectPipelinePanel } from '@/components/cb-control-center/v2/CbccProjectPipelinePanel'
 import { listProjects } from '@/lib/cb-control-center/cbccProjectRepository'
 import { mergeProjectsWithEngineBacked } from '@/lib/cb-control-center/cbccEngineRegistry'
@@ -17,10 +18,19 @@ export default async function CBControlCenterHomePage({
     <div className="h-screen bg-gray-950 font-sans text-gray-300 flex flex-col overflow-hidden">
       <CbccNav />
       <div className="flex flex-1 overflow-hidden">
-        <div className="w-72 shrink-0 border-r border-gray-800 flex flex-col overflow-y-auto">
+
+        {/* Left — project list */}
+        <div className="w-56 shrink-0 border-r border-gray-800 flex flex-col overflow-y-auto">
           <CbccProjectWorkspaceLeft projects={projects} selectedSlug={selectedSlug ?? null} />
         </div>
-        <div className="flex-1 overflow-y-auto px-8 py-6">
+
+        {/* Center — AI chat */}
+        <div className="w-[380px] shrink-0 border-r border-gray-800 flex flex-col">
+          <CbccAiChatPanel projectSlug={selectedSlug ?? null} />
+        </div>
+
+        {/* Right — pipeline (Step 0 + stages 1–7) */}
+        <div className="flex-1 min-w-0 overflow-y-auto px-8 py-6">
           {selectedSlug ? (
             <CbccProjectPipelinePanel slug={selectedSlug} />
           ) : (
@@ -29,6 +39,7 @@ export default async function CBControlCenterHomePage({
             </div>
           )}
         </div>
+
       </div>
     </div>
   )
