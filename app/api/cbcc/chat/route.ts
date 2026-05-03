@@ -1,11 +1,11 @@
-import Anthropic from '@anthropic-ai/sdk'
+import { spawn } from 'child_process'
 import { NextRequest, NextResponse } from 'next/server'
 import { isEngineBackedSlug } from '@/lib/cb-control-center/cbccEngineRegistry'
 import { DAP_STAGE_GATES, type DapStageStatus } from '@/lib/cb-control-center/dapStageGates'
 import { getDapStageApprovalStore } from '@/lib/cb-control-center/dapStageApprovalStore'
 import { getProjectBySlug, getProjectStages } from '@/lib/cb-control-center/cbccProjectRepository'
 
-const anthropic = new Anthropic()
+const CLAUDE_BIN = process.env.CLAUDE_BIN ?? '/Users/mike/.local/bin/claude'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -28,7 +28,13 @@ function statusLabel(s: DapStageStatus): string {
   return map[s] ?? s
 }
 
-async function buildDapSystemPrompt(): Promise<string> {
+function formatHistory(messages: Message[]): string {
+  return messages
+    .map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`)
+    .join('\n\n')
+}
+
+async function buildDapPrompt(messages: Message[]): Promise<string> {
   const persistedApprovals = await getDapStageApprovalStore().list().catch(() => [])
   const persistedByNumber = new Map(persistedApprovals.map(p => [p.stageNumber, p]))
 
@@ -62,7 +68,9 @@ ${activeGate.blockers.length > 0 ? `\n### Blockers\n${activeGate.blockers.map(b 
 `
     : '\nAll stages approved.'
 
-  return `You are the AI advisor for the Dental Advantage Plan (DAP) build pipeline inside CB Control Center.
+  return `[SYSTEM CONTEXT — CB Control Center AI Assistant]
+
+You are the AI advisor for the Dental Advantage Plan (DAP) build pipeline inside CB Control Center.
 
 DAP is a dental membership marketplace — NOT dental insurance. It connects patients with participating practices that offer a membership plan giving members discounted rates on dental procedures.
 
@@ -74,13 +82,16 @@ Your role:
 
 ## Build Pipeline
 ${pipelineSummary}
-${activeSection}`
+${activeSection}
+[CONVERSATION]
+
+${formatHistory(messages)}`
 }
 
-async function buildProjectSystemPrompt(slug: string): Promise<string> {
+async function buildProjectPrompt(slug: string, messages: Message[]): Promise<string> {
   const project = await getProjectBySlug(slug).catch(() => null)
   if (!project) {
-    return `You are the CB Control Center AI assistant. The project "${slug}" could not be loaded.`
+    return `[SYSTEM CONTEXT]\nYou are the CB Control Center AI assistant. The project "${slug}" could not be loaded.\n\n[CONVERSATION]\n\n${formatHistory(messages)}`
   }
 
   const stages = await getProjectStages(project.id).catch(() => [])
@@ -99,14 +110,20 @@ Forbidden claims: ${project.charterJson.forbiddenClaims.join('; ')}
 `
     : ''
 
-  return `You are the AI advisor for the "${project.name}" build pipeline inside CB Control Center.
+  return `[SYSTEM CONTEXT — CB Control Center AI Assistant]
+
+You are the AI advisor for the "${project.name}" build pipeline inside CB Control Center.
 
 Business type: ${project.businessType ?? 'Not specified'}
 Primary goal: ${project.primaryGoal ?? 'Not specified'}
 Target customer: ${project.targetCustomer ?? 'Not specified'}
 ${charterSection}
 ## Build Pipeline
-${pipelineSummary}`
+${pipelineSummary}
+
+[CONVERSATION]
+
+${formatHistory(messages)}`
 }
 
 export async function POST(req: NextRequest) {
@@ -117,41 +134,25 @@ export async function POST(req: NextRequest) {
 
   const { projectSlug, messages } = body as { projectSlug: string; messages: Message[] }
 
-  const systemPrompt = isEngineBackedSlug(projectSlug)
-    ? await buildDapSystemPrompt()
-    : await buildProjectSystemPrompt(projectSlug)
+  const prompt = isEngineBackedSlug(projectSlug)
+    ? await buildDapPrompt(messages)
+    : await buildProjectPrompt(projectSlug, messages)
 
-  const anthropicMessages: Anthropic.MessageParam[] = messages.map(m => ({
-    role: m.role,
-    content: m.content,
-  }))
-
-  const stream = anthropic.messages.stream({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 1024,
-    system: systemPrompt,
-    messages: anthropicMessages,
+  const child = spawn(CLAUDE_BIN, ['-p', prompt], {
+    env: { ...process.env, PATH: `/Users/mike/.local/bin:${process.env.PATH ?? ''}` },
   })
 
+  child.stdin.end()
+
   const readable = new ReadableStream<Uint8Array>({
-    async start(controller) {
-      const encoder = new TextEncoder()
-      try {
-        for await (const event of stream) {
-          if (
-            event.type === 'content_block_delta' &&
-            event.delta.type === 'text_delta'
-          ) {
-            controller.enqueue(encoder.encode(event.delta.text))
-          }
-        }
-        controller.close()
-      } catch (err) {
-        controller.error(err)
-      }
+    start(controller) {
+      child.stdout.on('data', (chunk: Buffer) => controller.enqueue(chunk))
+      child.stdout.on('end', () => controller.close())
+      child.stderr.on('data', () => {})
+      child.on('error', err => controller.error(err))
     },
     cancel() {
-      stream.abort()
+      child.kill()
     },
   })
 
