@@ -25,7 +25,7 @@ export default async function CBControlCenterHomePage({
   )
 
   const contextNode = selectedSlug ? <CbccAiContextPanel slug={selectedSlug} /> : undefined
-  const suggestedPrompts = selectedSlug ? getCbccSuggestedPrompts(selectedSlug) : undefined
+  const suggestedPrompts = selectedSlug ? await getCbccSuggestedPrompts(selectedSlug) : undefined
 
   return (
     <div className="h-screen bg-gray-950 font-sans text-gray-300 flex flex-col overflow-hidden">

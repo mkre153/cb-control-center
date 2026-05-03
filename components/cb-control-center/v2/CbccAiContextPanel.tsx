@@ -2,6 +2,7 @@ import { DAP_BUSINESS_DEFINITION } from '@/lib/cb-control-center/dapBusinessDefi
 import { DAP_STAGE_GATES, type DapStageGate, type DapStageStatus } from '@/lib/cb-control-center/dapStageGates'
 import { isEngineBackedSlug } from '@/lib/cb-control-center/cbccEngineRegistry'
 import { getProjectBySlug, getProjectStages } from '@/lib/cb-control-center/cbccProjectRepository'
+import { getDapStageApprovalStore } from '@/lib/cb-control-center/dapStageApprovalStore'
 
 // ─── Suggested prompts per next stage ─────────────────────────────────────────
 
@@ -50,7 +51,7 @@ const STAGE_PROMPTS: Record<number, string[]> = {
   ],
 }
 
-export function getCbccSuggestedPrompts(slug: string): string[] {
+export async function getCbccSuggestedPrompts(slug: string): Promise<string[]> {
   if (!isEngineBackedSlug(slug)) {
     return [
       'What does the next stage require?',
@@ -58,7 +59,9 @@ export function getCbccSuggestedPrompts(slug: string): string[] {
       'What evidence is needed for the next approval?',
     ]
   }
-  const next = DAP_STAGE_GATES.find(g => !g.approvedByOwner)
+  const persistedApprovals = await getDapStageApprovalStore().list().catch(() => [])
+  const persistedByNumber = new Map(persistedApprovals.map(p => [p.stageNumber, p]))
+  const next = DAP_STAGE_GATES.find(g => !(persistedByNumber.get(g.stageNumber)?.approved ?? g.approvedByOwner))
   if (!next) return ['How do I verify the full build is complete?', 'What comes after Stage 7?']
   return STAGE_PROMPTS[next.stageNumber] ?? []
 }
@@ -123,6 +126,20 @@ function statusLabel(s: DapStageStatus): string {
 }
 
 // ─── DAP sections ──────────────────────────────────────────────────────────────
+
+function DapLastApprovedStage({ stage }: { stage: DapStageGate }) {
+  const short = stage.title.replace(/Stage \d+ — /, '')
+  return (
+    <div>
+      <SectionHeader label="Last Approved Stage" dot="green" />
+      <div className="flex items-baseline justify-between gap-2">
+        <p className="text-sm font-semibold text-white">Stage {stage.stageNumber} — {short}</p>
+        <span className="text-xs text-green-400 shrink-0">Approved{stage.approvedAt ? ` ${stage.approvedAt}` : ''}</span>
+      </div>
+      <p className="text-xs text-gray-500 mt-1 leading-relaxed">{stage.description}</p>
+    </div>
+  )
+}
 
 function DapCharterDigest({ lastApproved }: { lastApproved: DapStageGate | null }) {
   const d = DAP_BUSINESS_DEFINITION
@@ -231,15 +248,28 @@ function DapRecommendation({ stage }: { stage: DapStageGate }) {
 export async function CbccAiContextPanel({ slug }: { slug: string }) {
   // ── DAP engine-backed ──────────────────────────────────────────────────────
   if (isEngineBackedSlug(slug)) {
-    const lastApproved =
-      [...DAP_STAGE_GATES]
-        .filter(g => g.approvedByOwner)
-        .sort((a, b) => b.stageNumber - a.stageNumber)[0] ?? null
-    const nextStage = DAP_STAGE_GATES.find(g => !g.approvedByOwner) ?? null
+    const persistedApprovals = await getDapStageApprovalStore().list().catch(() => [])
+    const persistedByNumber = new Map(persistedApprovals.map(p => [p.stageNumber, p]))
+
+    const effectiveGates = DAP_STAGE_GATES.map(g => ({
+      ...g,
+      approvedByOwner: persistedByNumber.get(g.stageNumber)?.approved ?? g.approvedByOwner,
+      approvedAt: persistedByNumber.get(g.stageNumber)?.approvedAt ?? g.approvedAt,
+    }))
+
+    const approvedGates = effectiveGates.filter(g => g.approvedByOwner).sort((a, b) => b.stageNumber - a.stageNumber)
+    const lastApproved = approvedGates[0] ?? null
+    const nextStage = effectiveGates.find(g => !g.approvedByOwner) ?? null
 
     return (
       <div className="px-4 py-5 space-y-5">
         <DapCharterDigest lastApproved={lastApproved} />
+        {lastApproved && (
+          <>
+            <Divider />
+            <DapLastApprovedStage stage={lastApproved} />
+          </>
+        )}
         {nextStage ? (
           <>
             <Divider />
