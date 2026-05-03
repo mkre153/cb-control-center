@@ -54,7 +54,7 @@ export function CbccCharterPanel({ project }: Props) {
 
         {/* Header */}
         <div data-charter-panel className="mb-8">
-          <h2 className="text-2xl font-bold text-white">Step 0 — Project Charter</h2>
+          <h2 className="text-2xl font-bold text-white">Project Onboarding</h2>
           <p
             data-charter-status
             className="mt-1 text-sm text-gray-400"
@@ -70,7 +70,7 @@ export function CbccCharterPanel({ project }: Props) {
         {/* Blocked banner */}
         {!project.charterApproved && (
           <div className="mb-6 px-4 py-3 rounded-md bg-amber-900/20 border border-amber-700/40 text-sm text-amber-400">
-            <strong>Blocked:</strong> Step 0 Project Charter requires owner approval before Stage 1 can begin.
+            <strong>Blocked:</strong> Project Onboarding requires owner approval before Stage 1 can begin.
           </div>
         )}
 

@@ -107,7 +107,7 @@ export function CbccProjectIntakeForm({
         <p className="mt-1 text-sm text-gray-400">
           {prefillState?.ok
             ? 'Review the pre-filled details and edit before submitting.'
-            : 'Complete Step 0 — Project Charter intake'}
+            : 'Complete Project Onboarding'}
         </p>
       </div>
       <div className="px-6 pb-6 pt-4">

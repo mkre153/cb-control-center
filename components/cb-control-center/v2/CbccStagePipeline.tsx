@@ -56,7 +56,7 @@ function Step0OverviewCard({
 
       <div className="flex-1 min-w-0 space-y-0.5">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-sm font-semibold text-gray-900">Step 0 — Project Charter</span>
+          <span className="text-sm font-semibold text-gray-900">Project Onboarding</span>
           <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold ${STEP_0_STYLE[state]}`}>
             {STEP_0_LABEL[state]}
           </span>
