@@ -28,6 +28,10 @@ export interface DapCopyAuditFinding {
   excerpt: string
   ruleNumber?: 1 | 2 | 3 | 4 | 5 | 6 | 7
   severity: 'critical' | 'warning'
+  // Stage 3 handoff fields — required on critical findings, optional on warnings
+  violatedTruthRules?: readonly string[]
+  whyItMatters?: string
+  requiredRemediation?: string
 }
 
 export interface DapCtaFinding {
@@ -62,6 +66,11 @@ export interface DapDesignAuditNote {
   severity: 'high' | 'medium' | 'low'
 }
 
+export interface DapStage3Implications {
+  readonly criticalClaimsToRemove: readonly string[]
+  readonly requiredRemediationNotes: readonly string[]
+}
+
 export interface DapDiscoveryAuditResult {
   auditedAt: string
   targetBaseUrl: string
@@ -73,5 +82,15 @@ export interface DapDiscoveryAuditResult {
   designAuditNotes: ReadonlyArray<DapDesignAuditNote>
   brokenAssets: ReadonlyArray<DapBrokenAsset>
   customerFacingChangeSummary: string
+  stage3Implications?: DapStage3Implications
   agentNotes?: string
+}
+
+export interface DapDiscoveryAuditStage3Handoff {
+  readonly auditStatus: 'reviewable' | 'approved'
+  readonly criticalFindingCount: number
+  readonly stage3ApprovalBlockedUntilReviewed: boolean
+  readonly forbiddenClaimsToCarryForward: readonly string[]
+  readonly requiredStage3RemediationNotes: readonly string[]
+  readonly sourceAuditId?: string
 }

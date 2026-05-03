@@ -11,6 +11,7 @@ import { describe, it, expect } from 'vitest'
 import {
   DAP_DISCOVERY_AUDIT,
   DAP_DISCOVERY_AUDIT_STATUS,
+  DAP_STAGE3_HANDOFF,
   type DapDiscoveryAuditStatus,
 } from './dapDiscoveryAudit'
 import type {
@@ -99,6 +100,122 @@ describe('DAP Discovery Audit — Phase B (after agent runs)', () => {
 
   it.skipIf(DAP_DISCOVERY_AUDIT === null)('customerFacingChangeSummary is non-empty', () => {
     expect(DAP_DISCOVERY_AUDIT!.customerFacingChangeSummary.trim().length).toBeGreaterThan(0)
+  })
+})
+
+// ─── Stage 3 Handoff: claim carryover and traceability ───────────────────────
+
+describe('DAP Discovery Audit — Stage 3 Handoff', () => {
+  it('exports DAP_STAGE3_HANDOFF', () => {
+    expect(DAP_STAGE3_HANDOFF).toBeDefined()
+  })
+
+  it('handoff auditStatus is reviewable', () => {
+    expect(DAP_STAGE3_HANDOFF.auditStatus).toBe('reviewable')
+  })
+
+  it('handoff criticalFindingCount is greater than 0', () => {
+    expect(DAP_STAGE3_HANDOFF.criticalFindingCount).toBeGreaterThan(0)
+  })
+
+  it('handoff stage3ApprovalBlockedUntilReviewed is true', () => {
+    expect(DAP_STAGE3_HANDOFF.stage3ApprovalBlockedUntilReviewed).toBe(true)
+  })
+
+  it('handoff forbiddenClaimsToCarryForward includes universal "25% off" claim', () => {
+    const text = DAP_STAGE3_HANDOFF.forbiddenClaimsToCarryForward.join(' ')
+    expect(text).toContain('25%')
+  })
+
+  it('handoff forbiddenClaimsToCarryForward includes "100% covered" claim', () => {
+    const text = DAP_STAGE3_HANDOFF.forbiddenClaimsToCarryForward.join(' ')
+    expect(text).toContain('100%')
+  })
+
+  it('handoff forbiddenClaimsToCarryForward includes "same coverage framework"', () => {
+    const text = DAP_STAGE3_HANDOFF.forbiddenClaimsToCarryForward.join(' ').toLowerCase()
+    expect(text).toContain('same coverage framework')
+  })
+
+  it('handoff forbiddenClaimsToCarryForward includes "DAP practices commit" language', () => {
+    const text = DAP_STAGE3_HANDOFF.forbiddenClaimsToCarryForward.join(' ').toLowerCase()
+    expect(text).toContain('dap practices commit')
+  })
+
+  it('handoff has at least 4 required remediation notes', () => {
+    expect(DAP_STAGE3_HANDOFF.requiredStage3RemediationNotes.length).toBeGreaterThanOrEqual(4)
+  })
+
+  it('handoff sourceAuditId references stage-02-discovery-audit', () => {
+    expect(DAP_STAGE3_HANDOFF.sourceAuditId).toBe('stage-02-discovery-audit')
+  })
+
+  // Critical finding traceability — runs only when audit is populated
+
+  it.skipIf(DAP_DISCOVERY_AUDIT === null)('all critical copy findings include violatedTruthRules', () => {
+    const criticals = DAP_DISCOVERY_AUDIT!.copyAuditFindings.filter(f => f.severity === 'critical')
+    expect(criticals.length, 'no critical findings found').toBeGreaterThan(0)
+    for (const f of criticals) {
+      expect(f.violatedTruthRules, `critical finding on ${f.url} missing violatedTruthRules`).toBeDefined()
+      expect(f.violatedTruthRules!.length, `critical finding on ${f.url} has empty violatedTruthRules`).toBeGreaterThan(0)
+    }
+  })
+
+  it.skipIf(DAP_DISCOVERY_AUDIT === null)('all critical copy findings include requiredRemediation', () => {
+    const criticals = DAP_DISCOVERY_AUDIT!.copyAuditFindings.filter(f => f.severity === 'critical')
+    for (const f of criticals) {
+      expect(f.requiredRemediation, `critical finding on ${f.url} missing requiredRemediation`).toBeTruthy()
+    }
+  })
+
+  it.skipIf(DAP_DISCOVERY_AUDIT === null)('all critical copy findings include whyItMatters', () => {
+    const criticals = DAP_DISCOVERY_AUDIT!.copyAuditFindings.filter(f => f.severity === 'critical')
+    for (const f of criticals) {
+      expect(f.whyItMatters, `critical finding on ${f.url} missing whyItMatters`).toBeTruthy()
+    }
+  })
+
+  it.skipIf(DAP_DISCOVERY_AUDIT === null)('audit contains finding with universal "25% off" claim text', () => {
+    const found = DAP_DISCOVERY_AUDIT!.copyAuditFindings.some(f => f.excerpt.includes('25%'))
+    expect(found, 'no finding contains "25%" claim text').toBe(true)
+  })
+
+  it.skipIf(DAP_DISCOVERY_AUDIT === null)('audit contains finding with "100% covered" claim text', () => {
+    const found = DAP_DISCOVERY_AUDIT!.copyAuditFindings.some(f => f.excerpt.includes('100% covered'))
+    expect(found, 'no finding contains "100% covered" claim text').toBe(true)
+  })
+
+  it.skipIf(DAP_DISCOVERY_AUDIT === null)('audit contains finding with "same coverage framework" claim text', () => {
+    const found = DAP_DISCOVERY_AUDIT!.copyAuditFindings.some(f =>
+      f.excerpt.toLowerCase().includes('same coverage framework')
+    )
+    expect(found, 'no finding contains "same coverage framework" text').toBe(true)
+  })
+
+  it.skipIf(DAP_DISCOVERY_AUDIT === null)('audit contains finding with "DAP practices commit to 25%" claim text', () => {
+    const found = DAP_DISCOVERY_AUDIT!.copyAuditFindings.some(f =>
+      f.excerpt.toLowerCase().includes('dap practices commit to 25%')
+    )
+    expect(found, 'no finding contains "dap practices commit to 25%" text').toBe(true)
+  })
+
+  it.skipIf(DAP_DISCOVERY_AUDIT === null)('stage3Implications is defined and populated', () => {
+    expect(DAP_DISCOVERY_AUDIT!.stage3Implications).toBeDefined()
+    expect(DAP_DISCOVERY_AUDIT!.stage3Implications!.criticalClaimsToRemove.length).toBeGreaterThan(0)
+    expect(DAP_DISCOVERY_AUDIT!.stage3Implications!.requiredRemediationNotes.length).toBeGreaterThan(0)
+  })
+
+  it.skipIf(DAP_DISCOVERY_AUDIT === null)('stage3Implications criticalClaimsToRemove includes all 4 key violation patterns', () => {
+    const claims = DAP_DISCOVERY_AUDIT!.stage3Implications!.criticalClaimsToRemove.join(' ').toLowerCase()
+    expect(claims).toContain('25%')
+    expect(claims).toContain('100%')
+    expect(claims).toContain('same coverage framework')
+    expect(claims).toContain('dap practices commit')
+  })
+
+  it.skipIf(DAP_DISCOVERY_AUDIT === null)('handoff criticalFindingCount matches actual critical findings', () => {
+    const actual = DAP_DISCOVERY_AUDIT!.copyAuditFindings.filter(f => f.severity === 'critical').length
+    expect(DAP_STAGE3_HANDOFF.criticalFindingCount).toBe(actual)
   })
 })
 

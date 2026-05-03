@@ -29,6 +29,7 @@ import {
 } from './dapStageGates'
 import { DAP_BUILD_LEDGER } from './dapBuildLedger'
 import { DAP_BUSINESS_DEFINITION } from './dapBusinessDefinition'
+import { DAP_STAGE3_HANDOFF } from './dapDiscoveryAudit'
 
 const VALID_STATUSES: DapStageStatus[] = [
   'not_started', 'ready_for_directive', 'directive_issued', 'in_progress',
@@ -673,5 +674,95 @@ describe('Group 10 — Artifact integrity', () => {
 
   it('Stage 1 artifact sourceFiles includes dapBusinessDefinition.ts', () => {
     expect(DAP_BUSINESS_DEFINITION.sourceFiles.join(' ')).toContain('dapBusinessDefinition.ts')
+  })
+})
+
+// ─── Group 11: Stage 2 → Stage 3 Handoff ─────────────────────────────────────
+
+describe('Group 11 — Stage 2 → Stage 3 Handoff', () => {
+  it('Stage 3 directive explicitly references the live-site "25% off" violation', () => {
+    const s3 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-03-truth-schema')!
+    expect(s3.directive).toContain('25% off')
+  })
+
+  it('Stage 3 directive explicitly references "same coverage framework" violation', () => {
+    const s3 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-03-truth-schema')!
+    expect(s3.directive).toContain('same coverage framework')
+  })
+
+  it('Stage 3 directive explicitly references "DAP practices commit" violation', () => {
+    const s3 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-03-truth-schema')!
+    expect(s3.directive).toContain('DAP practices commit')
+  })
+
+  it('Stage 3 directive explicitly references "100% covered" violation', () => {
+    const s3 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-03-truth-schema')!
+    expect(s3.directive).toContain('100% covered')
+  })
+
+  it('Stage 3 directive references Stage 2 discovery audit as source', () => {
+    const s3 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-03-truth-schema')!
+    expect(s3.directive).toContain('dapDiscoveryAudit.ts')
+  })
+
+  it('Stage 3 requiredApprovals reference Stage 2 critical findings', () => {
+    const s3 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-03-truth-schema')!
+    const approvalText = s3.requiredApprovals.join(' ').toLowerCase()
+    expect(approvalText).toContain('stage 2')
+    expect(approvalText).toContain('25%')
+  })
+
+  it('Stage 3 requiredApprovals acknowledge guaranteed savings prohibition', () => {
+    const s3 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-03-truth-schema')!
+    const approvalText = s3.requiredApprovals.join(' ').toLowerCase()
+    expect(approvalText).toContain('guaranteed savings')
+  })
+
+  it('Stage 3 requiredApprovals acknowledge "same coverage framework" prohibition', () => {
+    const s3 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-03-truth-schema')!
+    const approvalText = s3.requiredApprovals.join(' ').toLowerCase()
+    expect(approvalText).toContain('same coverage framework')
+  })
+
+  it('Stage 3 handoff sourceAuditId matches stage-02-discovery-audit', () => {
+    expect(DAP_STAGE3_HANDOFF.sourceAuditId).toBe('stage-02-discovery-audit')
+  })
+
+  it('Stage 3 handoff has at least 5 critical findings surfaced', () => {
+    expect(DAP_STAGE3_HANDOFF.criticalFindingCount).toBeGreaterThanOrEqual(5)
+  })
+
+  it('Stage 4 remains not_started and locked', () => {
+    const s4 = DAP_STAGE_GATES.find(g => g.stageNumber === 4)!
+    expect(s4.status).toBe('not_started')
+    expect(s4.approvedByOwner).toBe(false)
+    expect(s4.nextStageUnlocked).toBe(false)
+  })
+
+  it('Stage 5 remains not_started and locked', () => {
+    const s5 = DAP_STAGE_GATES.find(g => g.stageNumber === 5)!
+    expect(s5.status).toBe('not_started')
+    expect(s5.approvedByOwner).toBe(false)
+    expect(s5.nextStageUnlocked).toBe(false)
+  })
+
+  it('Stage 6 remains not_started and locked', () => {
+    const s6 = DAP_STAGE_GATES.find(g => g.stageNumber === 6)!
+    expect(s6.status).toBe('not_started')
+    expect(s6.approvedByOwner).toBe(false)
+    expect(s6.nextStageUnlocked).toBe(false)
+  })
+
+  it('Stage 7 remains not_started and locked', () => {
+    const s7 = DAP_STAGE_GATES.find(g => g.stageNumber === 7)!
+    expect(s7.status).toBe('not_started')
+    expect(s7.approvedByOwner).toBe(false)
+  })
+
+  it('Stage 3 remains awaiting_owner_approval (not yet approved)', () => {
+    const s3 = DAP_STAGE_GATES.find(s => s.stageId === 'stage-03-truth-schema')!
+    expect(s3.status).toBe('awaiting_owner_approval')
+    expect(s3.approvedByOwner).toBe(false)
+    expect(s3.nextStageUnlocked).toBe(false)
   })
 })

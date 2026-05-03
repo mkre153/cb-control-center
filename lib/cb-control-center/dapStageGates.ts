@@ -207,16 +207,30 @@ Do not begin Stage 3 (Truth Schema) until owner approval is recorded.`,
     directiveIssued: true,
     directive: `# Stage 3 — Truth Schema Review
 
-Review the DAP truth schema contracts in CBCC. Confirm all 7 truth rules, forbidden claims,
-and required disclaimers are accurate and complete.
+IMPORTANT — Stage 2 Discovery Audit critical findings must be reviewed before approving Stage 3.
+
+The live DAP site (https://dentaladvantageplan.vercel.app) contains 5 critical truth-rule
+violations that Stage 3 approval must explicitly acknowledge. These claims must NOT carry
+forward into the rebuilt site:
+
+  1. "25% off everything else" (in /v5 meta description) — violates Rule 4 + Rule 5
+  2. "Diagnostics 100% covered. Preventive 100% covered." (/v5 homepage) — violates Rule 4
+  3. "The same coverage framework at every participating practice" (/v5) — violates Rule 4 + Rule 6
+  4. "DAP practices commit to 25%" (/v5) — violates Rule 4
+  5. "Most patients come out ahead" (on / and /v5) — violates Rule 5
+
+Approving Stage 3 confirms: the 7 truth rules govern ALL downstream positioning, SEO/AEO,
+page briefs, and build output. Universal discount claims, coverage-framework language,
+DAP-enforced-pricing language, and guaranteed-savings claims are permanently prohibited.
 
 Files to review:
 - lib/cb-control-center/cbSeoAeoLlmFormatting.ts (74 tests passing)
 - lib/cb-control-center/cbSeoAeoPageGeneration.ts (243 tests passing)
+- lib/cb-control-center/dapDiscoveryAudit.ts (Stage 2 critical findings — source of truth)
 
 Evidence submitted: 74 + 243 tests passing. No new implementation required.
 
-Stop condition: confirm review complete, then update CBCC stage gate:
+To approve, update this stage gate:
   status: 'approved'
   approvedByOwner: true
   approvedAt: '<today>'
@@ -248,6 +262,9 @@ Do not begin Stage 4 until this approval is recorded.`,
       'Forbidden claims list accepted',
       'Required disclaimers accepted',
       'Test coverage accepted',
+      'Stage 2 critical finding acknowledged: universal "25% off" and "100% covered" claims must not carry forward',
+      'Stage 2 critical finding acknowledged: "same coverage framework" and "DAP practices commit to 25%" must not carry forward',
+      'Stage 2 critical finding acknowledged: guaranteed savings language ("most patients come out ahead") must not carry forward',
     ],
     blockers: [],
     ledgerPhaseId: 'phase-18c-page-generation-contract',
