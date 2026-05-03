@@ -2862,5 +2862,66 @@ out of scope.
 
 This thread ends here.
 
+---
+
+## DAP Registry Migration — Final Freeze (Wave 5C)
+
+**Status: FROZEN. Last migration commit: `c49d7a5`.**
+
+The future architectural reorganization anticipated in Part 22 (§4, "the other ~70 files") is now complete and closed. The full migration record is in `docs/dap-domain-extraction.md`.
+
+### What moved
+
+| Zone | Files |
+|---|---|
+| `lib/dap/registry/` | 14 files — provider status types, display rules, public UX rules, participation/onboarding/offer terms/request types + rules, member status rules |
+| `lib/dap/membership/` | 4 files — member status types, public types, read model, preview |
+| `lib/dap/site/` | 3 files — CMS types, public UX types, public section models |
+
+### Wave summaries
+
+**Wave 5A** — Inspected `dapActionCatalogTypes`, `dapActionCatalog`, `dapActionAvailabilityRules`. Moved none. All three are CBCC operator affordance layer: they answer "what can the CBCC operator click?" not "what does the DAP product define?" The `DapActionAvailabilityContext` composite type aggregates CBCC admin pipeline state alongside DAP domain values — moving it would inject CBCC concepts into `lib/dap/`.
+
+**Wave 5B** — Inspected `dapPublicSectionModels`, `dapPageBriefBuilder`. Moved `dapPublicSectionModels` → `lib/dap/site/`: single import from `lib/dap/site/dapPublicUxTypes`, purely public page content (FAQ, comparison, how-it-works, savings), no CBCC concepts. Retained `dapPageBriefBuilder`: imports `cbSeoAeoPageGeneration` and `cbSeoAeoLlmFormatting` (both CBCC); builds BrandScript/SEO/AEO/wireframe briefs for content operators.
+
+### What stays in lib/cb-control-center/ and why
+
+| Category | Files | Reason |
+|---|---|---|
+| Action catalog / operator affordances | `dapActionCatalogTypes`, `dapActionCatalog`, `dapActionAvailabilityRules` | Define and compute what the CBCC operator can do — not DAP domain rules |
+| Stage gates / stage review | `dapStageGates`, `dapStageActions`, `dapStageApprovalStore`, `dapStageStateResolver`, `dapStageAiReviewLegacy`, `dapStageReviewer` | Supabase + AI review transport; CBCC stage machinery |
+| Admin decisioning | `dapAdminDecision*`, `dapAdminRejection*`, `dapAdminEventTimeline` | Admin workflow orchestration |
+| Communication pipeline | `dapCommunication*`, `dapMemberStatusEmail*`, `dapPracticeDecisionEmail*`, `dapRejectionEmailQueue`, `dapMemberAdminSummary` | Notification copy, dispatch readiness, approval pipeline |
+| Page brief / editorial generation | `dapPageBriefBuilder` | BrandScript/SEO/AEO briefing for content operators |
+| Supabase-touching runtime | `dapRequestActions`, `dapRequestPersistence`, `dapRequestAdmin`, `dapPracticeOnboarding`, `dapPracticeOnboardingActions`, `dapProviderParticipation`, `dapOfferTerms`, `dapOfferTermsReview`, `dapPublishingPipeline`, `dapCmsExport` | Network/DB calls; cannot move without splitting data access layer |
+| Dashboard / view-model composition | `dapBuildLedger`, `dapClaimQA`, `dapCityData`, `dapAdminWorkflowFixtures`, `source/` | CBCC admin view composition |
+| Mock / simulation | `mockData`, `simulationStates`, `dapAdminWorkflowFixtures` | CBCC test infrastructure |
+
+### Boundary invariant
+
+`lib/dap/**` must never import from `lib/cb-control-center/**`.
+`lib/cb-control-center/**` may import from `lib/dap/**`.
+Direction is one-way.
+
+### Freeze rule
+
+**No future DAP-named file moves are allowed unless a new product requirement proves the file is DAP-owned and independent of CBCC workflows.**
+
+A DAP-named file stays in `lib/cb-control-center/` when it answers any of:
+- What can the CBCC operator click, approve, reject, review, simulate, or dispatch?
+- What stage gate is active or what brief should be generated?
+- What Supabase/runtime orchestration is needed for CBCC workflows?
+- What communication pipeline or dispatch readiness should be evaluated?
+
+Moving a file "because it starts with `dap`" is not a valid reason.
+
+### Validation (Wave 5C baseline)
+
+- `pnpm typecheck` — clean
+- `pnpm test` — 6260 pass, 1 skipped, 105 files
+- `pnpm lint` — 0 errors, 50 warnings (baseline)
+
+DAP/CBCC migration is frozen. Next work shifts to product: member status page, rejection emails, admin UX polish, MKCRM shadow-mode webhooks, or DAP public-site rebuild.
+
 
 
