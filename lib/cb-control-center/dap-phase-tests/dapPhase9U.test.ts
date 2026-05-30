@@ -50,7 +50,7 @@ describe('Phase 9U — Page exists', () => {
   })
 
   it('total page count is now 23', () => {
-    expect(findPages(join(ROOT, 'app')).length).toBe(58)
+    expect(findPages(join(ROOT, 'app')).length).toBe(64)
   })
 })
 
@@ -264,7 +264,7 @@ describe('Phase 9U — CTA inactive state', () => {
 
 describe('Phase 9U — Full suite guard', () => {
   it('page count is 23 (all prior pages preserved)', () => {
-    expect(findPages(join(ROOT, 'app')).length).toBe(58)
+    expect(findPages(join(ROOT, 'app')).length).toBe(64)
   })
 
   it('Phase 9T preview helper still returns 8 previews', () => {

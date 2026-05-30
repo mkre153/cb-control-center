@@ -206,9 +206,17 @@ describe('Current production route inventory', () => {
     'app/projects/[slug]/charter/page.tsx',
     // CBCC v2 stage detail route
     'app/projects/[slug]/stages/[stageNumber]/page.tsx',
+    // Content Engine business routes
+    'app/businesses/content-engine/page.tsx',
+    'app/businesses/content-engine/build/page.tsx',
+    // Channel Intelligence Platform — operator dashboard over PRC tables
+    'app/platform/page.tsx',
+    'app/platform/channels/[id]/page.tsx',
+    'app/platform/agents/page.tsx',
+    'app/platform/agents/[id]/page.tsx',
   ]
 
-  it('exactly 58 page.tsx files in app/ (CBCC v2 added stage detail route)', () => {
+  it('exactly 60 page.tsx files in app/ (content-engine added 2 routes)', () => {
     const found = findFiles(join(ROOT, 'app'), f => f.endsWith('page.tsx'))
     expect(found.length).toBe(KNOWN_ROUTES.length)
   })
@@ -242,6 +250,8 @@ describe('API route inventory (Phase 9C added POST /api/dap/requests)', () => {
     const KNOWN_ROUTES = [
       'app/api/dap/requests/route.ts',
       'app/api/businesses/dental-advantage-plan/stages/review/route.ts',
+      'app/api/businesses/dental-advantage-plan/stages/4/generate/route.ts',
+      'app/api/businesses/dental-advantage-plan/stages/5/generate/route.ts',
       'app/api/cbcc/chat/route.ts',
     ]
     const unexpected = routes.filter(r => !KNOWN_ROUTES.some(k => r.endsWith(k)))

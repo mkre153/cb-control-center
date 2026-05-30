@@ -491,7 +491,7 @@ describe('Phase 9N boundary — system boundary definitions still hold', () => {
       }
       return results
     }
-    expect(findPages(join(ROOT, 'app')).length).toBe(58)
+    expect(findPages(join(ROOT, 'app')).length).toBe(64)
   })
 
   it('no ClientBuilder billing API route created in Phase 9O', () => {

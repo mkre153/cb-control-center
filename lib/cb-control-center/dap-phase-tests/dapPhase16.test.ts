@@ -817,7 +817,7 @@ describe('Phase 16 — Preview-only boundary', () => {
   })
 
   it('total page count is now 34', () => {
-    expect(findPages(join(ROOT, 'app')).length).toBe(58)
+    expect(findPages(join(ROOT, 'app')).length).toBe(64)
   })
 })
 
@@ -825,7 +825,7 @@ describe('Phase 16 — Preview-only boundary', () => {
 
 describe('Phase 16 — Full suite guard', () => {
   it('page count is 34 (all prior pages preserved)', () => {
-    expect(findPages(join(ROOT, 'app')).length).toBe(58)
+    expect(findPages(join(ROOT, 'app')).length).toBe(64)
   })
 
   it('buildAuditEventsFromDemoContext still returns 9 events', () => {

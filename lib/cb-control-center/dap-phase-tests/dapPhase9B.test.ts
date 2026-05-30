@@ -96,6 +96,8 @@ describe('Production route allowlist', () => {
     const KNOWN_ROUTES = [
       'app/api/dap/requests/route.ts',
       'app/api/businesses/dental-advantage-plan/stages/review/route.ts',
+      'app/api/businesses/dental-advantage-plan/stages/4/generate/route.ts',
+      'app/api/businesses/dental-advantage-plan/stages/5/generate/route.ts',
       'app/api/cbcc/chat/route.ts',
     ]
     const unexpected = routeFiles.filter(r => !KNOWN_ROUTES.some(k => r.endsWith(k)))
@@ -457,6 +459,8 @@ describe('Boundary preservation', () => {
       'supabase/migrations/20260430000002_dap_communication_dry_run_events.sql',
       'supabase/migrations/20260430000003_dap_admin_decision_events.sql',
       'supabase/migrations/20260501010000_cbcc_projects.sql',
+      'supabase/migrations/20260504000000_cbcc_stage_count_8.sql',
+      'supabase/migrations/20260504000001_cbcc_stage_count_9.sql',
     ]
     const unexpected = sqlFiles.filter(f => !KNOWN_MIGRATIONS.some(k => f.endsWith(k)))
     expect(unexpected).toHaveLength(0)
@@ -467,6 +471,8 @@ describe('Boundary preservation', () => {
     const KNOWN_ROUTES = [
       'app/api/dap/requests/route.ts',
       'app/api/businesses/dental-advantage-plan/stages/review/route.ts',
+      'app/api/businesses/dental-advantage-plan/stages/4/generate/route.ts',
+      'app/api/businesses/dental-advantage-plan/stages/5/generate/route.ts',
       'app/api/cbcc/chat/route.ts',
     ]
     const unexpected = routeFiles.filter(r => !KNOWN_ROUTES.some(k => r.endsWith(k)))

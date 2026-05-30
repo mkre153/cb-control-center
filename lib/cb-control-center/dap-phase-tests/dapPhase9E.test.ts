@@ -253,8 +253,8 @@ describe('Page count is now 15 (Phase 9E added 2 new preview pages)', () => {
   it('no new production routes added in Phase 9E', () => {
     const pages = findPages(join(ROOT, 'app'))
     const productionPages = pages.filter(p => !p.includes('/preview/') && !p.includes('/api/'))
-    // 14 DAP/content + 3 businesses (Phase 17B) + 1 compare (Phase 18A) + 1 stage detail (Phase 19C) + 5 CBCC v2 projects (incl. stage detail)
-    expect(productionPages.length).toBeLessThanOrEqual(24)
+    // 14 DAP/content + 3 businesses (Phase 17B) + 1 compare (Phase 18A) + 1 stage detail (Phase 19C) + 5 CBCC v2 projects (incl. stage detail) + 2 content-engine + 2 channel-intelligence platform
+    expect(productionPages.length).toBeLessThanOrEqual(30)
   })
 })
 

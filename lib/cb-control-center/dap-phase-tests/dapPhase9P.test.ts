@@ -524,6 +524,6 @@ describe('Outbox does not mutate standing — wouldUpdateStoredStanding is alway
       }
       return results
     }
-    expect(findPages(join(ROOT, 'app')).length).toBe(58)
+    expect(findPages(join(ROOT, 'app')).length).toBe(64)
   })
 })

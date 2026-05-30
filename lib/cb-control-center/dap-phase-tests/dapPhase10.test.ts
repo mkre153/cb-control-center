@@ -529,7 +529,7 @@ describe('Phase 10 — member status preview page', () => {
   })
 
   it('page count is now 26 (Phase 10 added member-status dynamic route)', () => {
-    expect(findPages(join(ROOT, 'app')).length).toBe(58)
+    expect(findPages(join(ROOT, 'app')).length).toBe(64)
   })
 })
 
@@ -546,9 +546,9 @@ describe('Phase 10 — prior phase contracts still hold', () => {
     )).toBe(true)
   })
 
-  it('10 known migrations still exist (CBCC v2 added cbcc_projects)', () => {
+  it('12 known migrations still exist (Stage 4 insertion added cbcc_stage_count_9)', () => {
     const dir   = resolve(ROOT, 'supabase/migrations')
     const files = readdirSync(dir).filter((f: string) => f.endsWith('.sql'))
-    expect(files).toHaveLength(10)
+    expect(files).toHaveLength(12)
   })
 })
