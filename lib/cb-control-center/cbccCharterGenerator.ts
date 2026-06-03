@@ -53,7 +53,7 @@ export async function generateProjectCharter(
 
   try {
     const message = await client.messages.create({
-      model: 'claude-opus-4-7',
+      model: 'claude-sonnet-4-6',
       max_tokens: 4096,
       messages: [{ role: 'user', content: userPrompt }],
       system: SYSTEM_PROMPT,

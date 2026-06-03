@@ -220,7 +220,7 @@ export async function saveCharter(projectId: string, charter: ProjectCharter): P
     .update({
       charter_json: charter,
       charter_generated_at: new Date().toISOString(),
-      charter_model: 'claude-opus-4-7',
+      charter_model: 'claude-sonnet-4-6',
       project_status: 'step_0_charter_ready',
       updated_at: new Date().toISOString(),
     })
