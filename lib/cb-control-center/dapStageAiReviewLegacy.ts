@@ -99,7 +99,7 @@ export function legacyReviewToEngineRaw(
     summary,
     recommendation: { action, rationale },
     risks,
-    model: options.model ?? 'claude-opus-4-7',
+    model: options.model ?? 'claude-sonnet-4-6',
     promptVersion: options.promptVersion,
   }
 }

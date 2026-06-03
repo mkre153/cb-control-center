@@ -570,7 +570,7 @@ export async function POST(req: NextRequest) {
     ? await buildDapPrompt(messages)
     : await buildProjectPrompt(projectSlug, messages)
 
-  const child = spawn(CLAUDE_BIN, ['-p', prompt, '--model', 'claude-opus-4-7'], {
+  const child = spawn(CLAUDE_BIN, ['-p', prompt, '--model', 'claude-sonnet-4-6'], {
     env: { ...process.env, PATH: `/Users/mike/.local/bin:${process.env.PATH ?? ''}` },
   })
 

@@ -53,7 +53,7 @@ export async function reviewStage(stage: DapStageGate): Promise<StageAiReview> {
   return new Promise(resolve => {
     const child = spawn(
       CLAUDE_BIN,
-      ['-p', combinedPrompt, '--model', 'claude-opus-4-7'],
+      ['-p', combinedPrompt, '--model', 'claude-sonnet-4-6'],
       { env: { ...process.env, PATH: `/Users/mike/.local/bin:${process.env.PATH ?? ''}` } },
     )
 
